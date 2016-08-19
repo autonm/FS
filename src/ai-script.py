@@ -52,30 +52,82 @@ class Region:
                             # find the control piece
                             if piece['name'].endswith('Control)'):
                                 self.control = piece['name'][piece['name'].find(' (')+2:-8] + ' Control'
-        
-        self.aedui_warband = theaedui_warband
-        self.aedui_tribe = theaedui_tribe
-        self.aedui_citadel = theaedui_citadel
-        self.arverni_leader = thearverni_leader
-        self.arverni_warband = thearverni_warband
-        self.arverni_tribe = thearverni_tribe
-        self.arverni_citadel = thearverni_citadel
-        self.belgic_leader = thebelgic_leader
-        self.belgic_warband = thebelgic_warband
-        self.belgic_tribe = thebelgic_tribe
-        self.belgic_citadel = thebelgic_citadel
-        self.germanic_warband = thegermanic_warband
-        self.germanic_tribe = thegermanic_tribe
-        self.roman_leader = theroman_leader
-        self.roman_auxilia = theroman_auxilia
-        self.roman_fort = theroman_fort
-        self.roman_legion = theroman_legion
-        self.roman_tribe = theroman_tribe
-        self.dispersed_gathering = thedispersed_gathering
-        self.devastated = thedevastated
-        self.max_cities = themax_cities
-        self.max_citadel = themax_citadel
-
+                            # count the aedui warbands
+                            if piece['name'] == 'Aedui Warband':
+                                self.aedui_warband += 1
+                            # count the aedui tribes (allies)
+                            if piece['name'] == 'Aedui Ally':
+                                self.aedui_tribe += 1
+                            # count the aedui citadels
+                            if piece['name'] == 'Aedui Citadel':
+                                self.aedui_citadel += 1
+                            # Averni leader
+                            if piece['name'] == ' (Vercingetorix /) (Averni Successor)':
+                                self.averni_leader = 1
+                            # count the averni warbands
+                            if piece['name'] == 'Averni Warband':
+                                self.averni_warband += 1
+                            # count the averni tribes (allies)
+                            if piece['name'] == 'Averni Ally':
+                                self.averni_tribe += 1
+                            # count the averni citadels
+                            if piece['name'] == 'Averni Citadel':
+                                self.averni_citadel += 1
+                            # Belgic leader
+                            if piece['name'] == ' (Ambiorix /) (Belgic Successor)':
+                                self.belgic_leader = 1
+                            # count the belgic warbands
+                            if piece['name'] == 'Belgic Warband':
+                                self.belgic_warband += 1
+                            # count the belgic tribes (allies)
+                            if piece['name'] == 'Belgic Ally':
+                                self.belgic_tribe += 1
+                            # count the belgic citadels
+                            if piece['name'] == 'Belgic Citadel':
+                                self.belgic_citadel += 1
+                            # count the germanic warbands
+                            if piece['name'] == 'Germanic Warband':
+                                self.germanic_warband += 1
+                            # count the germanic tribes (allies)
+                            if piece['name'] == 'Germanic Ally':
+                                self.germanic_tribe += 1
+                            # Roman leader
+                            if piece['name'] == ' (Caesar /) (Roman Successor)':
+                                self.roman_leader = 1
+                            # count the roman auxilia
+                            if piece['name'] == 'Roman Auxilia':
+                                self.roman_auxilia += 1
+                            # count the roman tribes (allies)
+                            if piece['name'] == 'Roman Ally':
+                                self.roman_tribe += 1
+                            # count the roman fort
+                            if piece['name'] == 'Roman Fort':
+                                self.roman_fort += 1
+                            # count the roman legion
+                            if piece['name'] == 'Roman Legion':
+                                self.roman_legion += 1
+                            # count Dispersed tribes
+                            if piece['name'].endswith(' (Dispersed)') or piece['name'].endswith(' (Gathering)'):
+                                self.dispersed_gathering += 1
+                            # count Devastated
+                            if piece['name'] == 'Devastated':
+                                self.devastated += 1
+                            # count number of tribes
+                            for tribe in theapp.allySpaces:
+                                piecename = piece['name']
+                                sep = piecename.find(' (');
+                                if sep > -1:
+                                    piecename = piecename[:sep]
+                                if piecename == tribe:
+                                    self.max_cities += 1
+                            # counter number of cities (citadel)
+                            for tribe in theapp.citadelSpaces:
+                                piecename = piece['name']
+                                sep = piecename.find(' (');
+                                if sep > -1:
+                                    piecename = piecename[:sep]
+                                if piecename == tribe:
+                                    self.max_cities += 1
 
 class FY(cmd.Cmd):
     scenario = 0
@@ -135,6 +187,38 @@ class FY(cmd.Cmd):
         "UBI": "Germania (Ubii, Suebi)",
         "VEN": "Celtica (Veneti, Namnetes)"
         }
+    allySpaces = {
+        "Catuvalauni",
+        "Morini",
+        "Menapii",
+        "Nervii",
+        "Atrebates",
+        "Bellovaci",
+        "Remi",
+        "Veneti",
+        "Namnetes",
+        "Aulerci",
+        "Pictones",
+        "Santones",
+        "Cadurci",
+        "Volcae",
+        "Senones",
+        "Lingones",
+        "Helvetii",
+        "Treveri",
+        "Sugambri",
+        "Suebi North",
+        "Ubii",
+        "Suebi South"
+        }
+    citadelSpaces = {
+        "Carnutes",
+        "Bituriges",
+        "Arverni",
+        "Aedui",
+        "Mandubii",
+        "Sequani"        
+        }
     map = {}
     cards = {}
 
@@ -146,7 +230,7 @@ class FY(cmd.Cmd):
             self.map["ATR"] = Region(self, "ATR", "Atrebates")
             self.map["BIT"] = Region(self, "BIT", "Bituriges")
             self.map["CAT"] = Region(self, "CAT", "Catuvellauni")
-            self.map["GAR"] = Region(self, "GAR", "Garnutes")
+            self.map["CAR"] = Region(self, "CAR", "Carnutes")
             self.map["HEL"] = Region(self, "HEL", "Helvii")
             self.map["MAN"] = Region(self, "MAN", "Mandubii")
             self.map["MOR"] = Region(self, "MOR", "Morini")
@@ -585,7 +669,7 @@ def main():
     file = open(sys.argv[1], 'r')
     jsonstr = file.read()
     file.close()
-    
+        
     global inputdata
     inputdata = json.loads(jsonstr)
     
