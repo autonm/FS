@@ -1,0 +1,2152 @@
+{
+   "npaverni":true,
+   "winter":4,
+   "npaedui":true,
+   "npbelgic":true,
+   "nproman":true,
+   "verbose":true,
+   "action":"Aedui",
+   "offboard":[
+      {
+         "x":295,
+         "y":295,
+         "name":"59 - Germanic Horse ** Unshaded Capability **"
+      },
+      {
+         "x":846,
+         "y":3123,
+         "name":" (60 Cards Remaining in Deck)"
+      }
+   ],
+   "zones":[
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"0",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"1",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"2",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"3",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":1126,
+               "y":79,
+               "name":"Arverni Victory (4)"
+            }
+         ],
+         "name":"4",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"5",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"6",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"7",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"8",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"9",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":1746,
+               "y":80,
+               "name":"Belgic Resources (10)"
+            },
+            {
+               "x":1746,
+               "y":80,
+               "name":"Averni Resources (10)"
+            }
+         ],
+         "name":"10",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"11",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"12",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"13",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2162,
+               "y":79,
+               "name":"Roman Victory (14)"
+            }
+         ],
+         "name":"14",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2265,
+               "y":79,
+               "name":"Aedui Resources (15)"
+            },
+            {
+               "x":2265,
+               "y":79,
+               "name":"Belgic Victory (15)"
+            }
+         ],
+         "name":"15",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"16",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"17",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"18",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"19",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2781,
+               "y":79,
+               "name":"Roman Resources (20)"
+            }
+         ],
+         "name":"20",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"21",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"22",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"23",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"24",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"25",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"26",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"27",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"28",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"29",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"30",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"31",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"32",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"33",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"34",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"35",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"36",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"37",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"38",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"39",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"40",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"41",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"42",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"43",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"44",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"45",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"Fallen Legions",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"Senate - Uproar",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":3470,
+               "y":2057,
+               "name":"Roman Senate"
+            }
+         ],
+         "name":"Senate - Intrigue",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"Senate - Adulation",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":3789,
+               "y":2211,
+               "name":"Roman Legion"
+            },
+            {
+               "x":3722,
+               "y":2211,
+               "name":"Roman Legion"
+            },
+            {
+               "x":3589,
+               "y":2211,
+               "name":"Roman Legion"
+            },
+            {
+               "x":3655,
+               "y":2211,
+               "name":"Roman Legion"
+            }
+         ],
+         "name":"Legions",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":1418,
+               "y":227,
+               "name":"Catuvalauni"
+            },
+            {
+               "x":1695,
+               "y":208,
+               "name":"Pop Button"
+            },
+            {
+               "x":1695,
+               "y":308,
+               "name":"1 Pop (AeduiControl)"
+            }
+         ],
+         "name":"Britannia",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2352,
+               "y":365,
+               "name":"2 Pop (GermanControl)"
+            },
+            {
+               "x":2527,
+               "y":213,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":2228,
+               "y":524,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2167,
+               "y":383,
+               "name":"Morini"
+            },
+            {
+               "x":2527,
+               "y":213,
+               "name":"Menapii"
+            },
+            {
+               "x":2301,
+               "y":528,
+               "name":"Roman Legion"
+            },
+            {
+               "x":2353,
+               "y":265,
+               "name":"Pop Button"
+            },
+            {
+               "x":2167,
+               "y":383,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":2238,
+               "y":305,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":2191,
+               "y":305,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":2142,
+               "y":305,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":2285,
+               "y":304,
+               "name":"Belgic Warband"
+            }
+         ],
+         "name":"Belgica (Morini, Menapii)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2651,
+               "y":485,
+               "name":"Roman Legion"
+            },
+            {
+               "x":2873,
+               "y":402,
+               "name":"2 Pop (GermanControl)"
+            },
+            {
+               "x":2554,
+               "y":511,
+               "name":"Roman Fort"
+            },
+            {
+               "x":2650,
+               "y":554,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2698,
+               "y":554,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2873,
+               "y":302,
+               "name":"Pop Button"
+            },
+            {
+               "x":3185,
+               "y":435,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":3076,
+               "y":293,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":3076,
+               "y":293,
+               "name":"Eburones"
+            },
+            {
+               "x":2675,
+               "y":381,
+               "name":"Nervii"
+            },
+            {
+               "x":2710,
+               "y":481,
+               "name":"Roman Legion"
+            },
+            {
+               "x":2920,
+               "y":408,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":3067,
+               "y":414,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":3015,
+               "y":410,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":2968,
+               "y":408,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":2980,
+               "y":284,
+               "name":"Ambiorix"
+            },
+            {
+               "x":2675,
+               "y":381,
+               "name":"Belgic Ally"
+            }
+         ],
+         "name":"Belgica (Nervii)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2266,
+               "y":723,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":2458,
+               "y":705,
+               "name":"Pop Button"
+            },
+            {
+               "x":2651,
+               "y":758,
+               "name":"Remi"
+            },
+            {
+               "x":2457,
+               "y":805,
+               "name":"3 Pop (GermanControl)"
+            },
+            {
+               "x":2266,
+               "y":723,
+               "name":"Bellovaci"
+            },
+            {
+               "x":2651,
+               "y":758,
+               "name":"Germanic Ally"
+            },
+            {
+               "x":2571,
+               "y":761,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2012,
+               "y":731,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":2101,
+               "y":722,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":2150,
+               "y":727,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":2073,
+               "y":593,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":2073,
+               "y":593,
+               "name":"Atrebates"
+            }
+         ],
+         "name":"Belcica (Atrebates, Bellovaci, Remi)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":931,
+               "y":1127,
+               "name":"Veneti"
+            },
+            {
+               "x":1426,
+               "y":1187,
+               "name":"2 Pop (AeduiControl)"
+            },
+            {
+               "x":1199,
+               "y":1188,
+               "name":"Namnetes"
+            },
+            {
+               "x":1424,
+               "y":1086,
+               "name":"Pop Button"
+            }
+         ],
+         "name":"Celtica (Veneti, Namnetes)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":1965,
+               "y":1151,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":1918,
+               "y":1154,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":1821,
+               "y":1151,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":1870,
+               "y":1154,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":2065,
+               "y":1164,
+               "name":"2 Pop (BelgicControl)"
+            },
+            {
+               "x":1784,
+               "y":1260,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":2065,
+               "y":1064,
+               "name":"Pop Button"
+            },
+            {
+               "x":1848,
+               "y":1022,
+               "name":"Aulerci"
+            },
+            {
+               "x":1784,
+               "y":1260,
+               "name":"Carnutes"
+            }
+         ],
+         "name":"Celtica (Aulerci, Carnutes)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":1338,
+               "y":1576,
+               "name":"Pictones"
+            },
+            {
+               "x":1746,
+               "y":1773,
+               "name":"2 Pop (AeduiControl)"
+            },
+            {
+               "x":1515,
+               "y":1748,
+               "name":"Santones"
+            },
+            {
+               "x":1746,
+               "y":1673,
+               "name":"Pop Button"
+            }
+         ],
+         "name":"Celctica (Pictones, Santones)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2112,
+               "y":1436,
+               "name":"Bituriges"
+            },
+            {
+               "x":2055,
+               "y":1475,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":2245,
+               "y":1739,
+               "name":"1 Pop (AverniControl)"
+            },
+            {
+               "x":1948,
+               "y":1472,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":2001,
+               "y":1474,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":2112,
+               "y":1436,
+               "name":"Aedui Ally"
+            },
+            {
+               "x":2246,
+               "y":1638,
+               "name":"Pop Button"
+            }
+         ],
+         "name":"Celtica (Bituriges)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2332,
+               "y":2165,
+               "name":"Vercingetorix"
+            },
+            {
+               "x":2393,
+               "y":2258,
+               "name":"Pop Button"
+            },
+            {
+               "x":1893,
+               "y":2406,
+               "name":"Volcae"
+            },
+            {
+               "x":2146,
+               "y":2205,
+               "name":"Cadurci"
+            },
+            {
+               "x":2392,
+               "y":2358,
+               "name":"3 Pop (BelgicControl)"
+            },
+            {
+               "x":2414,
+               "y":1978,
+               "name":"Arverni"
+            },
+            {
+               "x":2414,
+               "y":1978,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":2274,
+               "y":2002,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":2220,
+               "y":2001,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":2244,
+               "y":2071,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":2262,
+               "y":2141,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":2297,
+               "y":2071,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":2327,
+               "y":2002,
+               "name":"Arverni Warband"
+            }
+         ],
+         "name":"Celtica (Arverni, Cadurci, Volcae)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2719,
+               "y":1745,
+               "name":"Pop Button"
+            },
+            {
+               "x":2719,
+               "y":1844,
+               "name":"1 Pop (AverniControl)"
+            },
+            {
+               "x":2680,
+               "y":1592,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":2519,
+               "y":1588,
+               "name":"Aedui"
+            },
+            {
+               "x":2631,
+               "y":1591,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":2727,
+               "y":1592,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":2519,
+               "y":1588,
+               "name":"Aedui Citadel"
+            }
+         ],
+         "name":"Celctica (Aedui)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2741,
+               "y":1144,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":2638,
+               "y":1144,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":2691,
+               "y":1144,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":2655,
+               "y":1355,
+               "name":"3 Pop (AeduiControl)"
+            },
+            {
+               "x":2655,
+               "y":1254,
+               "name":"Pop Button"
+            },
+            {
+               "x":2783,
+               "y":1197,
+               "name":"Aedui Ally"
+            },
+            {
+               "x":2325,
+               "y":1095,
+               "name":"Senones"
+            },
+            {
+               "x":2325,
+               "y":1095,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":2284,
+               "y":1222,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":2381,
+               "y":1221,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":2332,
+               "y":1221,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":2507,
+               "y":1156,
+               "name":"Mandubii"
+            },
+            {
+               "x":2783,
+               "y":1197,
+               "name":"Lingones"
+            }
+         ],
+         "name":"Celtica (Senones, Mandubii, Lingones)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":3403,
+               "y":1492,
+               "name":"Helvetii"
+            },
+            {
+               "x":3042,
+               "y":1491,
+               "name":"Sequani"
+            },
+            {
+               "x":3227,
+               "y":1465,
+               "name":"Pop Button"
+            },
+            {
+               "x":3228,
+               "y":1566,
+               "name":"2 Pop (AeduiControl)"
+            }
+         ],
+         "name":"Celtica (Sequani, Helvetii)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":3187,
+               "y":841,
+               "name":"Pop Button"
+            },
+            {
+               "x":3061,
+               "y":683,
+               "name":"Treveri"
+            },
+            {
+               "x":3118,
+               "y":1018,
+               "name":"Roman Legion"
+            },
+            {
+               "x":2990,
+               "y":900,
+               "name":"Roman Fort"
+            },
+            {
+               "x":3015,
+               "y":1015,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":3064,
+               "y":1015,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":3288,
+               "y":648,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":3240,
+               "y":648,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":3145,
+               "y":650,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":3192,
+               "y":650,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":3187,
+               "y":941,
+               "name":"1 Pop (GermanControl)"
+            },
+            {
+               "x":3061,
+               "y":683,
+               "name":"Belgic Ally"
+            }
+         ],
+         "name":"Celtica (Treveri)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":3330,
+               "y":216,
+               "name":"Germanic Ally"
+            },
+            {
+               "x":3471,
+               "y":286,
+               "name":"Pop Button"
+            },
+            {
+               "x":3472,
+               "y":386,
+               "name":"1 Pop (RomanControl)"
+            },
+            {
+               "x":3713,
+               "y":343,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":3664,
+               "y":347,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":3575,
+               "y":400,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":3611,
+               "y":344,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":3330,
+               "y":216,
+               "name":"Sugambri"
+            },
+            {
+               "x":3622,
+               "y":216,
+               "name":"Germanic Ally"
+            },
+            {
+               "x":3622,
+               "y":216,
+               "name":"Suebi North"
+            }
+         ],
+         "name":"Germania (Sugambri, Suebi)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":3640,
+               "y":948,
+               "name":"Pop Button"
+            },
+            {
+               "x":3657,
+               "y":765,
+               "name":"Ubii"
+            },
+            {
+               "x":3640,
+               "y":1048,
+               "name":"1 Pop (RomanControl)"
+            },
+            {
+               "x":3601,
+               "y":1259,
+               "name":"Suebi South"
+            },
+            {
+               "x":3652,
+               "y":1177,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":3602,
+               "y":1172,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":3550,
+               "y":1175,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":3707,
+               "y":1182,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":3601,
+               "y":1259,
+               "name":"Germanic Ally"
+            }
+         ],
+         "name":"Germania (Ubii, Suebi)",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":705,
+               "y":1993,
+               "name":"Belgic Eligibility"
+            },
+            {
+               "x":705,
+               "y":2089,
+               "name":"Averni Eligibility"
+            }
+         ],
+         "name":"Eligible Factions",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"Pass",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":995,
+               "y":1930,
+               "name":"Roman Eligibility"
+            }
+         ],
+         "name":"1st Faction Command Only",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"1st Faction Command + Special Ability",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"1st Faction Event",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"2nd Faction Limited Command",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"2nd Faction Event or Limited Command",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"2nd Faction Command May Add Special Activity",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":1420,
+               "y":2065,
+               "name":"Aedui Eligibility"
+            }
+         ],
+         "name":"Ineligible Factions",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":2837,
+               "y":2421,
+               "name":"Roman Legion"
+            },
+            {
+               "x":2919,
+               "y":2350,
+               "name":"Pop Button"
+            },
+            {
+               "x":2780,
+               "y":2422,
+               "name":"Roman Legion"
+            },
+            {
+               "x":2884,
+               "y":2258,
+               "name":"Caesar"
+            },
+            {
+               "x":2658,
+               "y":2448,
+               "name":"Roman Fort"
+            },
+            {
+               "x":2774,
+               "y":2051,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2821,
+               "y":2122,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2875,
+               "y":2051,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2827,
+               "y":2050,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2770,
+               "y":2122,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2722,
+               "y":2121,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":2807,
+               "y":2355,
+               "name":"Roman Legion"
+            },
+            {
+               "x":2752,
+               "y":2372,
+               "name":"Roman Legion"
+            },
+            {
+               "x":2919,
+               "y":2450,
+               "name":"1 Pop (NoControl)"
+            },
+            {
+               "x":2784,
+               "y":2252,
+               "name":"Helvii"
+            }
+         ],
+         "name":"Provincia",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[],
+         "name":"Senate",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":710,
+               "y":2460,
+               "name":"Winter"
+            }
+         ],
+         "name":"Map",
+         "x":600
+      },
+      {
+         "y":2550,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":1269,
+               "y":2807,
+               "name":"60 - Indutiomarus"
+            }
+         ],
+         "name":"Upcoming",
+         "x":600
+      },
+      {
+         "y":2550,
+         "map":"Main Map",
+         "pieces":[
+            {
+               "x":1695,
+               "y":2808,
+               "name":"55 - Commius"
+            }
+         ],
+         "name":"Current",
+         "x":600
+      },
+      {
+         "y":0,
+         "map":"Aedui Confederation Available Forces",
+         "pieces":[
+            {
+               "x":186,
+               "y":310,
+               "name":" (11 Warbands)"
+            },
+            {
+               "x":238,
+               "y":84,
+               "name":"Aedui Resources +"
+            },
+            {
+               "x":960,
+               "y":691,
+               "name":"Other Most Allies"
+            },
+            {
+               "x":1103,
+               "y":506,
+               "name":"Aedui Citadel"
+            },
+            {
+               "x":944,
+               "y":456,
+               "name":"Aedui Citadel"
+            },
+            {
+               "x":792,
+               "y":512,
+               "name":"Aedui Ally"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Aedui Warband"
+            },
+            {
+               "x":260,
+               "y":512,
+               "name":"Aedui Ally"
+            },
+            {
+               "x":395,
+               "y":512,
+               "name":"Aedui Ally"
+            },
+            {
+               "x":526,
+               "y":512,
+               "name":"Aedui Ally"
+            },
+            {
+               "x":658,
+               "y":512,
+               "name":"Aedui Ally"
+            },
+            {
+               "x":127,
+               "y":512,
+               "name":"Aedui Ally"
+            },
+            {
+               "x":88,
+               "y":84,
+               "name":"Aedui Resources -"
+            },
+            {
+               "x":163,
+               "y":134,
+               "name":"Aedui Resources Label (Resources)"
+            },
+            {
+               "x":163,
+               "y":84,
+               "name":"Aedui Resources Label (15)"
+            }
+         ],
+         "name":"Aedui Available Forces",
+         "x":0
+      },
+      {
+         "y":0,
+         "map":"Averni Confederation Available Forces",
+         "pieces":[
+            {
+               "x":186,
+               "y":310,
+               "name":" (22 Warbands)"
+            },
+            {
+               "x":163,
+               "y":84,
+               "name":"Aedui Resources Label (10)"
+            },
+            {
+               "x":238,
+               "y":84,
+               "name":"Averni Resources +"
+            },
+            {
+               "x":88,
+               "y":84,
+               "name":"Averni Resources -"
+            },
+            {
+               "x":436,
+               "y":320,
+               "name":" (Vercingetorix /) (Averni Successor)"
+            },
+            {
+               "x":163,
+               "y":134,
+               "name":"Aedui Resources Label (Resources)"
+            },
+            {
+               "x":130,
+               "y":691,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":260,
+               "y":691,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":526,
+               "y":558,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":658,
+               "y":558,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":395,
+               "y":558,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":964,
+               "y":575,
+               "name":"Arverni Citadel"
+            },
+            {
+               "x":825,
+               "y":653,
+               "name":"Arverni Citadel"
+            },
+            {
+               "x":658,
+               "y":691,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":526,
+               "y":691,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":395,
+               "y":691,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":260,
+               "y":558,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":130,
+               "y":558,
+               "name":"Arverni Ally"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":1104,
+               "y":652,
+               "name":"Arverni Citadel"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Arverni Warband"
+            }
+         ],
+         "name":"Arverni Available Forces",
+         "x":0
+      },
+      {
+         "y":0,
+         "map":"Belgic Tribes Available Forces",
+         "pieces":[
+            {
+               "x":713,
+               "y":558,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":574,
+               "y":558,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":432,
+               "y":558,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":294,
+               "y":558,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":852,
+               "y":558,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":432,
+               "y":691,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":294,
+               "y":691,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":713,
+               "y":691,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":574,
+               "y":691,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":852,
+               "y":691,
+               "name":"Belgic Ally"
+            },
+            {
+               "x":1056,
+               "y":621,
+               "name":"Belgic Citadel"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Belgic Warband"
+            },
+            {
+               "x":186,
+               "y":310,
+               "name":" (10 Warbands)"
+            },
+            {
+               "x":436,
+               "y":320,
+               "name":" (Ambiorix /) (Belgic Successor)"
+            },
+            {
+               "x":88,
+               "y":84,
+               "name":"Belgic Resources -"
+            },
+            {
+               "x":238,
+               "y":84,
+               "name":"Belgic Resources +"
+            },
+            {
+               "x":163,
+               "y":134,
+               "name":"Resources Label (Resources)"
+            },
+            {
+               "x":163,
+               "y":84,
+               "name":"Aedui Resources Label (10)"
+            }
+         ],
+         "name":"Belgic Available Forces",
+         "x":0
+      },
+      {
+         "y":0,
+         "map":"Germanic Tribes Available Forces",
+         "pieces":[
+            {
+               "x":186,
+               "y":310,
+               "name":" (6 Warbands)"
+            },
+            {
+               "x":314,
+               "y":675,
+               "name":"Germanic Ally"
+            },
+            {
+               "x":447,
+               "y":675,
+               "name":"Germanic Ally"
+            },
+            {
+               "x":579,
+               "y":675,
+               "name":"Germanic Ally"
+            },
+            {
+               "x":710,
+               "y":675,
+               "name":"Germanic Ally"
+            },
+            {
+               "x":844,
+               "y":675,
+               "name":"Germanic Ally"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":973,
+               "y":675,
+               "name":"Germanic Ally"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Germanic Warband"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Germanic Warband"
+            }
+         ],
+         "name":"Germanic Available Forces",
+         "x":0
+      },
+      {
+         "y":0,
+         "map":"Roman Republic Available Forces",
+         "pieces":[
+            {
+               "x":88,
+               "y":84,
+               "name":"Roman Resources -"
+            },
+            {
+               "x":163,
+               "y":84,
+               "name":"Aedui Resources Label (20)"
+            },
+            {
+               "x":686,
+               "y":340,
+               "name":" (3 Forts)"
+            },
+            {
+               "x":238,
+               "y":84,
+               "name":"Roman Resources +"
+            },
+            {
+               "x":686,
+               "y":240,
+               "name":"Roman Fort"
+            },
+            {
+               "x":686,
+               "y":240,
+               "name":"Roman Fort"
+            },
+            {
+               "x":686,
+               "y":240,
+               "name":"Roman Fort"
+            },
+            {
+               "x":436,
+               "y":320,
+               "name":" (Caesar /) (Roman Successor)"
+            },
+            {
+               "x":186,
+               "y":310,
+               "name":" (8 Auxilia)"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":837,
+               "y":690,
+               "name":"Roman Ally"
+            },
+            {
+               "x":970,
+               "y":690,
+               "name":"Roman Ally"
+            },
+            {
+               "x":705,
+               "y":690,
+               "name":"Roman Ally"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":186,
+               "y":240,
+               "name":"Roman Auxilia"
+            },
+            {
+               "x":441,
+               "y":690,
+               "name":"Roman Ally"
+            },
+            {
+               "x":309,
+               "y":690,
+               "name":"Roman Ally"
+            },
+            {
+               "x":574,
+               "y":690,
+               "name":"Roman Ally"
+            },
+            {
+               "x":163,
+               "y":134,
+               "name":"Resources Label (Resources)"
+            }
+         ],
+         "name":"Roman Available Forces",
+         "x":0
+      }
+   ]
+}
