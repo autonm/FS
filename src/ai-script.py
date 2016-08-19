@@ -249,19 +249,11 @@ class FY(cmd.Cmd):
             print "map, available                            -"
             print "aedui, arverni, belgic, germanic, roman   -"
             print "aedui_flow                                -"
-            self.prompt = "Command: "
-
-    def postcmd(self, stop, line):
-        if line == "quit":
-            return True
-
-    def help_quit(self):
-        print "Quits game."
-
-    def emptyline(self):
-        print ""
-        print 'Year: %s' % self.currentyear
-        print 'Enter help for a list of commands.'
+            print ""
+            
+            for country in self.map:
+                print country
+                self.do_status(country)
 
     def do_status(self, rest):
 
