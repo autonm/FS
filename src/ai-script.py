@@ -1,13 +1,16 @@
 import cmd
 import sys
 import json
+import string
 
 RELEASE = "0.14082016x"
 
 
 class Region:
     app = None
+    key = ""
     name = ""
+    modname = ""
     control = ""
     aedui_warband = 0
     aedui_tribe = 0
@@ -32,10 +35,24 @@ class Region:
     max_cities = 0
     max_citadel = 0
 
-    def __init__(self, theapp, thename, thecontrol, theaedui_warband, theaedui_tribe, theaedui_citadel, thearverni_leader, thearverni_warband, thearverni_tribe, thearverni_citadel, thebelgic_leader, thebelgic_warband, thebelgic_tribe, thebelgic_citadel, thegermanic_warband, thegermanic_tribe, theroman_leader, theroman_fort, theroman_auxilia, theroman_legion, theroman_tribe, thedispersed_gathering, thedevastated, themax_cities, themax_citadel):
+    def __init__(self, theapp, thekey, thename):
         self.app = theapp
+        self.key = thekey
         self.name = thename
-        self.control = thecontrol
+
+        # name of this region in the json data        
+        self.modname = theapp.mapIndex[thekey]
+        
+        # find zone for region in inputdata
+        for element, data in inputdata.items():
+            if element == 'zones':
+                for zone in data:
+                    if zone['name'] == self.modname:
+                        for piece in zone['pieces']:
+                            # find the control piece
+                            if piece['name'].endswith('Control)'):
+                                self.control = piece['name'][piece['name'].find(' (')+2:-8] + ' Control'
+        
         self.aedui_warband = theaedui_warband
         self.aedui_tribe = theaedui_tribe
         self.aedui_citadel = theaedui_citadel
@@ -100,15 +117,47 @@ class FY(cmd.Cmd):
 
     bRally = False
 
+    mapIndex = {
+        "AED": "Celctica (Aedui)",
+        "ARV": "Celtica (Arverni, Cadurci, Volcae)",
+        "ATR": "Belcica (Atrebates, Bellovaci, Remi)",
+        "BIT": "Celtica (Bituriges)",
+        "CAT": "Britannia",
+        "CAR": "Celtica (Aulerci, Carnutes)",
+        "HEL": "Provincia",
+        "MAN": "Celtica (Senones, Mandubii, Lingones)",
+        "MOR": "Belgica (Morini, Menapii)",
+        "NER": "Belgica (Nervii)",
+        "PIC": "Celctica (Pictones, Santones)",
+        "SEQ": "Celtica (Sequani, Helvetii)",
+        "SUG": "Germania (Sugambri, Suebi)",
+        "TRE": "Celtica (Treveri)",
+        "UBI": "Germania (Ubii, Suebi)",
+        "VEN": "Celtica (Veneti, Namnetes)"
+        }
     map = {}
     cards = {}
 
-    def __init__(self, thescenario):
+    def __init__(self):
             cmd.Cmd.__init__(self)
-            self.scenario = thescenario
-            self.scenariosetup()
-            self.map = {}
-            self.mapsetup()
+            
+            self.map["AED"] = Region(self, "AED", "Aedui")
+            self.map["ARV"] = Region(self, "ARV", "Arverni")
+            self.map["ATR"] = Region(self, "ATR", "Atrebates")
+            self.map["BIT"] = Region(self, "BIT", "Bituriges")
+            self.map["CAT"] = Region(self, "CAT", "Catuvellauni")
+            self.map["GAR"] = Region(self, "GAR", "Garnutes")
+            self.map["HEL"] = Region(self, "HEL", "Helvii")
+            self.map["MAN"] = Region(self, "MAN", "Mandubii")
+            self.map["MOR"] = Region(self, "MOR", "Morini")
+            self.map["NER"] = Region(self, "NER", "Nervii")
+            self.map["PIC"] = Region(self, "PIC", "Pictones")
+            self.map["SEQ"] = Region(self, "SEQ", "Sequani")
+            self.map["SUG"] = Region(self, "SUG", "Sugambri")
+            self.map["TRE"] = Region(self, "TRE", "Treveri")
+            self.map["UBI"] = Region(self, "UBI", "Ubii")
+            self.map["VEN"] = Region(self, "VEN", "Veneti")
+            
 
             print ""
             print "** COMMAND LIST **"
@@ -129,73 +178,6 @@ class FY(cmd.Cmd):
         print ""
         print 'Year: %s' % self.currentyear
         print 'Enter help for a list of commands.'
-
-    def scenariosetup(self):
-        print ""
-        print 'Running Scenario Setup: %s' % self.scenario
-        if self.scenario == 1:
-            self.campaign = 1
-
-        elif self.scenario == 2:
-            self.campaign = 1
-            self.yearfrom = 1234
-            self.yearto = 5678
-            self.currentyear = "53BC"
-
-            self.other_most_allies = 7
-
-            self.off_map_legions = 4
-            self.subdued_dispersed_allies = 14
-            self.control_allies = 15
-
-            self.aedui_resources = 15
-            self.arverni_resources = 10
-            self.belgic_resources = 10
-            self.germanic_resources = 0
-            self.roman_resources = 20
-
-            self.aedui_warband_available = 11
-            self.aedui_tribe_available = 4
-            self.aedui_citadel_available = 1
-            self.arverni_leader_available = 0
-            self.arverni_warband_available = 22
-            self.arverni_tribe_available = 7
-            self.arverni_citadel_available = 3
-            self.belgic_leader_available = 0
-            self.belgic_warband_available = 10
-            self.belgic_tribe_available = 3
-            self.belgic_citadel_available = 1
-            self.germanic_warband_available = 6
-            self.germanic_tribe_available = 3
-            self.roman_leader_available = 0
-            self.roman_auxilia_available = 8
-            self.roman_fort_available = 3
-            self.roman_legion_available = 4
-            self.roman_tribe_available = 5
-
-    def mapsetup(self):
-        print ""
-        print 'Running Map Setup: %s' % self.scenario
-        if self.scenario == 1:
-            self.scenario = 1
-
-        elif self.scenario == 2:
-            self.map["AED"] = Region(self, "Aedui", "Aedui Control", 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1)
-            self.map["ARV"] = Region(self, "Arverni", "Arverni Control", 0, 0, 0, 1, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1)
-            self.map["ATR"] = Region(self, "Atrebates", "Belgic Control", 0, 0, 0, 0, 0, 0, 0, 0, 3, 2, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 3, 0)
-            self.map["BIT"] = Region(self, "Bituriges", "Aedui Control", 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1)
-            self.map["CAT"] = Region(self, "Catuvellauni", "No Control", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0)
-            self.map["GAR"] = Region(self, "Garnutes", "Arverni Control", 0, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1)
-            self.map["HEL"] = Region(self, "Helvii", "Roman Control", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 6, 4, 0, 0, 0, 1, 0)
-            self.map["MAN"] = Region(self, "Mandubii", "No Control", 3, 1, 0, 0, 3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1)
-            self.map["MOR"] = Region(self, "Morini", "Belgic Control", 0, 0, 0, 0, 0, 0, 0, 0, 4, 2, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 2, 0)
-            self.map["NER"] = Region(self, "Nervii", "Belgic Control", 0, 0, 0, 0, 0, 0, 0, 1, 4, 2, 0, 1, 0, 0, 1, 2, 2, 0, 0, 0, 2, 0)
-            self.map["PIC"] = Region(self, "Pictones", "No Control", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0)
-            self.map["SEQ"] = Region(self, "Sequani", "No Control", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 1)
-            self.map["SUG"] = Region(self, "Sugambri", "German Control", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0)
-            self.map["TRE"] = Region(self, "Treveri", "Belgic Control", 0, 0, 0, 0, 0, 0, 0, 0, 4, 1, 0, 0, 0, 0, 1, 2, 1, 0, 0, 0, 1, 0)
-            self.map["UBI"] = Region(self, "Ubii", "German Control", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1, 0, 0, 0, 0, 0, 0, 0, 2, 0)
-            self.map["VEN"] = Region(self, "Veneti", "No Control", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 2, 0)
 
     def do_status(self, rest):
 
@@ -357,131 +339,6 @@ class FY(cmd.Cmd):
     def do_roman(self,rest):
         print ""
         self.roman_resources = raw_input("Roman Resources [" + str(self.roman_resources) + "] Change to [0-100] ? ")
-
-    def do_available(self, rest):
-        print ""
-        self.aedui_warband_available = raw_input("Aedui Warband Available [" + str(self.aedui_warband_available) + "] Change to [0-100] ? ")
-        self.aedui_tribe_available = raw_input("Aedui Tribe Available [" + str(self.aedui_tribe_available) + "] Change to [0-100] ? ")
-        self.aedui_citadel_available = raw_input("Aedui Citadel Available [" + str(self.aedui_citadel_available) + "] Change to [0-100] ? ")
-        self.arverni_leader_available = raw_input("Arverni Leader Available [" + str(self.arverni_leader_available) + "] Change to [0-100] ? ")
-        self.arverni_warband_available = raw_input("Roman Resources [" + str(self.arverni_warband_available) + "] Change to [0-100] ? ")
-        self.arverni_tribe_available = raw_input("Arverni Warband Available [" + str(self.arverni_tribe_available) + "] Change to [0-100] ? ")
-        self.arverni_citadel_available = raw_input("Arverni Citadel Available [" + str(self.arverni_citadel_available) + "] Change to [0-100] ? ")
-        self.belgic_leader_available = raw_input("Belgic Leader Available [" + str(self.belgic_leader_available) + "] Change to [0-100] ? ")
-        self.belgic_warband_available = raw_input("Belgic Warband Available [" + str(self.belgic_warband_available) + "] Change to [0-100] ? ")
-        self.belgic_tribe_available = raw_input("Belgic Tribe Available [" + str(self.belgic_tribe_available) + "] Change to [0-100] ? ")
-        self.belgic_citadel_available = raw_input("Belgic Citadel Available [" + str(self.belgic_citadel_available) + "] Change to [0-100] ? ")
-        self.germanic_warband_available = raw_input("Germanic Warband Available [" + str(self.germanic_warband_available) + "] Change to [0-100] ? ")
-        self.germanic_tribe_available = raw_input("Germanic Tribe Available [" + str(self.germanic_tribe_available) + "] Change to [0-100] ? ")
-        self.roman_leader_available = raw_input("Roman Leader Available [" + str(self.roman_leader_available) + "] Change to [0-100] ? ")
-        self.roman_auxilia_available = raw_input("Roman Auxilia Available [" + str(self.roman_auxilia_available) + "] Change to [0-100] ? ")
-        self.roman_fort_available = raw_input("Roman Fort Available [" + str(self.roman_fort_available) + "] Change to [0-100] ? ")
-        self.roman_legion_available = raw_input("Roman Legion Available [" + str(self.roman_legion_available) + "] Change to [0-100] ? ")
-        self.roman_tribe_available = raw_input("Roman Tribe Available [" + str(self.roman_tribe_available) + "] Change to [0-100] ? ")
-
-    def control_change_check(self):
-        print ""
-        print "Checking Control Changes...."
-        for region in self.map:
-            aedui_control = int(self.map[region].aedui_warband) + int(self.map[region].aedui_tribe) + int(self.map[region].aedui_citadel)
-            arverni_count = int(self.map[region].arverni_leader) + int(self.map[region].arverni_warband) + int(self.map[region].arverni_tribe) + int(self.map[region].arverni_citadel)
-            belgic_count = int(self.map[region].belgic_leader) + int(self.map[region].belgic_warband) + int(self.map[region].belgic_tribe) + int(self.map[region].belgic_citadel)
-            roman_count = int(self.map[region].roman_leader) + int(self.map[region].roman_auxilia) + int(self.map[region].roman_fort) + int(self.map[region].roman_legion) + int(self.map[region].roman_tribe)
-            germanic_count = int(self.map[region].aedui_warband) + int(self.map[region].aedui_tribe)
-
-            if aedui_control > arverni_count + belgic_count + roman_count + germanic_count:
-                if self.map[region].control != "Aedui Control":
-                    print "ACTION: Control changed in: %s from %s to Aedui Control" % (self.map[region].name, self.map[region].control)
-                    self.map[region].control = "Aedui Control"
-
-            if arverni_count > aedui_control + belgic_count + roman_count + germanic_count:
-                if self.map[region].control != "Arverni Control":
-                    print "ACTION: Control changed in: %s from %s to Arverni Control" % (self.map[region].name, self.map[region].control)
-                    self.map[region].control = "Arverni Control"
-
-            if belgic_count > aedui_control + arverni_count + roman_count + germanic_count:
-                if self.map[region].control != "Belgic Control":
-                    print "ACTION: Control changed in: %s from %s to Belgic Control" % (self.map[region].name, self.map[region].control)
-                    self.map[region].control = "Belgic Control"
-
-            if roman_count > aedui_control + arverni_count + belgic_count + germanic_count:
-                if self.map[region].control != "Roman Control":
-                    print "ACTION: Control changed in: %s from %s to Roman Control" % (self.map[region].name, self.map[region].control)
-                    self.map[region].control = "Roman Control"
-
-            if germanic_count > aedui_control + arverni_count + belgic_count + roman_count:
-                if self.map[region].control != "Germanic Control":
-                    print "ACTION: Control changed in: %s from %s to Germanic Control" % (self.map[region].name, self.map[region].control)
-                    self.map[region].control = "Germanic Control"
-
-        print ""
-        print "Control Change Complete."
-        print ""
-
-    def do_map(self, rest):
-        try:
-            print ""
-            print "Region Codes:"
-            print "[AED] Aedui, [ARV] Arverni, [ATR] Atrebates"
-            print "[BIT] Bituriges, [CAT] Catuvellauni, [GAR] Garnites"
-            print "[HEL] Helvii, [MAN] Mandubii, [MOR] Morini, [NER] Nervii"
-            print "[PIC] Pictones, [SEQ] Sequani, [SUG] Sugambri"
-            print "[TRE] Treveri [UBI] Ubii, [VEN] Veneti"
-            print ""
-
-            region = raw_input("Enter Region code to change: ").upper()
-            print ""
-            print 'Name: %s' % self.map[region].name
-            print 'Control: %s' % self.map[region].control
-
-
-            self.map[region].aedui_warband = int(raw_input("Aeduit Warband [" + str(self.map[region].aedui_warband) + "] Change to [0-100] : "))
-
-            self.map[region].aedui_warband = int(raw_input("Aeduit Tribe [" + str(self.map[region].aedui_warband) + "] Change to [0-100] : "))
-
-            self.map[region].aedui_citadel = int(raw_input("Aeduit Citadel [" + str(self.map[region].aedui_citadel) + "] Change to [0-100] : "))
-
-            self.map[region].arverni_leader = int(raw_input("Arverni Leader [" + str(self.map[region].arverni_leader) + "] Change to [0-1] : "))
-
-            self.map[region].arverni_warband = int(raw_input("Arverni Warband [" + str(self.map[region].arverni_warband) + "] Change to [0-100] : "))
-
-            self.map[region].arverni_tribe = int(raw_input("Arverni Tribe [" + str(self.map[region].arverni_tribe) + "] Change to [0-100] : "))
-
-            self.map[region].arverni_citadel = int(raw_input("Arverni Citadel [" + str(self.map[region].arverni_citadel) + "] Change to [0-100] : "))
-
-            self.map[region].belgic_leader = int(raw_input("Belgic Leader [" + str(self.map[region].belgic_leader) + "] Change to [0-100] : "))
-
-            self.map[region].belgic_warband = int(raw_input("Belgic Warband [" + str(self.map[region].belgic_warband) + "] Change to [0-100] : "))
-
-            self.map[region].belgic_tribe = int(raw_input("Belgic Tribe [" + str(self.map[region].belgic_tribe) + "] Change to [0-100] : "))
-
-            self.map[region].belgic_citadel = int(raw_input("Belgic Citadel [" + str(self.map[region].belgic_citadel) + "] Change to [0-100] : "))
-
-            self.map[region].germanic_warband = int(raw_input("Germanic Warband [" + str(self.map[region].germanic_warband) + "] Change to [0-100] : "))
-
-            self.map[region].germanic_tribe = int(raw_input("Germanic Tribe [" + str(self.map[region].germanic_tribe) + "] Change to [0-100] : "))
-
-            self.map[region].roman_leader = int(
-                raw_input("Roman Leader [" + str(self.map[region].roman_leader) + "] Change to [0-100] : "))
-
-            self.map[region].roman_auxilia = int(
-                raw_input("Roman Auxilia [" + str(self.map[region].roman_auxilia) + "] Change to [0-100] : "))
-
-            self.map[region].roman_fort = int(
-                raw_input("Roman Fort [" + str(self.map[region].roman_fort) + "] Change to [0-100] : "))
-
-            self.map[region].roman_legion = int(
-                raw_input("Roman Legion [" + str(self.map[region].roman_legion) + "] Change to [0-100] : "))
-
-            self.map[region].roman_tribe = int(
-                raw_input("Roman Tribe [" + str(self.map[region].roman_tribe) + "] Change to [0-100] : "))
-
-            self.map[region].dispersed_gathering = int(
-                raw_input("Dispersed Gathering [" + str(self.map[region].dispersed_gathering) + "] Change to [-1 > 0] : "))
-
-            self.control_change_check()
-        except:
-            print "Unknown location. Enter command again."
 
     def do_aedui_flow(self, rest):
         bFlowEnded = False
@@ -729,10 +586,10 @@ def main():
     jsonstr = file.read()
     file.close()
     
+    global inputdata
     inputdata = json.loads(jsonstr)
-    print inputdata
     
-#    app = FY(scenario)
+    app = FY()
 
 #    app.cmdloop()
 
