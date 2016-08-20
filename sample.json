@@ -1,7 +1,7 @@
 {
    "verbose":true,
    "npaedui":true,
-   "npaverni":true,
+   "nparverni":true,
    "nproman":true,
    "npbelgic":true,
    "winter":4,
@@ -24,28 +24,36 @@
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"1",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"2",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"3",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"4",
@@ -65,35 +73,45 @@
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"6",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"7",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"8",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"9",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"10",
@@ -118,21 +136,27 @@
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"12",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"13",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"14",
@@ -170,28 +194,36 @@
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"17",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"18",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"19",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"20",
@@ -211,189 +243,243 @@
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"22",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"23",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"24",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"25",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"26",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"27",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"28",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"29",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"30",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"31",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"32",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"33",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"34",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"35",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"36",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"37",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"38",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"39",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"40",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"41",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"42",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"43",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"44",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"45",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"Fallen Legions",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"Senate - Uproar",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"Senate - Intrigue",
@@ -413,7 +499,9 @@
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"Legions",
@@ -702,7 +790,7 @@
          "y":0,
          "pieces":[
             {
-               "name":"Veneti",
+               "name":"Veneti (Dispersed)",
                "x":931,
                "y":1127
             },
@@ -710,6 +798,11 @@
                "name":"2 Pop (NoControl)",
                "x":1426,
                "y":1187
+            },
+            {
+               "name":"Devastated",
+               "x":1424,
+               "y":1160
             },
             {
                "name":"Namnetes (Gathering)",
@@ -750,7 +843,7 @@
                "y":1154
             },
             {
-               "name":"2 Pop (AverniControl)",
+               "name":"2 Pop (ArverniControl)",
                "x":2065,
                "y":1164
             },
@@ -854,7 +947,7 @@
          "y":0,
          "pieces":[
             {
-               "name":"Vercingetorix",
+               "name":"Arverni Successor",
                "x":2332,
                "y":2165
             },
@@ -874,7 +967,7 @@
                "y":2205
             },
             {
-               "name":"3 Pop (AverniControl)",
+               "name":"3 Pop (ArverniControl)",
                "x":2392,
                "y":2358
             },
@@ -1266,7 +1359,9 @@
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"1st Faction Command Only",
@@ -1286,35 +1381,45 @@
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"1st Faction Event",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"2nd Faction Limited Command",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"2nd Faction Event or Limited Command",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"2nd Faction Command May Add Special Activity",
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"Ineligible Factions",
@@ -1417,7 +1522,9 @@
          "map":"Main Map",
          "x":600,
          "y":0,
-         "pieces":[],
+         "pieces":[
+
+         ]
       },
       {
          "name":"Map",
@@ -1480,17 +1587,17 @@
                "y":691
             },
             {
-               "name":"Aedui Citadel",
+               "name":"Aedui Citadel (Occupied)",
                "x":1103,
                "y":506
             },
             {
-               "name":"Aedui Citadel",
+               "name":"Aedui Citadel (Ally)",
                "x":944,
                "y":456
             },
             {
-               "name":"Aedui Ally",
+               "name":"Aedui Ally (Occupied)",
                "x":792,
                "y":512
             },
@@ -1550,27 +1657,27 @@
                "y":240
             },
             {
-               "name":"Aedui Ally",
+               "name":"Aedui Ally (Empty)",
                "x":260,
                "y":512
             },
             {
-               "name":"Aedui Ally",
+               "name":"Aedui Ally (Empty)",
                "x":395,
                "y":512
             },
             {
-               "name":"Aedui Ally",
+               "name":"Aedui Ally (Occupied)",
                "x":526,
                "y":512
             },
             {
-               "name":"Aedui Ally",
+               "name":"Aedui Ally (Occupied)",
                "x":658,
                "y":512
             },
             {
-               "name":"Aedui Ally",
+               "name":"Aedui Ally (Empty)",
                "x":127,
                "y":512
             },
@@ -1628,62 +1735,62 @@
                "y":134
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Occupied)",
                "x":130,
                "y":691
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Occupied)",
                "x":260,
                "y":691
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Occupied)",
                "x":526,
                "y":558
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Occupied)",
                "x":658,
                "y":558
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Empty)",
                "x":395,
                "y":558
             },
             {
-               "name":"Arverni Citadel",
+               "name":"Arverni Citadel (Occupied)",
                "x":964,
                "y":575
             },
             {
-               "name":"Arverni Citadel",
+               "name":"Arverni Citadel (Occupied)",
                "x":825,
                "y":653
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Occupied)",
                "x":658,
                "y":691
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Occupied)",
                "x":526,
                "y":691
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Occupied)",
                "x":395,
                "y":691
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Empty)",
                "x":260,
                "y":558
             },
             {
-               "name":"Arverni Ally",
+               "name":"Arverni Ally (Empty)",
                "x":130,
                "y":558
             },
@@ -1768,7 +1875,7 @@
                "y":240
             },
             {
-               "name":"Arverni Citadel",
+               "name":"Arverni Citadel (Occupied)",
                "x":1104,
                "y":652
             },
@@ -1811,22 +1918,22 @@
          "y":0,
          "pieces":[
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Empty)",
                "x":713,
                "y":558
             },
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Empty)",
                "x":574,
                "y":558
             },
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Empty)",
                "x":432,
                "y":558
             },
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Empty)",
                "x":294,
                "y":558
             },
@@ -1856,37 +1963,37 @@
                "y":240
             },
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Empty)",
                "x":852,
                "y":558
             },
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Empty)",
                "x":432,
                "y":691
             },
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Empty)",
                "x":294,
                "y":691
             },
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Occupied)",
                "x":713,
                "y":691
             },
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Occupied)",
                "x":574,
                "y":691
             },
             {
-               "name":"Belgic Ally",
+               "name":"Belgic Ally (Occupied)",
                "x":852,
                "y":691
             },
             {
-               "name":"Belgic Citadel",
+               "name":"Belgic Citadel (Occupied)",
                "x":1056,
                "y":621
             },
@@ -1959,27 +2066,27 @@
                "y":310
             },
             {
-               "name":"Germanic Ally",
+               "name":"Germanic Ally (Empty)",
                "x":314,
                "y":675
             },
             {
-               "name":"Germanic Ally",
+               "name":"Germanic Ally (Empty)",
                "x":447,
                "y":675
             },
             {
-               "name":"Germanic Ally",
+               "name":"Germanic Ally (Empty)",
                "x":579,
                "y":675
             },
             {
-               "name":"Germanic Ally",
+               "name":"Germanic Ally (Occupied)",
                "x":710,
                "y":675
             },
             {
-               "name":"Germanic Ally",
+               "name":"Germanic Ally (Occupied)",
                "x":844,
                "y":675
             },
@@ -2004,7 +2111,7 @@
                "y":240
             },
             {
-               "name":"Germanic Ally",
+               "name":"Germanic Ally (Occupied)",
                "x":973,
                "y":675
             },
@@ -2097,17 +2204,17 @@
                "y":240
             },
             {
-               "name":"Roman Ally",
+               "name":"Roman Ally (Occupied)",
                "x":837,
                "y":690
             },
             {
-               "name":"Roman Ally",
+               "name":"Roman Ally (Occupied)",
                "x":970,
                "y":690
             },
             {
-               "name":"Roman Ally",
+               "name":"Roman Ally (Occupied)",
                "x":705,
                "y":690
             },
@@ -2127,17 +2234,17 @@
                "y":240
             },
             {
-               "name":"Roman Ally",
+               "name":"Roman Ally (Occupied)",
                "x":441,
                "y":690
             },
             {
-               "name":"Roman Ally",
+               "name":"Roman Ally (Empty)",
                "x":309,
                "y":690
             },
             {
-               "name":"Roman Ally",
+               "name":"Roman Ally (Occupied)",
                "x":574,
                "y":690
             },
