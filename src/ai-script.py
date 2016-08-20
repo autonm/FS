@@ -12,6 +12,7 @@ class Region:
     name = ""
     modname = ""
     control = ""
+    pop = 0
     aedui_warband = 0
     aedui_tribe = 0
     aedui_citadel = 0
@@ -52,6 +53,9 @@ class Region:
                             # find the control piece
                             if piece['name'].endswith('Control)'):
                                 self.control = piece['name'][piece['name'].find(' (')+2:-8] + ' Control'
+                                self.pop += int(piece['name'][0:1])
+                            if piece['name'] == 'Colony Added':
+                                self.pop += 1
                             # count the aedui warbands
                             if piece['name'] == 'Aedui Warband':
                                 self.aedui_warband += 1
@@ -61,18 +65,18 @@ class Region:
                             # count the aedui citadels
                             if piece['name'] == 'Aedui Citadel':
                                 self.aedui_citadel += 1
-                            # Averni leader
+                            # Arverni leader
                             if piece['name'] == ' (Vercingetorix /) (Averni Successor)':
-                                self.averni_leader = 1
-                            # count the averni warbands
+                                self.arverni_leader = 1
+                            # count the arverni warbands
                             if piece['name'] == 'Averni Warband':
-                                self.averni_warband += 1
-                            # count the averni tribes (allies)
+                                self.arverni_warband += 1
+                            # count the arverni tribes (allies)
                             if piece['name'] == 'Averni Ally':
-                                self.averni_tribe += 1
-                            # count the averni citadels
+                                self.arverni_tribe += 1
+                            # count the arverni citadels
                             if piece['name'] == 'Averni Citadel':
-                                self.averni_citadel += 1
+                                self.arverni_citadel += 1
                             # Belgic leader
                             if piece['name'] == ' (Ambiorix /) (Belgic Successor)':
                                 self.belgic_leader = 1
@@ -109,6 +113,7 @@ class Region:
                             # count Dispersed tribes
                             if piece['name'].endswith(' (Dispersed)') or piece['name'].endswith(' (Gathering)'):
                                 self.dispersed_gathering += 1
+                                self.pop -= 1
                             # count Devastated
                             if piece['name'] == 'Devastated':
                                 self.devastated += 1
@@ -130,22 +135,22 @@ class Region:
                                     self.max_cities += 1
 
 class FY(cmd.Cmd):
-    scenario = 0
-    campaign = 1
-    currentyear = 0
-
-    other_most_allies = 0
-
+    winter_remaining = 0
+    frost = 0
+    winter = 0
+    
     roman_senate = 2
 
+    other_most_allies = 0
     off_map_legions = 0
     subdued_dispersed_allies = 0
     control_allies = 0
+    
+    colonies = 0
 
     aedui_resources = 0
     arverni_resources = 0
     belgic_resources = 0
-    germanic_resources = 0
     roman_resources = 0
 
     aedui_warband_available = 0
@@ -209,7 +214,9 @@ class FY(cmd.Cmd):
         "Sugambri",
         "Suebi North",
         "Ubii",
-        "Suebi South"
+        "Suebi South",
+        "Helvii",
+        "Eburones"
         }
     citadelSpaces = {
         "Carnutes",
@@ -217,7 +224,7 @@ class FY(cmd.Cmd):
         "Arverni",
         "Aedui",
         "Mandubii",
-        "Sequani"        
+        "Sequani"    
         }
     map = {}
     cards = {}
@@ -225,6 +232,7 @@ class FY(cmd.Cmd):
     def __init__(self):
             cmd.Cmd.__init__(self)
             
+            # load Regions from inputdata
             self.map["AED"] = Region(self, "AED", "Aedui")
             self.map["ARV"] = Region(self, "ARV", "Arverni")
             self.map["ATR"] = Region(self, "ATR", "Atrebates")
@@ -242,180 +250,137 @@ class FY(cmd.Cmd):
             self.map["UBI"] = Region(self, "UBI", "Ubii")
             self.map["VEN"] = Region(self, "VEN", "Veneti")
             
-
-            print ""
-            print "** COMMAND LIST **"
-            print "senate, ca, sda, off_map_legions          -"
-            print "map, available                            -"
-            print "aedui, arverni, belgic, germanic, roman   -"
-            print "aedui_flow                                -"
-            print ""
+            # find number of resources
+            for element, data in inputdata.items():
+                if element == 'zones':
+                    for zone in data:
+                        for piece in zone['pieces']:
+                            # Aedui Resources
+                            if piece['name'].startswith('Aedui Resources ('):
+                                self.aedui_resources = int(zone['name'])
+                            # Arverni Resources
+                            if piece['name'].startswith('Averni Resources ('):
+                                self.arverni_resources = int(zone['name'])
+                            # Belgic Resources
+                            if piece['name'].startswith('Belgic Resources ('):
+                                self.belgic_resources = int(zone['name'])
+                            # Roman Resources
+                            if piece['name'].startswith('Roman Resources ('):
+                                self.roman_resources = int(zone['name'])
             
-            for country in self.map:
-                print country
-                self.do_status(country)
+            # units available, cards
+            self.arverni_leader_available = 1
+            self.belgic_leader_available = 1
+            self.roman_leader_available = 1
+            for element, data in inputdata.items():
+                if element == 'zones':
+                    for zone in data:
+                        if zone['name'] == 'Aedui Available Forces':
+                            for piece in zone['pieces']:
+                                if piece['name'] == 'Aedui Warband':
+                                    self.aedui_warband_available += 1
+                                if piece['name'] == 'Aedui Ally (Occupied)' or piece['name'] == 'Aedui Citadel (Ally)':
+                                    self.aedui_tribe_available += 1
+                                if piece['name'] == 'Aedui Citadel (Occupied)':
+                                    self.aedui_citadel_available += 1
+                        if zone['name'] == 'Arverni Available Forces':
+                            for piece in zone['pieces']:
+                                if piece['name'] == 'Arverni Warband':
+                                    self.arverni_warband_available += 1
+                                if piece['name'] == 'Arverni Ally (Occupied)' or piece['name'] == 'Arverni Citadel (Ally)':
+                                    self.arverni_tribe_available += 1
+                                if piece['name'] == 'Arverni Citadel (Occupied)':
+                                    self.arverni_citadel_available += 1
+                        if zone['name'] == 'Belgic Available Forces':
+                            for piece in zone['pieces']:
+                                if piece['name'] == 'Belgic Warband':
+                                    self.belgic_warband_available += 1
+                                if piece['name'] == 'Belgic Ally (Occupied)' or piece['name'] == 'Belgic Citadel (Ally)':
+                                    self.belgic_tribe_available += 1
+                                if piece['name'] == 'Belgic Citadel (Occupied)':
+                                    self.belgic_citadel_available += 1
+                        if zone['name'] == 'Germanic Available Forces':
+                            for piece in zone['pieces']:
+                                if piece['name'] == 'Germanic Warband':
+                                    self.germanic_warband_available += 1
+                                if piece['name'] == 'Germanic Ally (Occupied)':
+                                    self.germanic_tribe_available += 1
+                        if zone['name'] == 'Roman Available Forces':
+                            for piece in zone['pieces']:
+                                if piece['name'] == 'Roman Auxilia':
+                                    self.roman_auxilia_available += 1
+                                if piece['name'] == 'Roman Fort':
+                                    self.roman_fort_available += 1
+                                if piece['name'] == 'Roman Ally (Occupied)':
+                                    self.roman_tribe_available += 1
+                                if piece['name'] == 'Roman Legion':
+                                    self.roman_legion_available += 1
+                        # check for Winter or Frost
+                        if zone['name'] == 'Upcoming':
+                            for piece in zone['pieces']:
+                                if piece['name'].endswith(' - Winter'):
+                                    self.frost = 1
+                        if zone['name'] == 'Current':
+                            for piece in zone['pieces']:
+                                if piece['name'].endswith(' - Winter'):
+                                    self.winter = 1
+                        # check for leaders on the map, colonies on map
+                        for piece in zone['pieces']:
+                            if piece['name'] == 'Ambiorix' or piece['name'] == 'Belgic Successor':
+                                self.belgic_leader_available = 0
+                            if piece['name'] == 'Vercingetorix' or piece['name'] == 'Arverni Successor':
+                                self.arverni_leader_available = 0
+                            if piece['name'] == 'Caesar' or piece['name'] == 'Roman Successor':
+                                self.roman_leader_available = 0
+                            if piece['name'] == 'Colony Added':
+                                self.colonies += 1
+                        
+            # find other_most_allies
+            aedui_score = 8 - self.aedui_tribe_available - self.aedui_citadel_available
+            arverni_score = 13 - self.arverni_tribe_available - self.arverni_citadel_available
+            belgic_score = 11 - self.belgic_tribe_available - self.belgic_citadel_available
+            germanic_score = 6 - self.germanic_tribe_available
+            roman_score = 6 - self.roman_tribe_available
+            self.other_most_allies = max(arverni_score, belgic_score, germanic_score, roman_score)
+            
+            # Roman Senate, Legions
+            for element, data in inputdata.items():
+                if element == 'zones':
+                    for zone in data:
+                        if zone['name'] == 'Senate - Uproar':
+                            for piece in zone['pieces']:
+                                if piece['name'] == 'Roman Senate':
+                                    self.roman_senate = 1
+                        if zone['name'] == 'Senate - Intrigue':
+                            for piece in zone['pieces']:
+                                if piece['name'] == 'Roman Senate':
+                                    self.roman_senate = 2
+                        if zone['name'] == 'Senate - Adulation':
+                            for piece in zone['pieces']:
+                                if piece['name'] == 'Roman Senate':
+                                    self.roman_senate = 3
+                        if zone['name'] == 'Legions':
+                            for piece in zone['pieces']:
+                                if piece['name'] == 'Roman Legion':
+                                    self.off_map_legions += 1
+            
+            # Roman Victory
+            cities = len(self.allySpaces) + len(self.citadelSpaces) + self.colonies
+            self.subdued_dispersed_allies = cities - arverni_score - belgic_score - germanic_score - aedui_score
+            
+            # Belgic Victory
+            self.control_allies = belgic_score
+            for key, region in self.map.items():
+                if region.control == 'Belgic Control':
+                    self.control_allies += region.pop
+            
+            # Winter cards left in Deck
+            self.winter_remaining = inputdata['winter']
 
-    def do_status(self, rest):
-
-        if rest == 'scenario':
-            print ""
-            print "** Scenario Status Report **"
-            print "Current Year: %s" % self.currentyear
-            return
-
-        elif rest:
-            print ""
-            goodcountry = False
-            possible = []
-            for country in self.map:
-                if rest.lower() == country.lower():
-                    possible = []
-                    possible.append(country)
-                    break
-
-                elif rest.lower() in country.lower():
-                    possible.append(country)
-
-            if len(possible) == 0:
-                print "Unrecognized country."
-                print ""
-
-            elif len(possible) > 1:
-                print "Be more specific", possible
-                print ""
-
-            else:
-                goodcountry = possible[0]
-
-            if goodcountry:
-                print '*Location Status Report*'
-                print 'Name: %s' % self.map[goodcountry].name
-                print 'Control: %s' % self.map[goodcountry].control
-                print "Aeduit Warband: %s" % self.map[goodcountry].aedui_warband
-                print "Aedui Tribe: %s" % self.map[goodcountry].aedui_tribe
-                print "Aedui Citadel: %s" % self.map[goodcountry].aedui_citadel
-                print "Arverni Leader: %s" % self.map[goodcountry].arverni_leader
-                print "Arverni Warband: %s" % self.map[goodcountry].arverni_warband
-                print "Arverni Tribe: %s" % self.map[goodcountry].arverni_tribe
-                print "Arverni Citadel: %s" % self.map[goodcountry].arverni_citadel
-                print "Belgic Leader: %s" % self.map[goodcountry].belgic_leader
-                print "Belgic Warband: %s" % self.map[goodcountry].belgic_warband
-                print "Belgic Tribe: %s" % self.map[goodcountry].belgic_tribe
-                print "Belgic Citadel: %s" % self.map[goodcountry].belgic_citadel
-                print "Germanic Warband: %s" % self.map[goodcountry].germanic_warband
-                print "Germanic Tribe: %s" % self.map[goodcountry].germanic_tribe
-                print "Roman Leader: %s" % self.map[goodcountry].roman_leader
-                print "Roman Auxilia: %s" % self.map[goodcountry].roman_auxilia
-                print "Roman Fort: %s" % self.map[goodcountry].roman_fort
-                print "Roman Legion: %s" % self.map[goodcountry].roman_legion
-                print "Roman Tribes: %s" % self.map[goodcountry].roman_tribe
-                print "Dispersed Gathering: %s" % self.map[goodcountry].dispersed_gathering
-                print ""
-
-                return
-            else:
-                return
-
-        for country in self.map:
-            print ""
-            print 'Name %s' % self.map[country].name
-
-            if self.map[country].control != "No Control":
-                print 'Control: %s' % self.map[country].control
-
-            if self.map[country].aedui_warband > 0:
-                print 'Aeduit Warband: %s' % self.map[country].aedui_warband
-
-            if self.map[country].aedui_tribe > 0:
-                print 'Aeduit Tribe: %s' % self.map[country].aedui_tribe
-
-            if self.map[country].aedui_citadel > 0:
-                print "Aedui Citadel: %s" % self.map[country].aedui_citadel
-
-            if self.map[country].arverni_leader > 0:
-                print "Arverni Leader: %s" % self.map[country].arverni_leader
-
-            if self.map[country].arverni_warband > 0:
-                print "Arverni Warband: %s" % self.map[country].arverni_warband
-
-            if self.map[country].arverni_tribe > 0:
-                print "Arverni Tribe: %s" % self.map[country].arverni_tribe
-
-            if self.map[country].arverni_citadel > 0:
-                print "Arverni Citadel: %s" % self.map[country].arverni_citadel
-
-            if self.map[country].belgic_leader > 0:
-                print "Belgic Leader: %s" % self.map[country].belgic_leader
-
-            if self.map[country].belgic_warband > 0:
-                print "Belgic Warband: %s" % self.map[country].belgic_warband
-
-            if self.map[country].belgic_tribe > 0:
-                print "Belgic Tribe: %s" % self.map[country].belgic_tribe
-
-            if self.map[country].belgic_citadel > 0:
-                print "Belgic Citadel: %s" % self.map[country].belgic_citadel
-
-            if self.map[country].germanic_warband > 0:
-                print "Germanic Warband: %s" % self.map[country].germanic_warband
-
-            if self.map[country].germanic_tribe > 0:
-                print "Germanic Tribe: %s" % self.map[country].germanic_tribe
-
-            if self.map[country].roman_leader > 0:
-                print "Roman Leader: %s" % self.map[country].roman_leader
-
-            if self.map[country].roman_auxilia > 0:
-                print "Roman Auxilia: %s" % self.map[country].roman_auxilia
-
-            if self.map[country].roman_fort > 0:
-                print "Roman Fort: %s" % self.map[country].roman_fort
-
-            if self.map[country].roman_legion > 0:
-                print "Roman Legion: %s" % self.map[country].roman_legion
-
-            if self.map[country].roman_tribe > 0:
-                print "Roman Tribes: %s" % self.map[country].roman_tribe
-
-            if self.map[country].dispersed_gathering != 0:
-                print "Dispersed Gathering: %s" % self.map[country].dispersed_gathering
-
-    def do_senate(self,rest):
-        print ""
-        self.roman_senate = raw_input("Roman Senate Level [" + str(self.roman_senate) + "] Change to [1-3] ? ")
-
-    def do_off_map_legions(self,rest):
-        print ""
-        self.off_map_legions = raw_input("Off Map Legions [" + str(self.off_map_legions) + "] Change to [0-100] ? ")
-
-    def do_sda(self,rest):
-        print ""
-        self.subdued_dispersed_allies = raw_input("Subdued Dispersed Allies [" + str(self.subdued_dispersed_allies) + "] Change to [0-100] ? ")
-
-    def do_ca(self,rest):
-        print ""
-        self.control_allies = raw_input("Control Allies [" + str(self.control_allies) + "] Change to [0-100] ? ")
-
-    def do_aedui(self,rest):
-        print ""
-        self.aedui_resources = raw_input("Aedui Resources [" + str(self.aedui_resources) + "] Change to [0-100] ? ")
-
-    def do_arverni(self,rest):
-        print ""
-        self.arverni_resources = raw_input("Arverni Resources [" + str(self.arverni_resources) + "] Change to [0-100] ? ")
-
-    def do_belgic(self,rest):
-        print ""
-        self.belgic_resources = raw_input("Belgic Resources [" + str(self.belgic_resources) + "] Change to [0-100] ? ")
-
-    def do_germanic(self,rest):
-        print ""
-        self.germanic_resources = raw_input("Gemanic Resources [" + str(self.germanic_resources) + "] Change to [0-100] ? ")
-
-    def do_roman(self,rest):
-        print ""
-        self.roman_resources = raw_input("Roman Resources [" + str(self.roman_resources) + "] Change to [0-100] ? ")
-
+            # Which bot to activate?
+            if inputdata['action'] == 'Aedui':
+                self.do_aedui_flow('')
+            
     def do_aedui_flow(self, rest):
         bFlowEnded = False
         bAmbush = False
@@ -666,8 +631,6 @@ def main():
     inputdata = json.loads(jsonstr)
     
     app = FY()
-
-#    app.cmdloop()
 
 
 if __name__ == "__main__":
