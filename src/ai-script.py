@@ -14,17 +14,21 @@ class Region:
     control = ""
     pop = 0
     aedui_warband = 0
+    aedui_warband_revealed = 0
     aedui_tribe = 0
     aedui_citadel = 0
     arverni_leader = 0
     arverni_warband = 0
+    arverni_warband_revealed = 0
     arverni_tribe = 0
     arverni_citadel = 0
     belgic_leader = 0
     belgic_warband = 0
+    belgic_warband_revealed = 0
     belgic_tribe = 0
     belgic_citadel = 0
     germanic_warband = 0
+    germanic_warband_revealed = 0
     germanic_tribe = 0
     roman_leader = 0
     roman_auxilia = 0
@@ -59,6 +63,9 @@ class Region:
                             # count the aedui warbands
                             if piece['name'] == 'Aedui Warband':
                                 self.aedui_warband += 1
+                            # count the revealed aedui warbands revealed
+                            if piece['name'] == 'Aedui Warband Revealed':
+                                self.aedui_warband_revealed += 1
                             # count the aedui tribes (allies)
                             if piece['name'] == 'Aedui Ally':
                                 self.aedui_tribe += 1
@@ -71,6 +78,9 @@ class Region:
                             # count the arverni warbands
                             if piece['name'] == 'Averni Warband':
                                 self.arverni_warband += 1
+                            # count the revealed averni warbands revealed
+                            if piece['name'] == 'Averni Warband Revealed':
+                                self.averni_warband_revealed += 1
                             # count the arverni tribes (allies)
                             if piece['name'] == 'Averni Ally':
                                 self.arverni_tribe += 1
@@ -83,6 +93,9 @@ class Region:
                             # count the belgic warbands
                             if piece['name'] == 'Belgic Warband':
                                 self.belgic_warband += 1
+                            # count the revealed belgic warbands revealed
+                            if piece['name'] == 'Belgic Warband Revealed':
+                                self.belgic_warband_revealed += 1
                             # count the belgic tribes (allies)
                             if piece['name'] == 'Belgic Ally':
                                 self.belgic_tribe += 1
@@ -92,6 +105,9 @@ class Region:
                             # count the germanic warbands
                             if piece['name'] == 'Germanic Warband':
                                 self.germanic_warband += 1
+                            # count the revealed germanic warbands revealed
+                            if piece['name'] == 'Germanic Warband Revealed':
+                                self.germanic_warband_revealed += 1
                             # count the germanic tribes (allies)
                             if piece['name'] == 'Germanic Ally':
                                 self.germanic_tribe += 1
@@ -617,12 +633,17 @@ class FY(cmd.Cmd):
                         print "Rally Unavailable"
 
                 else:
-                    print "Rally check FAILED - %s Warbands already on the map" % (20 - self.aedui_warband_available)
+                    print "RALLY check FAILED - %s Aedui Warbands already on the map" % (20 - self.aedui_warband_available)
 
                 if self.bRally:
                     if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
                         bTrade = True
                 else:
+                    print ""
+                    print "***CHECKING TO SEE IF RAID IS POSSIBLE"
+                    # print "TEST FOLLOWING LINE- forces aedui resources = 3
+                    self.aedui_resources = 3
+
                     if self.aedui_resources < 4:
                         print "Aedui has < 4 Resources with %s " % self.aedui_resources
                         self.aedui_raid()
@@ -632,7 +653,7 @@ class FY(cmd.Cmd):
                             bTrade = True
 
                     else:
-                        print "Aedui has > 4 Resources with %s" % self.aedui_resources
+                        print "RAID check FAILED Aedui has > 4 Resources with %s" % self.aedui_resources
                         self.aedui_march()
 
                         if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
@@ -752,9 +773,16 @@ class FY(cmd.Cmd):
 
     def aedui_raid(self):
         print ""
-        print "RAID"
-        # global bPass
-        # if we are unable to raid
+        print "***RAID CHECK***"
+
+        print "Raid locations are as follows"
+        print "Aedui Resources: %s " % self.aedui_resources
+        print ""
+
+        bfound_raid = False
+
+        #for country in self.map:
+        #    if self.map[country]. == 0 and region_list.find(country) == -1:
 
 
     def aedui_march(self):
