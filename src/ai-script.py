@@ -303,7 +303,6 @@ class FY(cmd.Cmd):
         71: ['Be ', 'Ae ', 'Ar ', 'Ro '],
         72: ['BeL', 'AeS', 'ArL', 'RoL']
     }
-    print cardIndex
     map = {}
     cards = {}
 
@@ -456,8 +455,80 @@ class FY(cmd.Cmd):
             self.winter_remaining = inputdata['winter']
 
             # Which bot to activate?
+            if inputdata['action'] == 'Game State':
+                self.do_status('')
             if inputdata['action'] == 'Aedui':
                 self.do_aedui_flow('')
+
+    def do_status(self, rest):
+
+        print "** Scenario Status Report **"
+        print ""
+
+        for key, country in self.map.items():
+            print 'Name: %s' % country.name
+
+            if country.control != "No Control":
+                print 'Control: %s' % country.control
+
+            if country.aedui_warband > 0:
+                print 'Aeduit Warband: %s' % country.aedui_warband
+
+            if country.aedui_tribe > 0:
+                print 'Aeduit Tribe: %s' % country.aedui_tribe
+
+            if country.aedui_citadel > 0:
+                print "Aedui Citadel: %s" % country.aedui_citadel
+
+            if country.arverni_leader > 0:
+                print "Arverni Leader: %s" % country.arverni_leader
+
+            if country.arverni_warband > 0:
+                print "Arverni Warband: %s" % country.arverni_warband
+
+            if country.arverni_tribe > 0:
+                print "Arverni Tribe: %s" % country.arverni_tribe
+
+            if country.arverni_citadel > 0:
+                print "Arverni Citadel: %s" % country.arverni_citadel
+
+            if country.belgic_leader > 0:
+                print "Belgic Leader: %s" % country.belgic_leader
+
+            if country.belgic_warband > 0:
+                print "Belgic Warband: %s" % country.belgic_warband
+
+            if country.belgic_tribe > 0:
+                print "Belgic Tribe: %s" % country.belgic_tribe
+
+            if country.belgic_citadel > 0:
+                print "Belgic Citadel: %s" % country.belgic_citadel
+
+            if country.germanic_warband > 0:
+                print "Germanic Warband: %s" % country.germanic_warband
+
+            if country.germanic_tribe > 0:
+                print "Germanic Tribe: %s" % country.germanic_tribe
+
+            if country.roman_leader > 0:
+                print "Roman Leader: %s" % country.roman_leader
+
+            if country.roman_auxilia > 0:
+                print "Roman Auxilia: %s" % country.roman_auxilia
+
+            if country.roman_fort > 0:
+                print "Roman Fort: %s" % country.roman_fort
+
+            if country.roman_legion > 0:
+                print "Roman Legion: %s" % country.roman_legion
+
+            if country.roman_tribe > 0:
+                print "Roman Tribes: %s" % country.roman_tribe
+
+            if country.dispersed_gathering != 0:
+                print "Dispersed Gathering: %s" % country.dispersed_gathering
+
+            print ""
             
     def do_aedui_flow(self, rest):
         bFlowEnded = False
