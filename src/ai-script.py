@@ -568,35 +568,50 @@ class FY(cmd.Cmd):
                 print ""
                 print "***CHECKING TO SEE IF RALLY IS POSSIBLE***"
 
-                print "TEST REMOVE FOLLOWING LINE"
-                self.aedui_warband_available = 16
+                #print "TEST FOLLOWING LINE- forces aedui_warband_available = 16"
+                #self.aedui_warband_available = 16
+
                 if (20 - self.aedui_warband_available) < 5:
                     print ""
-                    print "Aedui Warbands on map < 5 with only %s on the map" % (20 - self.aedui_warband_available)
+                    print "There are < 5 Aedui Warbands on map, there are %s on the map" % (20 - self.aedui_warband_available)
+                    print "Aedui Resources: %s " % self.aedui_resources
                     print ""
-                    print "Checking to see if a Rally is available"
+                    print "Checking available Rally Points"
+                    region_list = ""
 
-                    if self.aedui_rally() == True:
-                        print self.bRally
+                    if self.aedui_rally(region_list) == True:
                         place = raw_input("Would Rally place Citadel, Ally, 3x pieces + available resources [Y/N]: ")
                         if place.upper() == "Y":
                             self.bRally = True
-
+                            region_list = ""
                         while True:
-                            print self.bRally
-                            select = raw_input("Update info where required. Use - 'map' 'aedui' 'available' OR 'QUIT': ")
+                            select = raw_input("Enter MAP to update Rally counts or QUIT: ")
                             if select.strip().upper() == "QUIT":
                                 break
                             else:
                                 if select.upper() == "MAP":
-                                    self.do_map(self)
-                                elif select.upper() == "AEDUI":
-                                    self.do_aedui(self)
-                                elif select.upper() == "AVAILABLE":
-                                    self.do_available(self)
-                                print ""
+                                    region = raw_input("Enter 3 CHAR Region Code to Rally in: ").upper()
+                                    region_list += region
+                                    region_list += " "
+                                    ac_count = int(raw_input("How many Aedui Citadel added to %s ? " % self.map[region].name))
+                                    at_count = int(raw_input("How many Aedui Tribe added to %s ? " % self.map[region].name))
+                                    aw_count = int(raw_input("How many Aedui Warband added to %s ? " % self.map[region].name))
 
-                        self.control_change_check()
+                                    self.map[region].aedui_citadel += ac_count
+                                    self.map[region].aedui_tribe += at_count
+                                    self.map[region].aedui_warband += aw_count
+                                    self.aedui_citadel_available -= ac_count
+                                    self.aedui_tribe_available -= at_count
+                                    self.aedui_warband_available -= aw_count
+                                    self.aedui_resources -= 1
+
+                                print ""
+                                print "Checking Available Rally points"
+
+                                print region_list
+
+                                if self.aedui_rally(region_list) == False and self.aedui_resources == 0:
+                                    break
 
                     else:
                         print "Rally Unavailable"
@@ -699,17 +714,17 @@ class FY(cmd.Cmd):
         print "Remove in order Leaders, Allied Tribes, Citadels, Legions"
         self.do_map(self)
 
-
-    def aedui_rally(self):
+    def aedui_rally(self, region_list):
         print ""
         print "***RALLY CHECK***"
-        print "Priority is indicated with n) - Instruction"
+        print "Priority is indicated with 1-3) + Instruction"
+        print "Aedui Resources: %s " % self.aedui_resources
         print ""
 
         bfound_rally = False
 
         for country in self.map:
-            if self.map[country].devastated == 0:
+            if self.map[country].devastated == 0 and region_list.find(country) == -1:
                 if self.aedui_citadel_available > 0:
                     if self.map[country].max_citadel > 0:
                         total_citadel_placed = int(self.map[country].aedui_citadel) + int(self.map[country].belgic_citadel) + int(self.map[country].arverni_citadel)
@@ -721,19 +736,16 @@ class FY(cmd.Cmd):
                 if self.aedui_tribe_available > 0:
                     if self.map[country].max_cities > 0 and self.map[country].control == "Aedui Control":
                         total_tribe_placed = int(self.map[country].aedui_tribe) + int(self.map[country].belgic_tribe) + int(self.map[country].arverni_tribe)
-                        if total_tribe_placed < self.map[country].max_cities:
-                            print "2) - Place Ally / Tribe at - %s" % self.map[country].name
+                        total_citadel_placed = int(self.map[country].aedui_citadel) + int(self.map[country].belgic_citadel) + int(self.map[country].arverni_citadel)
+                        if total_tribe_placed + total_citadel_placed < self.map[country].max_cities:
+                            print "2) - Place %s Ally / Tribe at - %s" % (self.map[country].max_cities - total_tribe_placed + total_citadel_placed, self.map[country].name)
                             bfound_rally = True
 
                 total = int(self.map[country].aedui_tribe) + int(self.map[country].aedui_citadel)
                 if total > 0:
-                    print "3) - Place Warbands up to %s at - %s" % (total, self.map[country].name)
+                    print "3) - Place up to %s Warband(s) at - %s" % (total, self.map[country].name)
                     bfound_rally = True
 
-        print ""
-        print "Use 'map' command to update"
-        print "Use 'aedui' command to update resources 1 per region"
-        print "Use 'available' command to adjust available pieces"
         print ""
 
         return bfound_rally
