@@ -473,7 +473,7 @@ class FY(cmd.Cmd):
             # Which bot to activate?
             if inputdata['action'] == 'Game State':
                 self.do_status('')
-            if inputdata['action'] == 'Aedui':
+            if inputdata['action'] == 'Aedui 2':
                 self.do_aedui_flow('')
 
     def do_status(self, rest):
