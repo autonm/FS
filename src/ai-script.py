@@ -76,13 +76,13 @@ class Region:
                             if piece['name'] == ' (Vercingetorix /) (Averni Successor)':
                                 self.arverni_leader = 1
                             # count the arverni warbands
-                            if piece['name'] == 'Averni Warband':
+                            if piece['name'] == 'Arverni Warband':
                                 self.arverni_warband += 1
                             # count the revealed averni warbands revealed
-                            if piece['name'] == 'Averni Warband Revealed':
-                                self.averni_warband_revealed += 1
+                            if piece['name'] == 'Arverni Warband Revealed':
+                                self.arverni_warband_revealed += 1
                             # count the arverni tribes (allies)
-                            if piece['name'] == 'Averni Ally':
+                            if piece['name'] == 'Arverni Ally':
                                 self.arverni_tribe += 1
                             # count the arverni citadels
                             if piece['name'] == 'Averni Citadel':
@@ -487,8 +487,8 @@ class FY(cmd.Cmd):
             if country.control != "No Control":
                 print 'Control: %s' % country.control
 
-            if country.aedui_warband > 0:
-                print 'Aeduit Warband: %s' % country.aedui_warband
+            if country.aedui_warband + country.aedui_warband_revealed > 0:
+                print 'Aeduit Warband: %s' % str(country.aedui_warband + country.aedui_warband_revealed)
 
             if country.aedui_tribe > 0:
                 print 'Aeduit Tribe: %s' % country.aedui_tribe
@@ -499,8 +499,8 @@ class FY(cmd.Cmd):
             if country.arverni_leader > 0:
                 print "Arverni Leader: %s" % country.arverni_leader
 
-            if country.arverni_warband > 0:
-                print "Arverni Warband: %s" % country.arverni_warband
+            if country.arverni_warband + country.arverni_warband_revealed > 0:
+                print "Arverni Warband: %s" % str(country.arverni_warband + country.arverni_warband_revealed)
 
             if country.arverni_tribe > 0:
                 print "Arverni Tribe: %s" % country.arverni_tribe
@@ -511,8 +511,8 @@ class FY(cmd.Cmd):
             if country.belgic_leader > 0:
                 print "Belgic Leader: %s" % country.belgic_leader
 
-            if country.belgic_warband > 0:
-                print "Belgic Warband: %s" % country.belgic_warband
+            if country.belgic_warband + country.belgic_warband_revealed > 0:
+                print "Belgic Warband: %s" % str(country.belgic_warband + country.belgic_warband_revealed)
 
             if country.belgic_tribe > 0:
                 print "Belgic Tribe: %s" % country.belgic_tribe
@@ -520,8 +520,8 @@ class FY(cmd.Cmd):
             if country.belgic_citadel > 0:
                 print "Belgic Citadel: %s" % country.belgic_citadel
 
-            if country.germanic_warband > 0:
-                print "Germanic Warband: %s" % country.germanic_warband
+            if country.germanic_warband + country.germanic_warband_revealed > 0:
+                print "Germanic Warband: %s" % str(country.germanic_warband + country.germanic_warband_revealed)
 
             if country.germanic_tribe > 0:
                 print "Germanic Tribe: %s" % country.germanic_tribe
