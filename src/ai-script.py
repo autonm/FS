@@ -600,7 +600,7 @@ class FY(cmd.Cmd):
                         if place.upper() == "Y":
                             self.bRally = True
                             region_list = ""
-                        while True:
+                        while True and place.upper() == "Y":
                             select = raw_input("Enter MAP to update Rally counts or QUIT: ")
                             if select.strip().upper() == "QUIT":
                                 break
@@ -620,11 +620,10 @@ class FY(cmd.Cmd):
                                     self.aedui_tribe_available -= at_count
                                     self.aedui_warband_available -= aw_count
                                     self.aedui_resources -= 1
+                                    print "Aedui Resources %s :" % self.aedui_resources
 
                                 print ""
-                                print "Checking Available Rally points"
-
-                                print region_list
+                                print "Checking Further Available Rally points"
 
                                 if self.aedui_rally(region_list) == False and self.aedui_resources == 0:
                                     break
@@ -635,6 +634,7 @@ class FY(cmd.Cmd):
                 else:
                     print "RALLY check FAILED - %s Aedui Warbands already on the map" % (20 - self.aedui_warband_available)
 
+                print ""
                 if self.bRally:
                     if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
                         bTrade = True
@@ -644,16 +644,46 @@ class FY(cmd.Cmd):
                     # print "TEST FOLLOWING LINE- forces aedui resources = 3
                     self.aedui_resources = 3
 
-                    if self.aedui_resources < 4:
-                        print "Aedui has < 4 Resources with %s " % self.aedui_resources
-                        self.aedui_raid()
-                        ## if no Raid - then PASS
+                    region_list = ""
 
-                        if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
-                            bTrade = True
+                    if self.aedui_raid(region_list) == True and self.aedui_resources < 4:
+                        place = raw_input("Would Raid gain > 2 Resources Total [Y/N]: ")
+                        if place.upper() == "Y":
+                            region_list = ""
+                        while True and place.upper() == "Y":
+                            select = raw_input("Enter MAP to update Raid - with Aedui Revealed counts or QUIT: ")
+                            if select.strip().upper() == "QUIT":
+                                break
+                            else:
+                                if select.upper() == "MAP":
+                                    region = raw_input("Enter 3 CHAR Region Code to Raid in: ").upper()
+                                    region_list += region
+                                    region_list += " "
+                                    aw_count = int(raw_input("How many Aedui Warband(s) are Revealed in %s ? " % self.map[region].name))
+
+                                    self.map[region].aedui_warband_revealed += aw_count
+                                    self.aedui_resources -= aw_count
+                                    print "Aedui Resources %s :" % self.aedui_resources
+
+                                print ""
+                                print "Checking Further Available Raid points"
+
+                                if self.aedui_raid(region_list) == False and self.aedui_resources == 0:
+                                    break
+
+                        else:
+                            print ""
+                            print "RAID UNAVAILABLE"
+                            bTrade = False
+                            print "Pass !!"
+
+                        print ""
+                        if bTrade == True:
+                            if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
+                                bTrade = True
 
                     else:
-                        print "RAID check FAILED Aedui has > 4 Resources with %s" % self.aedui_resources
+                        print "RAID check FAILED Aedui has > 3 Resources with %s" % self.aedui_resources
                         self.aedui_march()
 
                         if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
@@ -664,14 +694,50 @@ class FY(cmd.Cmd):
                         if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
                             bTrade = True
 
-        if bAmbush == True:
-            self.aedui_ambush()
+        #if bAmbush == True:
+        #    self.aedui_ambush()
 
-        if bTrade == True or bNoAmbush:
-            self.aedui_trade
+        #if bTrade == True or bNoAmbush:
+        #    self.aedui_trade
 
-        if bNoTrade:
-            self.aedui_Suborn
+        #if bNoTrade:
+        #    self.aedui_Suborn
+
+    def aedui_rally(self, region_list):
+        print ""
+        print "***RALLY CHECK***"
+        print "Priority is indicated with 1-3) + Instruction"
+        print "Aedui Resources: %s " % self.aedui_resources
+        print ""
+
+        bfound_rally = False
+
+        for country in self.map:
+            if self.map[country].devastated == 0 and region_list.find(country) == -1:
+                if self.aedui_citadel_available > 0:
+                    if self.map[country].max_citadel > 0:
+                        total_citadel_placed = int(self.map[country].aedui_citadel) + int(self.map[country].belgic_citadel) + int(self.map[country].arverni_citadel)
+                        if total_citadel_placed < self.map[country].max_citadel:
+                            if self.map[country].aedui_tribe > 0:
+                                print "1) - Replace Aedui Ally / Tribe with Citadel at - %s" % self.map[country].name
+                                bfound_rally = True
+
+                if self.aedui_tribe_available > 0:
+                    if self.map[country].max_cities > 0 and self.map[country].control == "Aedui Control":
+                        total_tribe_placed = int(self.map[country].aedui_tribe) + int(self.map[country].belgic_tribe) + int(self.map[country].arverni_tribe)
+                        total_citadel_placed = int(self.map[country].aedui_citadel) + int(self.map[country].belgic_citadel) + int(self.map[country].arverni_citadel)
+                        if total_tribe_placed + total_citadel_placed < self.map[country].max_cities:
+                            print "2) - Place %s Ally / Tribe at - %s" % (self.map[country].max_cities - total_tribe_placed + total_citadel_placed, self.map[country].name)
+                            bfound_rally = True
+
+                total = int(self.map[country].aedui_tribe) + int(self.map[country].aedui_citadel)
+                if total > 0:
+                    print "3) - Place up to %s Warband(s) at - %s" % (total, self.map[country].name)
+                    bfound_rally = True
+
+        print ""
+
+        return bfound_rally
 
     def aedui_battle(self):
         bHalfLoss = False
@@ -735,55 +801,40 @@ class FY(cmd.Cmd):
         print "Remove in order Leaders, Allied Tribes, Citadels, Legions"
         self.do_map(self)
 
-    def aedui_rally(self, region_list):
-        print ""
-        print "***RALLY CHECK***"
-        print "Priority is indicated with 1-3) + Instruction"
-        print "Aedui Resources: %s " % self.aedui_resources
-        print ""
-
-        bfound_rally = False
-
-        for country in self.map:
-            if self.map[country].devastated == 0 and region_list.find(country) == -1:
-                if self.aedui_citadel_available > 0:
-                    if self.map[country].max_citadel > 0:
-                        total_citadel_placed = int(self.map[country].aedui_citadel) + int(self.map[country].belgic_citadel) + int(self.map[country].arverni_citadel)
-                        if total_citadel_placed < self.map[country].max_citadel:
-                            if self.map[country].aedui_tribe > 0:
-                                print "1) - Replace Aedui Ally / Tribe with Citadel at - %s" % self.map[country].name
-                                bfound_rally = True
-
-                if self.aedui_tribe_available > 0:
-                    if self.map[country].max_cities > 0 and self.map[country].control == "Aedui Control":
-                        total_tribe_placed = int(self.map[country].aedui_tribe) + int(self.map[country].belgic_tribe) + int(self.map[country].arverni_tribe)
-                        total_citadel_placed = int(self.map[country].aedui_citadel) + int(self.map[country].belgic_citadel) + int(self.map[country].arverni_citadel)
-                        if total_tribe_placed + total_citadel_placed < self.map[country].max_cities:
-                            print "2) - Place %s Ally / Tribe at - %s" % (self.map[country].max_cities - total_tribe_placed + total_citadel_placed, self.map[country].name)
-                            bfound_rally = True
-
-                total = int(self.map[country].aedui_tribe) + int(self.map[country].aedui_citadel)
-                if total > 0:
-                    print "3) - Place up to %s Warband(s) at - %s" % (total, self.map[country].name)
-                    bfound_rally = True
-
-        print ""
-
-        return bfound_rally
-
-    def aedui_raid(self):
+    def aedui_raid(self, region_list):
         print ""
         print "***RAID CHECK***"
-
+        print "Priority 1) Arverni, 2) Belgic, 3) No Faction. "
+        print " - Never Roman - never Last Hidden Warband - "
+        print ""
         print "Raid locations are as follows"
-        print "Aedui Resources: %s " % self.aedui_resources
         print ""
 
         bfound_raid = False
 
-        #for country in self.map:
-        #    if self.map[country]. == 0 and region_list.find(country) == -1:
+        for country in self.map:
+            if country == "MAN":
+                bfound_raid = False
 
+            if region_list.find(country) == -1:
+                if self.map[country].aedui_warband > 1 and (self.map[country].arverni_warband + self.map[country].arverni_warband_revealed) > 0:
+                    total = self.map[country].aedui_warband
+                    print "1) %s Aedui Warband(s) available at - %s - against Arverni" % (total, self.map[country].name)
+                    bfound_raid = True
+
+                elif self.map[country].aedui_warband > 1 and (self.map[country].belgic_warband + self.map[country].belgic_warband_revealed) > 0:
+                    total = self.map[country].aedui_warband
+                    print "2) %s Aedui Warband(s) available at - %s - against Belgic" % (total, self.map[country].name)
+                    bfound_raid = True
+
+                elif self.map[country].aedui_warband > 1 and (self.map[country].arverni_warband + self.map[country].arverni_warband_revealed) == 0 and (self.map[country].belgic_warband + self.map[country].belgic_warband_revealed) == 0:
+                    total = self.map[country].aedui_warband
+                    print "3) %s Aedui Warband(s) available at - %s - no faction" % (total, self.map[country].name)
+                    bfound_raid = True
+
+        print ""
+
+        return bfound_raid
 
     def aedui_march(self):
         print ""
