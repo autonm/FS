@@ -5,9 +5,13 @@ import string
 import os
 import tempfile
 import itertools
+import random
 
 RELEASE = "0.14082016xx"
 # test
+
+def d6():
+    return random.randint(1, 6)
 
 class Region:
     app = None
@@ -54,8 +58,14 @@ class Region:
 class Game:
     def __init__(self):
         self.map = {}
-        self.cards = {}
+        self.currentcard = ""
+        self.upcomingcard = ""
         self.action = ""
+
+        self.aedui_eligibility = ""
+        self.arverni_eligibility = ""
+        self.belgic_eligibility = ""
+        self.roman_eligibility = ""
 
         self.winter_remaining = 0
         self.frost = 0
@@ -254,10 +264,15 @@ class FY(cmd.Cmd):
                 self.do_status(self)
                 sys.exit()
 
-            if self.game.action == 'Aedui':
+            if self.game.action.startswith('Aedui'):
                 # check answer key for continuation of flow
                 if (answer is None):
                     self.do_aedui_flow(self)
+                elif (answer.q == 'event_ineffective'):
+                    if (answer.reply.upper() == 'YES'):
+                        self.do_aedui_flow_862(self)
+                    else:
+                        self.do_aedui_flow_execute_event(self)
 
     def parse_json(self, rest):
         global inputdata
@@ -301,7 +316,7 @@ class FY(cmd.Cmd):
         self.game.map["VEN"] = Region(self, "VEN", "Veneti")
         self.load_region(self.game.map["VEN"])
 
-        # find number of resources
+        # find number of resources, find eligibility
         for element, data in inputdata.items():
             if element == 'zones':
                 for zone in data:
@@ -309,15 +324,27 @@ class FY(cmd.Cmd):
                         # Aedui Resources
                         if piece['name'].startswith('Aedui Resources ('):
                             self.game.aedui_resources = int(zone['name'])
+                        # Aedui Eligibility
+                        if piece['name'].startswith('Aedui Eligibility'):
+                            self.game.aedui_eligibility = zone['name']
                         # Arverni Resources
                         if piece['name'].startswith('Averni Resources ('):
                             self.game.arverni_resources = int(zone['name'])
+                        # Arverni Eligibility
+                        if piece['name'].startswith('Averni Eligibility'):
+                            self.game.arverni_eligibility = zone['name']
                         # Belgic Resources
                         if piece['name'].startswith('Belgic Resources ('):
                             self.game.belgic_resources = int(zone['name'])
+                        # Belgic Eligibility
+                        if piece['name'].startswith('Belgic Eligibility'):
+                            self.game.belgic_eligibility = zone['name']
                         # Roman Resources
                         if piece['name'].startswith('Roman Resources ('):
                             self.game.roman_resources = int(zone['name'])
+                        # Roman Eligibility
+                        if piece['name'].startswith('Roman Eligibility'):
+                            self.game.roman_eligibility = zone['name']
 
         # units available, cards
         self.game.arverni_leader_available = 1
@@ -394,7 +421,7 @@ class FY(cmd.Cmd):
         roman_score = 6 - self.game.roman_tribe_available
         self.game.other_most_allies = max(arverni_score, belgic_score, germanic_score, roman_score)
 
-        # Roman Senate, Legions
+        # Roman Senate, Legions, Cards
         for element, data in inputdata.items():
             if element == 'zones':
                 for zone in data:
@@ -414,6 +441,12 @@ class FY(cmd.Cmd):
                         for piece in zone['pieces']:
                             if piece['name'] == 'Roman Legion':
                                 self.game.off_map_legions += 1
+                    if zone['name'] == "Current":
+                        for piece in zone['pieces']:
+                            self.game.currentcard = piece['name']
+                    if zone['name'] == "Upcoming":
+                        for piece in zone['pieces']:
+                            self.game.upcomingcard = piece['name']
 
         # Roman Victory
         cities = len(self.allySpaces) + len(self.citadelSpaces) + self.game.colonies
@@ -531,10 +564,6 @@ class FY(cmd.Cmd):
                                 if piecename == tribe:
                                     region.max_cities += 1
 
-    def as_gamedata(self, dct):
-        print dct
-        return dct
-
     def parse_gamedata(self, datafile):
         # Start new Game
         self.game = Game()
@@ -567,9 +596,6 @@ class FY(cmd.Cmd):
                 for subitem in gamedata[item]:
                     for subprop in gamedata[item][subitem]:
                         setattr(self.game.map[subitem], subprop, gamedata[item][subitem][subprop])
-            elif item == "cards":
-                # we probably need to treat Cards uniquely too, but we don't have any yet
-                a = 1  # TODO
             else:
                 setattr(self.game, item, gamedata[item])
 
@@ -587,6 +613,14 @@ class FY(cmd.Cmd):
             # Delete file somewhere when done? not here!
             #os.remove(filename)
             return temp.name
+
+    def ask_question(self, code, question):
+        if isvassal:
+            self.write_gamedata(self)
+            print json.dumps({"q": code, "question": question})
+            return ''
+        else:
+            return raw_input(question + ' [Y/N]: ')
 
     def do_status(self, rest):
 
@@ -668,147 +702,165 @@ class FY(cmd.Cmd):
 
         # 8.6.1 Is Aedui symbol 1st on the next card AND != 1st on current?
 
-        choice = raw_input("Is Aedui symbol 1st on the next card AND != 1st on current? [Y/N]: ").upper()
-        if choice == "Y":
-            roll = int(raw_input("Roll D6. 1-4 Pass, 5-6 Continue. Enter result: "))
-            if roll <= 4:
+        card_now = int(self.game.currentcard[0:2])
+        card_next = int(self.game.upcomingcard[0:2])
+        if self.cardIndex[card_next][0][0:2] == 'Ae' and self.cardIndex[card_now][0][0:2] != 'Ae':
+            if d6() < 5:
+                # 8.6.1 + die roll of 1-4, so Pass
                 print "ACTION: Move Aedui to Pass"
-                print ""
-                return
+                sys.exit()
+        for f in self.cardIndex[card_now]:
+            if (f.startswith('Ae')):
+                card_has_swords = (f[2:1] == 'S')
 
-        if bFlowEnded == False:
+        # By sequence of play, Aedui can use the Event?
+        bnoevent = False
+        if (self.game.aedui_eligibility != 'Eligible Factions' or
+                    self.game.arverni_eligibility == '1st Faction Event' or self.game.arverni_eligibility == '1st Faction Command Only' or
+                    self.game.arverni_eligibility.startswith('2nd ') or
+                    self.game.belgic_eligibility == '1st Faction Event' or self.game.belgic_eligibility == '1st Faction Command Only' or
+                    self.game.belgic_eligibility.startswith('2nd ') or
+                    self.game.roman_eligibility == '1st Faction Event' or self.game.roman_eligibility == '1st Faction Command Only' or
+                    self.game.roman_eligibility.startswith('2nd ') or card_has_swords):
+            # can't use the event
+            bnoevent = True
+        else:
+            # can choose the event, see if the event has a Swords icon
+            # ask the player if the event is effective
+            reply = self.ask_question("event_ineffective", "Is the event Ineffective OR adds a Capability during final year?")
+            if reply == 'Y':
+                bnoevent = True
+            elif reply == 'N':
+                self.do_aedui_flow_execute_event(self)
+
+        if bnoevent:
+            # continue with 8.6.2
+            self.do_aedui_flow_862(self)
+
+    def do_aedui_flow_execute_event(self, rest):
+        print "ACTION: Execute Event UNSHADED text. Check for Laurels on the Aedui icon."
+
+    def do_aedui_flow_862(self, rest):
+        print ""
+        choice = raw_input("Battle would force loss on Enemy Leader, Ally, Citadel or Legion? [Y/N]: ").upper()
+        if choice == "Y":
+            self.aedui_battle()
+            if raw_input("Play Special Event - Ambush? [Y/N]").upper == "Y":
+                bAmbush = True
+        else:
+
             print ""
-            choice = raw_input("By sequence of play, Aedui can use the Event? [Y/N]: ").upper()
-            if choice == "Y":
+            print "***CHECKING TO SEE IF RALLY IS POSSIBLE***"
+
+            #print "TEST FOLLOWING LINE- forces aedui_warband_available = 16"
+            #self.aedui_warband_available = 16
+
+            if (20 - self.game.aedui_warband_available) < 5:
                 print ""
-                choice = raw_input("Is the event (1)INeffective OR (2)Adds a Capability during final year OR (3)Swords icon 'on Boar' (see 8.2.1) : ").upper()
-                if choice == "N":
-                    print ""
-                    print "ACTION: Execute Event UNSHADED text. Check for Laurels on pig"
-                    print ""
-                    return
-
-        if bFlowEnded == False:
-            print ""
-            choice = raw_input("Battle would force loss on Enemy Leader, Ally, Citadel or Legion? [Y/N]: ").upper()
-            if choice == "Y":
-                self.aedui_battle()
-                if raw_input("Play Special Event - Ambush? [Y/N]").upper == "Y":
-                    bAmbush = True
-            else:
-
+                print "There are < 5 Aedui Warbands on map, there are %s on the map" % (20 - self.game.aedui_warband_available)
+                print "Aedui Resources: %s " % self.game.aedui_resources
                 print ""
-                print "***CHECKING TO SEE IF RALLY IS POSSIBLE***"
+                print "Checking available Rally Points"
+                region_list = ""
 
-                #print "TEST FOLLOWING LINE- forces aedui_warband_available = 16"
-                #self.aedui_warband_available = 16
+                if self.aedui_rally(region_list) == True:
+                    place = raw_input("Would Rally place Citadel, Ally, 3x pieces + available resources [Y/N]: ")
+                    if place.upper() == "Y":
+                        self.bRally = True
+                        region_list = ""
+                    while True and place.upper() == "Y":
+                        select = raw_input("Enter MAP to update Rally counts or QUIT: ")
+                        if select.strip().upper() == "QUIT":
+                            break
+                        else:
+                            if select.upper() == "MAP":
+                                region = raw_input("Enter 3 CHAR Region Code to Rally in: ").upper()
+                                region_list += region
+                                region_list += " "
+                                ac_count = int(raw_input("How many Aedui Citadel added to %s ? " % self.game.map[region].name))
+                                at_count = int(raw_input("How many Aedui Tribe added to %s ? " % self.game.map[region].name))
+                                aw_count = int(raw_input("How many Aedui Warband added to %s ? " % self.game.map[region].name))
 
-                if (20 - self.game.aedui_warband_available) < 5:
-                    print ""
-                    print "There are < 5 Aedui Warbands on map, there are %s on the map" % (20 - self.game.aedui_warband_available)
-                    print "Aedui Resources: %s " % self.game.aedui_resources
-                    print ""
-                    print "Checking available Rally Points"
-                    region_list = ""
+                                self.game.map[region].aedui_citadel += ac_count
+                                self.game.map[region].aedui_tribe += at_count
+                                self.game.map[region].aedui_warband += aw_count
+                                self.game.aedui_citadel_available -= ac_count
+                                self.game.aedui_tribe_available -= at_count
+                                self.game.aedui_warband_available -= aw_count
+                                self.game.aedui_resources -= 1
+                                print "Aedui Resources %s :" % self.game.aedui_resources
 
-                    if self.aedui_rally(region_list) == True:
-                        place = raw_input("Would Rally place Citadel, Ally, 3x pieces + available resources [Y/N]: ")
-                        if place.upper() == "Y":
-                            self.bRally = True
-                            region_list = ""
-                        while True and place.upper() == "Y":
-                            select = raw_input("Enter MAP to update Rally counts or QUIT: ")
-                            if select.strip().upper() == "QUIT":
+                            print ""
+                            print "Checking Further Available Rally points"
+
+                            if self.aedui_rally(region_list) == False and self.game.aedui_resources == 0:
                                 break
-                            else:
-                                if select.upper() == "MAP":
-                                    region = raw_input("Enter 3 CHAR Region Code to Rally in: ").upper()
-                                    region_list += region
-                                    region_list += " "
-                                    ac_count = int(raw_input("How many Aedui Citadel added to %s ? " % self.game.map[region].name))
-                                    at_count = int(raw_input("How many Aedui Tribe added to %s ? " % self.game.map[region].name))
-                                    aw_count = int(raw_input("How many Aedui Warband added to %s ? " % self.game.map[region].name))
-
-                                    self.game.map[region].aedui_citadel += ac_count
-                                    self.game.map[region].aedui_tribe += at_count
-                                    self.game.map[region].aedui_warband += aw_count
-                                    self.game.aedui_citadel_available -= ac_count
-                                    self.game.aedui_tribe_available -= at_count
-                                    self.game.aedui_warband_available -= aw_count
-                                    self.game.aedui_resources -= 1
-                                    print "Aedui Resources %s :" % self.game.aedui_resources
-
-                                print ""
-                                print "Checking Further Available Rally points"
-
-                                if self.aedui_rally(region_list) == False and self.game.aedui_resources == 0:
-                                    break
-
-                    else:
-                        print "Rally Unavailable"
 
                 else:
-                    print "RALLY check FAILED - %s Aedui Warbands already on the map" % (20 - self.game.aedui_warband_available)
+                    print "Rally Unavailable"
 
+            else:
+                print "RALLY check FAILED - %s Aedui Warbands already on the map" % (20 - self.game.aedui_warband_available)
+
+            print ""
+            if self.bRally:
+                if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
+                    bTrade = True
+            else:
                 print ""
-                if self.bRally:
+                print "***CHECKING TO SEE IF RAID IS POSSIBLE"
+                # print "TEST FOLLOWING LINE- forces aedui resources = 3
+                self.game.aedui_resources = 3
+
+                region_list = ""
+
+                if self.aedui_raid(region_list) == True and self.game.aedui_resources < 4:
+                    place = raw_input("Would Raid gain > 2 Resources Total [Y/N]: ")
+                    if place.upper() == "Y":
+                        region_list = ""
+                    while True and place.upper() == "Y":
+                        select = raw_input("Enter MAP to update Raid - with Aedui Revealed counts or QUIT: ")
+                        if select.strip().upper() == "QUIT":
+                            break
+                        else:
+                            if select.upper() == "MAP":
+                                region = raw_input("Enter 3 CHAR Region Code to Raid in: ").upper()
+                                region_list += region
+                                region_list += " "
+                                aw_count = int(raw_input("How many Aedui Warband(s) are Revealed in %s ? " % self.game.map[region].name))
+
+                                self.game.map[region].aedui_warband_revealed += aw_count
+                                self.game.aedui_resources -= aw_count
+                                print "Aedui Resources %s :" % self.game.aedui_resources
+
+                            print ""
+                            print "Checking Further Available Raid points"
+
+                            if self.aedui_raid(region_list) == False and self.game.aedui_resources == 0:
+                                break
+
+                    else:
+                        print ""
+                        print "RAID UNAVAILABLE"
+                        bTrade = False
+                        print "Pass !!"
+
+                    print ""
+                    if bTrade == True:
+                        if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
+                            bTrade = True
+
+                else:
+                    print "RAID check FAILED Aedui has > 3 Resources with %s" % self.game.aedui_resources
+                    self.aedui_march()
+
                     if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
                         bTrade = True
-                else:
-                    print ""
-                    print "***CHECKING TO SEE IF RAID IS POSSIBLE"
-                    # print "TEST FOLLOWING LINE- forces aedui resources = 3
-                    self.game.aedui_resources = 3
 
-                    region_list = ""
-
-                    if self.aedui_raid(region_list) == True and self.game.aedui_resources < 4:
-                        place = raw_input("Would Raid gain > 2 Resources Total [Y/N]: ")
-                        if place.upper() == "Y":
-                            region_list = ""
-                        while True and place.upper() == "Y":
-                            select = raw_input("Enter MAP to update Raid - with Aedui Revealed counts or QUIT: ")
-                            if select.strip().upper() == "QUIT":
-                                break
-                            else:
-                                if select.upper() == "MAP":
-                                    region = raw_input("Enter 3 CHAR Region Code to Raid in: ").upper()
-                                    region_list += region
-                                    region_list += " "
-                                    aw_count = int(raw_input("How many Aedui Warband(s) are Revealed in %s ? " % self.game.map[region].name))
-
-                                    self.game.map[region].aedui_warband_revealed += aw_count
-                                    self.game.aedui_resources -= aw_count
-                                    print "Aedui Resources %s :" % self.game.aedui_resources
-
-                                print ""
-                                print "Checking Further Available Raid points"
-
-                                if self.aedui_raid(region_list) == False and self.game.aedui_resources == 0:
-                                    break
-
-                        else:
-                            print ""
-                            print "RAID UNAVAILABLE"
-                            bTrade = False
-                            print "Pass !!"
-
-                        print ""
-                        if bTrade == True:
-                            if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
-                                bTrade = True
-
-                    else:
-                        print "RAID check FAILED Aedui has > 3 Resources with %s" % self.game.aedui_resources
-                        self.aedui_march()
-
-                        if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
-                            bTrade = True
-
-                        ##if none or Frost then raid
-                        self.aedui_raid()
-                        if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
-                            bTrade = True
+                    ##if none or Frost then raid
+                    self.aedui_raid()
+                    if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
+                        bTrade = True
 
         #if bAmbush == True:
         #    self.aedui_ambush()
