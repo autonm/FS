@@ -249,11 +249,10 @@ class FY(cmd.Cmd):
                 # We have an Answer, meaning this is the return from a Question, so we load the JSON from FSBot format
                 self.parse_gamedata(self)
 
-            self.game.action = "Aedui"
-
             # Which bot to activate?
             if self.game.action == 'Game State':
                 self.do_status(self)
+                sys.exit()
 
             if self.game.action == 'Aedui':
                 # check answer key for continuation of flow
@@ -665,6 +664,10 @@ class FY(cmd.Cmd):
         bTrade = False
 
         print ""
+        print "Bot Activated: Aedui"
+
+        # 8.6.1 Is Aedui symbol 1st on the next card AND != 1st on current?
+
         choice = raw_input("Is Aedui symbol 1st on the next card AND != 1st on current? [Y/N]: ").upper()
         if choice == "Y":
             roll = int(raw_input("Roll D6. 1-4 Pass, 5-6 Continue. Enter result: "))
