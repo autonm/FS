@@ -616,8 +616,8 @@ class FY(cmd.Cmd):
 
     def ask_question(self, code, question):
         if isvassal:
-            self.write_gamedata(self)
-            print json.dumps({"q": code, "question": question})
+            datafile = self.write_gamedata(self)
+            print json.dumps({"q": code, "question": question, "datafile": datafile})
             return ''
         else:
             return raw_input(question + ' [Y/N]: ')
