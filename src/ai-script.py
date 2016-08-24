@@ -1177,20 +1177,5 @@ def main():
 
     app = FY()
 
-    # TEST STUFF for return from q&a
-    # outfile = app.write_gamedata(app)
-    # print "before erase app:", app.game.action
-    # app = None
-    # print outfile
-    # print app
-    # answer = {}
-    #
-    # file = open(outfile, 'r')
-    # inputdata = file.read()
-    # file.close()
-    #
-    # print inputdata
-    # app = FY()
-
 if __name__ == "__main__":
     main()
