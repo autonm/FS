@@ -165,38 +165,38 @@ class FY(cmd.Cmd):
         "VEN": {}
     }
     allySpaces = {
-        "Catuvalauni": {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Morini":      {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Menapii":     {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Nervii":      {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Atrebates":   {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Bellovaci":   {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Remi":        {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Veneti":      {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Namnetes":    {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Aulerci":     {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Pictones":    {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Santones":    {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Cadurci":     {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Volcae":      {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Senones":     {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Lingones":    {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Helvetii":    {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Treveri":     {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Sugambri":    {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
+        "Catuvalauni": {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Morini":      {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Menapii":     {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Nervii":      {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Atrebates":   {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Bellovaci":   {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Remi":        {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Veneti":      {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Namnetes":    {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Aulerci":     {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Pictones":    {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Santones":    {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Cadurci":     {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Volcae":      {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Senones":     {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Lingones":    {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Helvetii":    {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Treveri":     {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Sugambri":    {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
         "Suebi North": {"Aedui": False, "Arverni": False, "Belgic": False, "Roman": False, "Germanic": True},
-        "Ubii":        {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
+        "Ubii":        {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
         "Suebi South": {"Aedui": False, "Arverni": False, "Belgic": False, "Roman": False, "Germanic": True},
-        "Helvii":      {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Eburones":    {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True}
+        "Helvii":      {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Eburones":    {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True}
         }
     citadelSpaces = {
-        "Carnutes":    {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Bituriges":   {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Arverni":     {"Aedui": False, "Arverni": True, "Belgic": False, "Roman": False, "Germanic": False},
-        "Aedui":       {"Aedui": True, "Arverni": False, "Belgic": False, "Roman": False, "Germanic": False},
-        "Mandubii":    {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True},
-        "Sequani":     {"Aedui": True, "Arverni": True, "Belgic": True, "Roman": True, "Germanic": True}
+        "Carnutes":    {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Bituriges":   {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Arverni":     {"Aedui": False, "Arverni": True,  "Belgic": False, "Roman": False, "Germanic": False},
+        "Aedui":       {"Aedui": True,  "Arverni": False, "Belgic": False, "Roman": False, "Germanic": False},
+        "Mandubii":    {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
+        "Sequani":     {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True}
         }
     # card number: [ faction order + NP Instruction ]
     # factions: (Ro)man, (Ar)verni, (Ae)dui, (Be)lgic
