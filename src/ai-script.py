@@ -1142,8 +1142,6 @@ class FY(cmd.Cmd):
 
 
 def main():
-    print "GMT: Falling Sky; Release", RELEASE
-
     args = len(sys.argv)
     if (args < 2 or args > 4):
         print "Invalid number of arguments"
@@ -1160,9 +1158,9 @@ def main():
     fileparam = sys.argv[1]
 
     # Is this from VASSAL or command line?
-    isvassal = ((sys.argv[2]).upper() == "TRUE") or True
+    isvassal = ((sys.argv[2]).upper() == "TRUE")
 
-    # JSON string with answer information from VASSAL, "{}" if running from VASSAL initially
+    # JSON string with answer information from VASSAL, no argument given if this is not a reply run
     if (args > 3):
         answerdata = json.loads(sys.argv[3])
         answer = Answer()
@@ -1170,6 +1168,10 @@ def main():
         # iterate the answer list to convert to object attributes
         for item in answerdata:
             setattr(answer, item, answerdata[item])
+
+    if Answer is None:
+        # Only show the RELEASE info on the initial run, not each reply as well
+        print "GMT: Falling Sky; Release", RELEASE
 
     file = open(fileparam, 'r')
     inputdata = file.read()
