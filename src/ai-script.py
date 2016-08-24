@@ -638,8 +638,7 @@ class FY(cmd.Cmd):
             temp.write(gamejson)
         finally:
             temp.close()
-            # Delete file somewhere when done? not here!
-            #os.remove(filename)
+
             return temp.name
 
     def ask_question(self, faction, code, question):
@@ -1160,6 +1159,11 @@ def main():
     # Is this from VASSAL or command line?
     isvassal = ((sys.argv[2]).upper() == "TRUE")
 
+    # load the input file, VASSAL JSON or our gamedata JSON
+    file = open(fileparam, 'r')
+    inputdata = file.read()
+    file.close()
+
     # JSON string with answer information from VASSAL, no argument given if this is not a reply run
     if (args > 3):
         answerdata = json.loads(sys.argv[3])
@@ -1169,14 +1173,14 @@ def main():
         for item in answerdata:
             setattr(answer, item, answerdata[item])
 
+        # Delete the gamedata file we no longer need
+        os.remove(fileparam)
+
     if answer is None:
         # Only show the RELEASE info on the initial run, not each reply as well
         print "GMT: Falling Sky; Release", RELEASE
 
-    file = open(fileparam, 'r')
-    inputdata = file.read()
-    file.close()
-
+    # start the main program
     app = FY()
 
 if __name__ == "__main__":
