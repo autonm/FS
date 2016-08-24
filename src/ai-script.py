@@ -1183,5 +1183,11 @@ def main():
     # start the main program
     app = FY()
 
+    # write inputdata to vassal-raw
+    #from os.path import expanduser
+    #home = expanduser("~")
+    #with open(home + "/vassal-raw.json", "w") as text_file:
+    #    text_file.write(inputdata)
+
 if __name__ == "__main__":
     main()
