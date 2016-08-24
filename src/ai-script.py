@@ -108,6 +108,12 @@ class Region:
         # adjancencies to this region
         self.adjacent = adjacencies
 
+class Answer:
+    def __init__(self):
+        self.q = ""
+        self.reply = ""
+        self.faction = ""
+
 # used when converting self.game to a JSON object for temporary storage in a file
 class GameEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -288,10 +294,10 @@ class FY(cmd.Cmd):
 
             if self.game.action.startswith('Aedui'):
                 # check answer key for continuation of flow
-                if (answer is None):
+                if answer is None:
                     self.do_aedui_flow(self)
-                elif (answer.q == 'event_ineffective'):
-                    if (answer.reply.upper() == 'YES'):
+                elif answer.q == 'event_ineffective':
+                    if answer.reply.upper() == 'YES':
                         self.do_aedui_flow_862(self)
                     else:
                         self.do_aedui_flow_execute_event(self)
@@ -1158,7 +1164,13 @@ def main():
 
     # JSON string with answer information from VASSAL, "{}" if running from VASSAL initially
     if (args > 3):
-        answer = json.loads(sys.argv[3])
+        answerdata = json.loads(sys.argv[3])
+        answer = Answer()
+
+        # iterate the answer list to convert to object attributes
+        for item in answerdata:
+            setattr(answer, item, answerdata[item])
+
     file = open(fileparam, 'r')
     inputdata = file.read()
     file.close()
@@ -1179,7 +1191,6 @@ def main():
     #
     # print inputdata
     # app = FY()
-
 
 if __name__ == "__main__":
     main()
