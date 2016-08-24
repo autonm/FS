@@ -1169,7 +1169,7 @@ def main():
         for item in answerdata:
             setattr(answer, item, answerdata[item])
 
-    if Answer is None:
+    if answer is None:
         # Only show the RELEASE info on the initial run, not each reply as well
         print "GMT: Falling Sky; Release", RELEASE
 
