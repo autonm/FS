@@ -636,10 +636,10 @@ class FY(cmd.Cmd):
             #os.remove(filename)
             return temp.name
 
-    def ask_question(self, code, question):
+    def ask_question(self, faction, code, question):
         if isvassal:
             datafile = self.write_gamedata(self)
-            print json.dumps({"q": code, "question": question, "datafile": datafile})
+            print json.dumps({"faction": faction, "q": code, "question": question, "datafile": datafile})
             return ''
         else:
             return raw_input(question + ' [Y/N]: ')
@@ -750,7 +750,7 @@ class FY(cmd.Cmd):
         else:
             # can choose the event, see if the event has a Swords icon
             # ask the player if the event is effective
-            reply = self.ask_question("event_ineffective", "Is the event Ineffective OR adds a Capability during final year?")
+            reply = self.ask_question("Aedui", "event_ineffective", "Is the event Ineffective OR adds a Capability during final year?")
             if reply == 'Y':
                 bnoevent = True
             elif reply == 'N':
@@ -1154,7 +1154,7 @@ def main():
     fileparam = sys.argv[1]
 
     # Is this from VASSAL or command line?
-    isvassal = ((sys.argv[2]).upper() == "TRUE")
+    isvassal = ((sys.argv[2]).upper() == "TRUE") or True
 
     # JSON string with answer information from VASSAL, "{}" if running from VASSAL initially
     if (args > 3):
