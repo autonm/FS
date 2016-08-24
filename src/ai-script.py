@@ -7,53 +7,11 @@ import tempfile
 import itertools
 import random
 
-RELEASE = "0.14082016xx"
+RELEASE = "0.14082016xx+"
 # test
 
 def d6():
     return random.randint(1, 6)
-
-class Region:
-    app = None
-    key = ""
-    name = ""
-    modname = ""
-    control = ""
-    pop = 0
-    aedui_warband = 0
-    aedui_warband_revealed = 0
-    aedui_tribe = 0
-    aedui_citadel = 0
-    arverni_leader = 0
-    arverni_warband = 0
-    arverni_warband_revealed = 0
-    arverni_tribe = 0
-    arverni_citadel = 0
-    belgic_leader = 0
-    belgic_warband = 0
-    belgic_warband_revealed = 0
-    belgic_tribe = 0
-    belgic_citadel = 0
-    germanic_warband = 0
-    germanic_warband_revealed = 0
-    germanic_tribe = 0
-    roman_leader = 0
-    roman_auxilia = 0
-    roman_fort = 0
-    roman_legion = 0
-    roman_tribe = 0
-    dispersed_gathering = 0
-    devastated = 0
-    max_cities = 0
-    max_citadel = 0
-
-    def __init__(self, theapp, thekey, thename):
-        self.app = theapp
-        self.key = thekey
-        self.name = thename
-
-        # name of this region in the json data        
-        self.modname = theapp.mapIndex[thekey]
 
 class Game:
     def __init__(self):
@@ -104,6 +62,52 @@ class Game:
         self.roman_legion_available = 0
         self.roman_tribe_available = 0
 
+class Region:
+    app = None
+    key = ""
+    name = ""
+    modname = ""
+    control = ""
+    pop = 0
+    aedui_warband = 0
+    aedui_warband_revealed = 0
+    aedui_tribe = 0
+    aedui_citadel = 0
+    arverni_leader = 0
+    arverni_warband = 0
+    arverni_warband_revealed = 0
+    arverni_tribe = 0
+    arverni_citadel = 0
+    belgic_leader = 0
+    belgic_warband = 0
+    belgic_warband_revealed = 0
+    belgic_tribe = 0
+    belgic_citadel = 0
+    germanic_warband = 0
+    germanic_warband_revealed = 0
+    germanic_tribe = 0
+    roman_leader = 0
+    roman_auxilia = 0
+    roman_fort = 0
+    roman_legion = 0
+    roman_tribe = 0
+    dispersed_gathering = 0
+    devastated = 0
+    max_cities = 0
+    max_citadel = 0
+    adjacent = {}
+
+    def __init__(self, theapp, thekey, thename, adjacencies):
+        self.app = theapp
+        self.key = thekey
+        self.name = thename
+
+        # name of this region in the json data
+        self.modname = theapp.mapIndex[thekey]
+
+        # adjancencies to this region
+        self.adjacent = adjacencies
+
 # used when converting self.game to a JSON object for temporary storage in a file
 class GameEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -136,6 +140,24 @@ class FY(cmd.Cmd):
         "UBI": "Germania (Ubii, Suebi)",
         "VEN": "Celtica (Veneti, Namnetes)"
         }
+    mapAdjacencies = {
+        "AED": {"ARV": "L", "HEL": "L", "SEQ": "L", "MAN": "L", "BIT": "L"},
+        "ARV": {"AED": "L", "BIT": "L", "HEL": "L", "PIC": "L"},
+        "ATR": {},
+        "BIT": {"PIC": "L", "ARV": "L", "AED": "L", "MAN": "L", "CAR": "L"},
+        "CAT": {},
+        "CAR": {},
+        "HEL": {},
+        "MAN": {},
+        "MOR": {},
+        "NER": {},
+        "PIC": {},
+        "SEQ": {},
+        "SUG": {},
+        "TRE": {},
+        "UBI": {},
+        "VEN": {}
+    }
     allySpaces = {
         "Catuvalauni",
         "Morini",
@@ -283,37 +305,37 @@ class FY(cmd.Cmd):
         self.game.action = inputdata['action']
 
         # set up all Regions and load Regions data from inputdata
-        self.game.map["AED"] = Region(self, "AED", "Aedui")
+        self.game.map["AED"] = Region(self, "AED", "Aedui", self.mapAdjacencies["AED"])
         self.load_region(self.game.map["AED"])
-        self.game.map["ARV"] = Region(self, "ARV", "Arverni")
+        self.game.map["ARV"] = Region(self, "ARV", "Arverni", self.mapAdjacencies["ARV"])
         self.load_region(self.game.map["ARV"])
-        self.game.map["ATR"] = Region(self, "ATR", "Atrebates")
+        self.game.map["ATR"] = Region(self, "ATR", "Atrebates", self.mapAdjacencies["ATR"])
         self.load_region(self.game.map["ATR"])
-        self.game.map["BIT"] = Region(self, "BIT", "Bituriges")
+        self.game.map["BIT"] = Region(self, "BIT", "Bituriges", self.mapAdjacencies["BIT"])
         self.load_region(self.game.map["BIT"])
-        self.game.map["CAT"] = Region(self, "CAT", "Catuvellauni")
+        self.game.map["CAT"] = Region(self, "CAT", "Catuvellauni", self.mapAdjacencies["CAT"])
         self.load_region(self.game.map["CAT"])
-        self.game.map["CAR"] = Region(self, "CAR", "Carnutes")
+        self.game.map["CAR"] = Region(self, "CAR", "Carnutes", self.mapAdjacencies["CAR"])
         self.load_region(self.game.map["CAR"])
-        self.game.map["HEL"] = Region(self, "HEL", "Helvii")
+        self.game.map["HEL"] = Region(self, "HEL", "Helvii", self.mapAdjacencies["HEL"])
         self.load_region(self.game.map["HEL"])
-        self.game.map["MAN"] = Region(self, "MAN", "Mandubii")
+        self.game.map["MAN"] = Region(self, "MAN", "Mandubii", self.mapAdjacencies["MAN"])
         self.load_region(self.game.map["MAN"])
-        self.game.map["MOR"] = Region(self, "MOR", "Morini")
+        self.game.map["MOR"] = Region(self, "MOR", "Morini", self.mapAdjacencies["MOR"])
         self.load_region(self.game.map["MOR"])
-        self.game.map["NER"] = Region(self, "NER", "Nervii")
+        self.game.map["NER"] = Region(self, "NER", "Nervii", self.mapAdjacencies["NER"])
         self.load_region(self.game.map["NER"])
-        self.game.map["PIC"] = Region(self, "PIC", "Pictones")
+        self.game.map["PIC"] = Region(self, "PIC", "Pictones", self.mapAdjacencies["PIC"])
         self.load_region(self.game.map["PIC"])
-        self.game.map["SEQ"] = Region(self, "SEQ", "Sequani")
+        self.game.map["SEQ"] = Region(self, "SEQ", "Sequani", self.mapAdjacencies["SEQ"])
         self.load_region(self.game.map["SEQ"])
-        self.game.map["SUG"] = Region(self, "SUG", "Sugambri")
+        self.game.map["SUG"] = Region(self, "SUG", "Sugambri", self.mapAdjacencies["SUG"])
         self.load_region(self.game.map["SUG"])
-        self.game.map["TRE"] = Region(self, "TRE", "Treveri")
+        self.game.map["TRE"] = Region(self, "TRE", "Treveri", self.mapAdjacencies["TRE"])
         self.load_region(self.game.map["TRE"])
-        self.game.map["UBI"] = Region(self, "UBI", "Ubii")
+        self.game.map["UBI"] = Region(self, "UBI", "Ubii", self.mapAdjacencies["UBI"])
         self.load_region(self.game.map["UBI"])
-        self.game.map["VEN"] = Region(self, "VEN", "Veneti")
+        self.game.map["VEN"] = Region(self, "VEN", "Veneti", self.mapAdjacencies["VEN"])
         self.load_region(self.game.map["VEN"])
 
         # find number of resources, find eligibility
@@ -355,7 +377,7 @@ class FY(cmd.Cmd):
                 for zone in data:
                     if zone['name'] == 'Aedui Available Forces':
                         for piece in zone['pieces']:
-                            if piece['name'] == 'Aedui Warband':
+                            if piece['name'].startswith('Aedui Warband'):
                                 self.game.aedui_warband_available += 1
                             if piece['name'] == 'Aedui Ally (Occupied)' or piece['name'] == 'Aedui Citadel (Ally)':
                                 self.game.aedui_tribe_available += 1
@@ -363,7 +385,7 @@ class FY(cmd.Cmd):
                                 self.game.aedui_citadel_available += 1
                     if zone['name'] == 'Arverni Available Forces':
                         for piece in zone['pieces']:
-                            if piece['name'] == 'Arverni Warband':
+                            if piece['name'].startswith('Arverni Warband'):
                                 self.game.arverni_warband_available += 1
                             if piece['name'] == 'Arverni Ally (Occupied)' or piece['name'] == 'Arverni Citadel (Ally)':
                                 self.game.arverni_tribe_available += 1
@@ -371,7 +393,7 @@ class FY(cmd.Cmd):
                                 self.game.arverni_citadel_available += 1
                     if zone['name'] == 'Belgic Available Forces':
                         for piece in zone['pieces']:
-                            if piece['name'] == 'Belgic Warband':
+                            if piece['name'].startswith('Belgic Warband'):
                                 self.game.belgic_warband_available += 1
                             if piece['name'] == 'Belgic Ally (Occupied)' or piece['name'] == 'Belgic Citadel (Ally)':
                                 self.game.belgic_tribe_available += 1
@@ -379,7 +401,7 @@ class FY(cmd.Cmd):
                                 self.game.belgic_citadel_available += 1
                     if zone['name'] == 'Germanic Available Forces':
                         for piece in zone['pieces']:
-                            if piece['name'] == 'Germanic Warband':
+                            if piece['name'].startswith('Germanic Warband'):
                                 self.game.germanic_warband_available += 1
                             if piece['name'] == 'Germanic Ally (Occupied)':
                                 self.game.germanic_tribe_available += 1
@@ -569,22 +591,22 @@ class FY(cmd.Cmd):
         self.game = Game()
 
         # set up Regions, but do not load them yet
-        self.game.map["AED"] = Region(self, "AED", "Aedui")
-        self.game.map["ARV"] = Region(self, "ARV", "Arverni")
-        self.game.map["ATR"] = Region(self, "ATR", "Atrebates")
-        self.game.map["BIT"] = Region(self, "BIT", "Bituriges")
-        self.game.map["CAT"] = Region(self, "CAT", "Catuvellauni")
-        self.game.map["CAR"] = Region(self, "CAR", "Carnutes")
-        self.game.map["HEL"] = Region(self, "HEL", "Helvii")
-        self.game.map["MAN"] = Region(self, "MAN", "Mandubii")
-        self.game.map["MOR"] = Region(self, "MOR", "Morini")
-        self.game.map["NER"] = Region(self, "NER", "Nervii")
-        self.game.map["PIC"] = Region(self, "PIC", "Pictones")
-        self.game.map["SEQ"] = Region(self, "SEQ", "Sequani")
-        self.game.map["SUG"] = Region(self, "SUG", "Sugambri")
-        self.game.map["TRE"] = Region(self, "TRE", "Treveri")
-        self.game.map["UBI"] = Region(self, "UBI", "Ubii")
-        self.game.map["VEN"] = Region(self, "VEN", "Veneti")
+        self.game.map["AED"] = Region(self, "AED", "Aedui", self.mapAdjacencies["AED"])
+        self.game.map["ARV"] = Region(self, "ARV", "Arverni", self.mapAdjacencies["ARV"])
+        self.game.map["ATR"] = Region(self, "ATR", "Atrebates", self.mapAdjacencies["ATR"])
+        self.game.map["BIT"] = Region(self, "BIT", "Bituriges", self.mapAdjacencies["BIT"])
+        self.game.map["CAT"] = Region(self, "CAT", "Catuvellauni", self.mapAdjacencies["CAT"])
+        self.game.map["CAR"] = Region(self, "CAR", "Carnutes", self.mapAdjacencies["CAR"])
+        self.game.map["HEL"] = Region(self, "HEL", "Helvii", self.mapAdjacencies["HEL"])
+        self.game.map["MAN"] = Region(self, "MAN", "Mandubii", self.mapAdjacencies["MAN"])
+        self.game.map["MOR"] = Region(self, "MOR", "Morini", self.mapAdjacencies["MOR"])
+        self.game.map["NER"] = Region(self, "NER", "Nervii", self.mapAdjacencies["NER"])
+        self.game.map["PIC"] = Region(self, "PIC", "Pictones", self.mapAdjacencies["PIC"])
+        self.game.map["SEQ"] = Region(self, "SEQ", "Sequani", self.mapAdjacencies["SEQ"])
+        self.game.map["SUG"] = Region(self, "SUG", "Sugambri", self.mapAdjacencies["SUG"])
+        self.game.map["TRE"] = Region(self, "TRE", "Treveri", self.mapAdjacencies["TRE"])
+        self.game.map["UBI"] = Region(self, "UBI", "Ubii", self.mapAdjacencies["UBI"])
+        self.game.map["VEN"] = Region(self, "VEN", "Veneti", self.mapAdjacencies["VEN"])
 
         # parse the JSON to Python lists
         gamedata = json.loads(inputdata)
@@ -696,6 +718,7 @@ class FY(cmd.Cmd):
         bFlowEnded = False
         bAmbush = False
         bTrade = False
+        card_has_swords = False
 
         print ""
         print "Bot Activated: Aedui"
@@ -741,6 +764,10 @@ class FY(cmd.Cmd):
         print "ACTION: Execute Event UNSHADED text. Check for Laurels on the Aedui icon."
 
     def do_aedui_flow_862(self, rest):
+        bFlowEnded = False
+        bAmbush = False
+        bTrade = False
+
         print ""
         choice = raw_input("Battle would force loss on Enemy Leader, Ally, Citadel or Legion? [Y/N]: ").upper()
         if choice == "Y":
@@ -760,7 +787,7 @@ class FY(cmd.Cmd):
                 print "There are < 5 Aedui Warbands on map, there are %s on the map" % (20 - self.game.aedui_warband_available)
                 print "Aedui Resources: %s " % self.game.aedui_resources
                 print ""
-                print "Checking available Rally Points"
+                print "Checking available Rally regions"
                 region_list = ""
 
                 if self.aedui_rally(region_list) == True:
@@ -809,7 +836,7 @@ class FY(cmd.Cmd):
             else:
                 print ""
                 print "***CHECKING TO SEE IF RAID IS POSSIBLE"
-                # print "TEST FOLLOWING LINE- forces aedui resources = 3
+                # print "TEST FOLLOWING LINE- forces a RAID aedui resources = 3
                 self.game.aedui_resources = 3
 
                 region_list = ""
@@ -829,12 +856,16 @@ class FY(cmd.Cmd):
                                 region_list += " "
                                 aw_count = int(raw_input("How many Aedui Warband(s) are Revealed in %s ? " % self.game.map[region].name))
 
+                                # TODO: you can't just increase the number of revealed warbands without decreasing the number of non-revealed warbands
+                                # TODO: or you will end up with too many warbands there. The total number of warbands in a region is
+                                # TODO: (x_warband + x_warband_revealed).
                                 self.game.map[region].aedui_warband_revealed += aw_count
-                                self.game.aedui_resources -= aw_count
+                                self.game.map[region].aedui_warband -= aw_count  # I ADDED THIS LINE
+                                self.game.aedui_resources += aw_count
                                 print "Aedui Resources %s :" % self.game.aedui_resources
 
                             print ""
-                            print "Checking Further Available Raid points"
+                            print "Checking Further Available Raid regions"
 
                             if self.aedui_raid(region_list) == False and self.game.aedui_resources == 0:
                                 break
@@ -852,15 +883,17 @@ class FY(cmd.Cmd):
 
                 else:
                     print "RAID check FAILED Aedui has > 3 Resources with %s" % self.game.aedui_resources
-                    self.aedui_march()
+                    print ""
+                    print "***CHECKING TO SEE IF MARCH IS POSSIBLE"
+                    if self.aedui_march() == True:
 
-                    if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
-                        bTrade = True
-
-                    ##if none or Frost then raid
-                    self.aedui_raid()
-                    if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
-                        bTrade = True
+                        if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
+                            bTrade = True
+                    else:
+                        ##if none or Frost then raid
+                        self.aedui_raid()  # TODO: this is highlighted as an error for missing parameter
+                        if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
+                            bTrade = True
 
         #if bAmbush == True:
         #    self.aedui_ambush()
@@ -943,7 +976,7 @@ class FY(cmd.Cmd):
 
         print "Attack round - Losses for %s are %s" % (battle_defender, a_count)
         print "Remove in order Leaders, Allied Tribes, Citadels, Legions"
-        self.do_map(self)
+        self.do_map(self)  # TODO: there is no do_map() in this file
 
         print ""
         print "Counterattack"
@@ -967,7 +1000,7 @@ class FY(cmd.Cmd):
 
         print "Counter Attack round - Losses for Aedui are %s" % a_count
         print "Remove in order Leaders, Allied Tribes, Citadels, Legions"
-        self.do_map(self)
+        self.do_map(self)  # TODO: there is no do_map() in this file
 
     def aedui_raid(self, region_list):
         print ""
@@ -1010,6 +1043,80 @@ class FY(cmd.Cmd):
         global bNoMarch
         ##if we are unable to march goes to Raid
 
+        bmarched = False
+
+        # Bullet Point 2
+        for country in self.game.map:
+
+            if bmarched == False:
+                high_count = 0
+                high_region = ""
+                moved = 0
+
+                # check that we are not moving last aedui warband
+                while self.game.map[country].aedui_warband > 1 and moved < 3:
+                    # need to check that moving will not change AEDUI control
+
+                    for loc in self.game.map[country].adjacent:
+                        if self.game.map[loc].aedui_warband == 0:
+                            count = self.game.map[loc].roman_tribe + self.game.map[loc].arverni_tribe + self.game.map[
+                                loc].belgic_tribe + self.game.map[loc].germanic_tribe
+                            count += self.game.map[loc].arverni_citadel + self.game.map[loc].belgic_citadel
+                            if count > 0 and count > high_count:
+                                high_region = loc
+
+                    if len(high_region) > 0:
+                        print "Move 1 Aedui Warband from %s to %s" % (country, high_region)
+                        self.game.map[country].aedui_warband -= 1
+                        self.game.map[high_region].aedui_warband += 1
+                        moved += 1
+                        bmarched = True
+
+        # Bullet Point 2
+        lowest_required = 0
+        lowest_adj_region = ""
+        lowest_from_region = ""
+
+        for country in self.game.map:
+            if self.game.map[country].aedui_warband > 1:
+                for loc in self.game.map[country].adjacent:
+                    for num in range(1, self.game.map[country].aedui_warband - 1):
+                        if self.game.map[loc].control != ("Aedui Control"):
+                            aedui_control = int(self.game.map[loc].aedui_warband) + \
+                                int(self.game.map[loc].aedui_tribe) + \
+                                int(self.game.map[loc].aedui_citadel)
+
+                            arverni_count = int(self.game.map[loc].arverni_leader) + \
+                                int(self.game.map[loc].arverni_warband) + int(self.game.map[loc].arverni_tribe) + \
+                                int(self.game.map[loc].arverni_citadel)
+
+                            belgic_count = int(self.game.map[loc].belgic_leader) + \
+                                int(self.game.map[loc].belgic_warband) + int(self.game.map[loc].belgic_tribe) + \
+                                int(self.game.map[loc].belgic_citadel)
+
+                            roman_count = int(self.game.map[loc].roman_leader) + \
+                                int(self.game.map[loc].roman_auxilia) + int(self.game.map[loc].roman_fort) + \
+                                int(self.game.map[loc].roman_legion) + int(self.game.map[loc].roman_tribe)
+
+                            germanic_count = int(self.game.map[loc].aedui_warband) + int(self.game.map[loc].aedui_tribe)
+
+                            if aedui_control + num > arverni_count + belgic_count + roman_count + germanic_count:
+                                if num < lowest_required or lowest_required == 0:
+                                    lowest_required = num
+                                    lowest_adj_region = loc
+                                    lowest_from_region = country
+                                break
+
+        if lowest_required > 0:
+            print "Move %s Aedui Warband from %s to %s" % (lowest_required, lowest_from_region, lowest_adj_region)
+            self.game.map[lowest_from_region].aedui_warband -= 1
+            self.game.map[lowest_adj_region].aedui_warband += 1
+            bmarched = True
+
+        if bmarched == True:
+            return True
+        else:
+            return False
 
     def aedui_ambush(self):
         print ""
