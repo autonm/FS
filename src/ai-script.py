@@ -148,22 +148,22 @@ class FY(cmd.Cmd):
         "VEN": "Celtica (Veneti, Namnetes)"
         }
     mapAdjacencies = {
-        "AED": {"ARV": "L", "HEL": "L", "SEQ": "L", "MAN": "L", "BIT": "L"},
-        "ARV": {"AED": "L", "BIT": "L", "HEL": "L", "PIC": "L"},
-        "ATR": {},
-        "BIT": {"PIC": "L", "ARV": "L", "AED": "L", "MAN": "L", "CAR": "L"},
-        "CAT": {},
-        "CAR": {},
-        "HEL": {},
-        "MAN": {},
-        "MOR": {},
-        "NER": {},
-        "PIC": {},
-        "SEQ": {},
-        "SUG": {},
-        "TRE": {},
-        "UBI": {},
-        "VEN": {}
+        "AED": {"MAN": "L", "SEQ": "L", "HEL": "L", "ARV": "L", "BIT": "L"},
+        "ARV": {"AED": "L", "HEL": "L", "PIC": "L", "BIT": "L"},
+        "ATR": {"MOR": "L", "NER": "L", "TRE": "L", "MAN": "L", "CAR": "L", "VEN": "L", "CAT": "S"},
+        "BIT": {"MAN": "L", "AED": "L", "ARV": "L", "PIC": "L", "CAR": "L"},
+        "CAT": {"MOR": "S", "ATR": "S", "VEN": "S"},
+        "CAR": {"ATR": "L", "MAN": "L", "BIT": "L", "PIC": "L", "VEN": "L"},
+        "HEL": {"ARV": "L", "AED": "L", "SEQ": "L"},
+        "MAN": {"ATR": "L", "TRE": "L", "SEQ": "L", "AED": "L", "BIT": "L", "CAR": "L"},
+        "MOR": {"SUG": "R", "NER": "L", "ATR": "L", "CAT": "S"},
+        "NER": {"SUG": "R", "TRE": "L", "ATR": "L", "MOR": "L"},
+        "PIC": {"VEN": "L", "CAR": "L", "BIT": "L", "ARV": "L"},
+        "SEQ": {"TRE": "L", "UBI": "R", "HEL": "L", "AED": "L", "MAN": "L"},
+        "SUG": {"UBI": "L", "TRE": "R", "NER": "R", "MOR": "R"},
+        "TRE": {"SUG": "R", "UBI": "R", "SEQ": "L", "MAN": "L", "ATR": "L", "NER": "L"},
+        "UBI": {"SEQ": "R", "TRE": "R", "SUG": "L"},
+        "VEN": {"CAT": "S", "ATR": "L", "CAR": "L", "PIC": "L"}
     }
     allySpaces = {
         "Catuvalauni": {"Aedui": True,  "Arverni": True,  "Belgic": True,  "Roman": True,  "Germanic": True},
