@@ -88,6 +88,7 @@ class Region:
     germanic_tribe = 0
     roman_leader = 0
     roman_auxilia = 0
+    roman_auxilia_revealed = 0
     roman_fort = 0
     roman_legion = 0
     roman_tribe = 0
@@ -559,6 +560,9 @@ class FY(cmd.Cmd):
                             # count the roman auxilia
                             if piece['name'] == 'Roman Auxilia':
                                 region.roman_auxilia += 1
+                            # count the roman auxilia revealed
+                            if piece['name'] == 'Roman Auxilia (Revealed)':
+                                region.roman_auxilia_revealed += 1
                             # count the roman tribes (allies)
                             if piece['name'] == 'Roman Ally':
                                 region.roman_tribe += 1
@@ -702,8 +706,8 @@ class FY(cmd.Cmd):
             if country.roman_leader > 0:
                 print "Roman Leader: %s" % country.roman_leader
 
-            if country.roman_auxilia > 0:
-                print "Roman Auxilia: %s" % country.roman_auxilia
+            if country.roman_auxilia + country.roman_auxilia_revealed > 0:
+                print "Roman Auxilia: %s" % country.roman_auxilia + country.roman_auxilia_revealed
 
             if country.roman_fort > 0:
                 print "Roman Fort: %s" % country.roman_fort
