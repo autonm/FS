@@ -2,6 +2,9 @@ import cmd
 import sys
 import json
 import os
+import string
+import tempfile
+import itertools
 import random
 
 RELEASE = "0.25082016b"
@@ -1220,6 +1223,12 @@ def main():
     inputdata = file.read()
     file.close()
 
+    # write inputdata to vassal-raw
+    #from os.path import expanduser
+    #home = expanduser("~")
+    #with open(home + "/vassal-raw.json", "w") as text_file:
+    #    text_file.write(inputdata)
+
     # JSON string with answer information from VASSAL, no argument given if this is not a reply run
     if (args > 3):
         answerparam = sys.argv[3]
@@ -1243,12 +1252,6 @@ def main():
 
     # start the main program
     app = FY()
-
-    # write inputdata to vassal-raw
-    #from os.path import expanduser
-    #home = expanduser("~")
-    #with open(home + "/vassal-raw.json", "w") as text_file:
-    #    text_file.write(inputdata)
 
 if __name__ == "__main__":
     main()
