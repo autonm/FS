@@ -1,9 +1,30 @@
 // setup
+
 var inputdata = {};
 var answerdata = {};
+var gamedata = {};
 
 var game = {};
 var msg = [];
+var askFactions = {};
+
+var interrupt = false;
+
+function reset() {
+	inputdata = {};
+	answerdata = {};
+	gamedata = {};
+	askFactions = {};
+
+	game = {};
+	msg = [];
+
+	interrupt = false;
+}
+
+var QUESTION_YESNO = "yesno";
+var QUESTION_SINGLECHOICE = "single";
+var QUESTION_MULTIPLECHOICE = "multi";
 
 var pieceLabel = {
 	"coalition_base": "Coalition Base", 
@@ -19,6 +40,25 @@ var pieceLabel = {
 	"warlords_guerrilla": "Warlords Guerrilla",
 	"warlords_guerrilla_underground": "Warlords Guerrilla",
 	"warlords_guerrilla_active": "Warlords Guerrilla Active"
+}
+
+var kMapAdjacencies = {
+	"AED": {"MAN": "L", "SEQ": "L", "HEL": "L", "ARV": "L", "BIT": "L"},
+	"ARV": {"AED": "L", "HEL": "L", "PIC": "L", "BIT": "L"},
+	"ATR": {"MOR": "L", "NER": "L", "TRE": "L", "MAN": "L", "CAR": "L", "VEN": "L", "CAT": "S"},
+	"BIT": {"MAN": "L", "AED": "L", "ARV": "L", "PIC": "L", "CAR": "L"},
+	"CAT": {"MOR": "S", "ATR": "S", "VEN": "S"},
+	"CAR": {"ATR": "L", "MAN": "L", "BIT": "L", "PIC": "L", "VEN": "L"},
+	"HEL": {"ARV": "L", "AED": "L", "SEQ": "L"},
+	"MAN": {"ATR": "L", "TRE": "L", "SEQ": "L", "AED": "L", "BIT": "L", "CAR": "L"},
+	"MOR": {"SUG": "R", "NER": "L", "ATR": "L", "CAT": "S"},
+	"NER": {"SUG": "R", "TRE": "L", "ATR": "L", "MOR": "L"},
+	"PIC": {"VEN": "L", "CAR": "L", "BIT": "L", "ARV": "L"},
+	"SEQ": {"TRE": "L", "UBI": "R", "HEL": "L", "AED": "L", "MAN": "L"},
+	"SUG": {"UBI": "L", "TRE": "R", "NER": "R", "MOR": "R"},
+	"TRE": {"SUG": "R", "UBI": "R", "SEQ": "L", "MAN": "L", "ATR": "L", "NER": "L"},
+	"UBI": {"SEQ": "R", "TRE": "R", "SUG": "L"},
+	"VEN": {"CAT": "S", "ATR": "L", "CAR": "L", "PIC": "L"}
 }
 
 var kAllySpaces = {
@@ -136,6 +176,9 @@ var kCardIndex = {
 }
 
 function loadGameFromInputData() {
+	game.retreatPermission = {};
+	game.state = "8.8.1";
+
 	game.action = inputdata.action;
 	game.aeduiNP = inputdata.npaedui;
 	game.arverniNP = inputdata.nparverni;
@@ -174,7 +217,7 @@ function loadGameFromInputData() {
 		},
 		CAT: {
 			key: "CAT",
-			name: "Catuvellauni",
+			name: "Britannia",
 			modname: "Britannia",
 			ally: 1,
 			citadel: 0
@@ -188,7 +231,7 @@ function loadGameFromInputData() {
 		},
 		HEL: {
 			key: "HEL",
-			name: "Helvii",
+			name: "Provincia",
 			modname: "Provincia",
 			ally: 1,
 			citadel: 0
@@ -285,12 +328,14 @@ function loadGameFromInputData() {
 				region.germanic_tribe = 0;
 				region.roman_leader = 0;
 				region.roman_auxilia = 0;
+				region.roman_auxilia_revealed = 0;
 				region.roman_fort = 0;
 				region.roman_legion = 0;
 				region.roman_tribe = 0;
 				region.dispersed_gathering = 0;
 				region.devastated = 0;
 				region.score = region.ally + region.citadel;
+				region.adjacent = kMapAdjacencies[key];
 
 				for (var p = 0; p < zone["pieces"].length; p++) {
 					var pieceName = zone["pieces"][p].name;
@@ -355,6 +400,9 @@ function loadGameFromInputData() {
 						region.roman_leader = 1;
 					// count the roman auxilia
 					if (pieceName == 'Roman Auxilia')
+						region.roman_auxilia++;
+					// count the roman auxilia revealed
+					if (pieceName == 'Roman Auxilia Revealed')
 						region.roman_auxilia++;
 					// count the roman tribes (allies)
 					if (pieceName == 'Roman Ally')
@@ -522,6 +570,8 @@ function main() {
 		game = inputdata;
 	} else {
 		loadGameFromInputData();
+
+		msgPush("# Activated Bot: " + game.action);
 	}
 		
 	// find cards
@@ -529,8 +579,6 @@ function main() {
 	//var momentum = getMomentumCards();
 
 	// Actions
-
-	msgPush("# Activated Bot: " + game.action);
 
 	if (game.action == "Roman") {
 		// Roman

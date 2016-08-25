@@ -6,11 +6,26 @@
 </head>
 
 <body>
+    <textarea id="question" type="text" cols="100" rows="3"></textarea><br>
+    <button id="button1">Answer</button>
+
     <p id="output" style="font-family: Monaco; font-size: 9pt;"></p>
 
     <script src="raw1.js"></script>
     <script>
         answer = "";
+        document.getElementById("question").value = '';
+
+        document.getElementById("button1").addEventListener("click", function(){
+            inputString = gamedata;
+            
+            reset();
+            
+            answer = document.getElementById("question").value;
+
+            main();
+            processBot();
+        });
     </script>
 
     <script src="../src/json2.js"></script>
@@ -22,8 +37,20 @@
     <script src="../src/ai-script.js"></script>
 
     <script>
-        msgs = msg.split('\n').join('<br>');
-        document.getElementById('output').innerHTML += msgs;
+        function processBot() {
+            document.getElementById('output').innerHTML = '';
+            msgs = msg.split('\n');
+            document.getElementById('output').innerHTML += msgs.join('<br>');
+
+            for (var i = 0; i < msgs.length; i++) {
+                if (msgs[i].startsWith('{')) {
+                    var m = JSON.parse(msgs[i]);
+                    m.reply = 'Yes';
+                    document.getElementById('question').value = JSON.stringify(m);
+                }
+            }
+        }
+        processBot();
     </script>
 </body>
 
