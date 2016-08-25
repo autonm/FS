@@ -1,14 +1,14 @@
 import cmd
 import sys
 import json
-import string
 import os
-import tempfile
-import itertools
 import random
 
-RELEASE = "0.14082016xx+"
-# test
+RELEASE = "0.25082016b"
+
+QUESTION_YESNO = "yesno"
+QUESTION_SINGLECHOICE = "single"
+QUESTION_MULTIPLECHOICE = "multi"
 
 def d6():
     return random.randint(1, 6)
@@ -129,6 +129,7 @@ class GameEncoder(json.JSONEncoder):
 class FY(cmd.Cmd):
     bRally = False
 
+    allRegions = ["AED", "ARV", "ATR", "BIT", "CAT", "CAR", "HEL", "MAN", "MOR", "NER", "PIC", "SEQ", "SUG", "TRE", "UBI", "VEN"]
     mapIndex = {
         "AED": "Celctica (Aedui)",
         "ARV": "Celtica (Arverni, Cadurci, Volcae)",
@@ -291,17 +292,18 @@ class FY(cmd.Cmd):
             # Which bot to activate?
             if self.game.action == 'Game State':
                 self.do_status(self)
-                sys.exit()
 
             if self.game.action.startswith('Aedui'):
                 # check answer key for continuation of flow
                 if answer is None:
                     self.do_aedui_flow(self)
-                elif answer.q == 'event_ineffective':
-                    if answer.reply.upper() == 'YES':
-                        self.do_aedui_flow_862(self)
-                    else:
-                        self.do_aedui_flow_execute_event(self)
+                else:
+                    print answer.q, answer.faction, answer.reply
+                    if answer.q == 'event_ineffective':
+                        if answer.reply.upper() == 'YES':
+                            self.do_aedui_flow_862(self)
+                        else:
+                            self.do_aedui_flow_execute_event(self)
 
     def parse_json(self, rest):
         global inputdata
@@ -645,13 +647,62 @@ class FY(cmd.Cmd):
 
             return temp.name
 
-    def ask_question(self, faction, code, question):
+    def ask_question(self, faction, type, code, question, options):
+        if options is None:
+            options = ''
         if isvassal:
             datafile = self.write_gamedata(self)
-            print json.dumps({"faction": faction, "q": code, "question": question, "datafile": datafile})
+            print json.dumps({"faction": faction, "type": type, "q": code, "question": question, "datafile": datafile, "options": options})
             return ''
         else:
-            return raw_input(question + ' [Y/N]: ')
+            if type == QUESTION_YESNO:
+                reply = raw_input(question + ' [Y/N]: ')
+                if reply.upper() == 'Y':
+                    return 'YES'
+                else:
+                    return 'NO'
+            elif type == QUESTION_SINGLECHOICE:
+                opts = options.split(';')
+                numopts = len(opts)
+                reply = 0
+                while reply < 1 or reply > numopts:
+
+                    print question + ':'
+                    for num, o in enumerate(opts):
+                        print (num+1), '-', o
+                    try:
+                        reply = int(raw_input('Type the number of your choice: '))
+                    except ValueError:
+                        reply = 0
+
+                return opts[reply-1]
+
+            elif type == QUESTION_MULTIPLECHOICE:
+                opts = options.split(';')
+                numopts = len(opts)
+                reply = -1
+                selection = []
+                while reply != 0:
+
+                    print question + ':'
+                    for num, o in enumerate(opts):
+                        if o in selection:
+                            print (num + 1), '[X]', o
+                        else:
+                            print (num + 1), '[ ]', o
+                    try:
+                        reply = int(raw_input('Type the number of your selection, type 0 to finish: '))
+                    except ValueError:
+                        reply = -1
+
+                    if reply >= 1 and reply <= numopts:
+                        if opts[reply-1] in selection:
+                            selection.remove(opts[reply-1])
+                        else:
+                            selection.append(opts[reply-1])
+
+                print ','.join(map(str, selection))
+                return ','.join(map(str, selection))
 
     def do_status(self, rest):
 
@@ -759,10 +810,10 @@ class FY(cmd.Cmd):
         else:
             # can choose the event, see if the event has a Swords icon
             # ask the player if the event is effective
-            reply = self.ask_question("Aedui", "event_ineffective", "Is the event Ineffective OR adds a Capability during final year?")
-            if reply == 'Y':
+            reply = self.ask_question("Aedui", QUESTION_YESNO, "event_ineffective", "Is the event Ineffective OR adds a Capability during final year?", "")
+            if reply == 'YES':
                 bnoevent = True
-            elif reply == 'N':
+            elif reply == 'NO':
                 self.do_aedui_flow_execute_event(self)
 
         if bnoevent:
@@ -778,10 +829,11 @@ class FY(cmd.Cmd):
         bTrade = False
 
         print ""
-        choice = raw_input("Battle would force loss on Enemy Leader, Ally, Citadel or Legion? [Y/N]: ").upper()
-        if choice == "Y":
+        choice = self.ask_question("Aedui", QUESTION_YESNO, "force_loss", "Battle would force loss on Enemy Leader, Ally, Citadel or Legion?", None)
+        if choice == "YES":
             self.aedui_battle()
-            if raw_input("Play Special Event - Ambush? [Y/N]").upper == "Y":
+            reply = self.ask_question("Aedui", QUESTION_YESNO, "play_event_ambush", "Play Special Event - Ambush?", None)
+            if reply == "YES":
                 bAmbush = True
         else:
 
@@ -789,7 +841,7 @@ class FY(cmd.Cmd):
             print "***CHECKING TO SEE IF RALLY IS POSSIBLE***"
 
             #print "TEST FOLLOWING LINE- forces aedui_warband_available = 16"
-            #self.aedui_warband_available = 16
+            #self.game.aedui_warband_available = 16
 
             if (20 - self.game.aedui_warband_available) < 5:
                 print ""
@@ -800,31 +852,31 @@ class FY(cmd.Cmd):
                 region_list = ""
 
                 if self.aedui_rally(region_list) == True:
-                    place = raw_input("Would Rally place Citadel, Ally, 3x pieces + available resources [Y/N]: ")
-                    if place.upper() == "Y":
+                    place = self.ask_question("Aedui", QUESTION_YESNO, "rally_places", "Would Rally place Citadel, Ally, 3x pieces + available resources?", None)
+                    if place == "YES":
                         self.bRally = True
                         region_list = ""
-                    while True and place.upper() == "Y":
-                        select = raw_input("Enter MAP to update Rally counts or QUIT: ")
-                        if select.strip().upper() == "QUIT":
+                    while place == "YES":
+                        select = self.ask_question("Aedui", QUESTION_YESNO, "rally_map_counts", "Update map Rally counts?", None)
+                        if select == "NO":
                             break
                         else:
-                            if select.upper() == "MAP":
-                                region = raw_input("Enter 3 CHAR Region Code to Rally in: ").upper()
-                                region_list += region
-                                region_list += " "
-                                ac_count = int(raw_input("How many Aedui Citadel added to %s ? " % self.game.map[region].name))
-                                at_count = int(raw_input("How many Aedui Tribe added to %s ? " % self.game.map[region].name))
-                                aw_count = int(raw_input("How many Aedui Warband added to %s ? " % self.game.map[region].name))
+                            region = self.ask_question("Aedui", QUESTION_SINGLECHOICE, "rally_location", "Where to Rally?", ';'.join(self.allRegions))
 
-                                self.game.map[region].aedui_citadel += ac_count
-                                self.game.map[region].aedui_tribe += at_count
-                                self.game.map[region].aedui_warband += aw_count
-                                self.game.aedui_citadel_available -= ac_count
-                                self.game.aedui_tribe_available -= at_count
-                                self.game.aedui_warband_available -= aw_count
-                                self.game.aedui_resources -= 1
-                                print "Aedui Resources %s :" % self.game.aedui_resources
+                            region_list += region
+                            region_list += " "
+                            ac_count = int(raw_input("How many Aedui Citadel added to %s ? " % self.game.map[region].name))
+                            at_count = int(raw_input("How many Aedui Tribe added to %s ? " % self.game.map[region].name))
+                            aw_count = int(raw_input("How many Aedui Warband added to %s ? " % self.game.map[region].name))
+
+                            self.game.map[region].aedui_citadel += ac_count
+                            self.game.map[region].aedui_tribe += at_count
+                            self.game.map[region].aedui_warband += aw_count
+                            self.game.aedui_citadel_available -= ac_count
+                            self.game.aedui_tribe_available -= at_count
+                            self.game.aedui_warband_available -= aw_count
+                            self.game.aedui_resources -= 1
+                            print "Aedui Resources %s :" % self.game.aedui_resources
 
                             print ""
                             print "Checking Further Available Rally points"
@@ -1147,7 +1199,7 @@ class FY(cmd.Cmd):
 def main():
     args = len(sys.argv)
     if (args < 2 or args > 4):
-        print "Invalid number of arguments"
+        print "Invalid number of arguments (", args, "): ", str(sys.argv)
         sys.exit(-1)
 
     global inputdata
@@ -1170,7 +1222,12 @@ def main():
 
     # JSON string with answer information from VASSAL, no argument given if this is not a reply run
     if (args > 3):
-        answerdata = json.loads(sys.argv[3])
+        answerparam = sys.argv[3]
+
+        file = open(answerparam, 'r')
+        answerdata = json.loads(file.read())
+        file.close()
+
         answer = Answer()
 
         # iterate the answer list to convert to object attributes
