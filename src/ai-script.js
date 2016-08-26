@@ -26,6 +26,9 @@ var QUESTION_YESNO = "yesno";
 var QUESTION_SINGLECHOICE = "single";
 var QUESTION_MULTIPLECHOICE = "multi";
 
+var SHADED = true;
+var UNSHADED = false;
+
 var pieceLabel = {
 	"coalition_base": "Coalition Base", 
 	"coalition_troops": "Coalition Troops",
@@ -176,7 +179,7 @@ var kCardIndex = {
 }
 
 function loadGameFromInputData() {
-	game.retreatPermission = {};
+	game.permissions = {};
 	game.capabilities = [];
 	game.state = "8.8.1";
 
@@ -271,7 +274,7 @@ function loadGameFromInputData() {
 			key: "NER",
 			name: "Nervii",
 			modname: "Belgica (Nervii)",
-			ally: 1,
+			ally: 2,
 			citadel: 0
 		},
 		PIC: {
@@ -573,10 +576,6 @@ function loadGameFromInputData() {
         germanic_score = 6 - self.game.germanic_tribe_available
         roman_score = 6 - self.game.roman_tribe_available
         self.game.other_most_allies = max(arverni_score, belgic_score, germanic_score, roman_score)
-
-        # Roman Victory
-        cities = len(self.allySpaces) + len(self.citadelSpaces) + self.game.colonies
-        self.game.subdued_dispersed_allies = cities - arverni_score - belgic_score - germanic_score - aedui_score
 
         # Belgic Victory
         self.game.control_allies = belgic_score

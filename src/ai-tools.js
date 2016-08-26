@@ -273,3 +273,69 @@ function askQuestion(type, code, question, options) {
 	));
 	interrupt = true;
 }
+
+function capabilityActive(num, shaded) {
+	for (var i = 0; i < game.capabilities; i++) {
+		if (game.capabilities[i].num == num && game.capabilities[i].shaded == shaded)
+			return true;
+	}
+	return false;
+}
+
+function totalDispersedGathering() {
+	var total = 0;
+	for (var key in game.map) {
+		var zone = game.map[key];
+		total += zone.dispersed_gathering;
+		console.log('totalDispersedGathering()', zone.name, zone.dispersed_gathering);
+	}
+	return total;
+}
+
+function totalSubdued() {
+	var total = 0;
+	for (var key in game.map) {
+		var zone = game.map[key];
+		var subdued = zone.ally -
+			(zone.aedui_tribe + zone.aedui_citadel +
+			zone.arverni_tribe + zone.arverni_citadel +
+			zone.belgic_tribe + zone.belgic_citadel +
+			zone.roman_tribe + zone.germanic_tribe) -
+			zone.dispersed_gathering;
+		total += subdued;
+		console.log('totalSubdued()', zone.name, zone.ally, subdued);
+	}
+	return total;
+}
+
+function romanVictoryScore() {
+	// Roman Victory
+
+	var score = (6 - game.roman_tribe_available) + 
+		totalDispersedGathering() + totalSubdued();
+	console.log('Roman Victory = ', score); 
+	return score;
+}
+
+function hasDiviciacusPermission() {
+	if (!('diviciacus' in game.permissions)) {
+		if (!capabilityActive(38, UNSHADED)) return false;
+
+		if (game.action == 'Roman') {
+			if (game.aeduiNP)
+				game.permissions['diviciacus'] = romanVictoryScore() <= 12;
+			else
+				askQuestion(QUESTION_YESNO, 'diviciacus_permission', 'Does Aedui player give permission for Diviciacus?');
+		} else {
+			if (game.romanNP)
+				msgPush('TODO: not implemented, aeduiVictoryScore() at hasDiviciacusPermission()');
+			else
+				askQuestion(QUESTION_YESNO, 'diviciacus_permission', 'Does Roman player give permission for Diviciacus?');
+		}
+	}
+	
+	if (!('diviciacus' in game.permissions))
+		return game.permissions['diviciacus'];
+	else
+		return false;
+}
