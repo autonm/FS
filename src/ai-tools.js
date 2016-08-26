@@ -198,21 +198,6 @@ function setFunctions(zone) {
 	}
 }
 
-function getMomentumCards() {
-    var momentum = [];
-	var cardZone = getZone("Momentum");
-	for (var i = 0; i < cardZone.pieces.length; i++) {
-		var piece = cardZone.pieces[i];
-		var periodIndex = piece.name.indexOf('.');
-		if (piece.name.charAt(0) != ' ' && periodIndex > 0 && periodIndex < 3) {
-			var cardNumber = piece.name.substring(0, periodIndex);
-			if (cardNumber.charAt(0) == '0') cardNumber = cardNumber.substring(1);
-			momentum.push(parseInt(cardNumber));
-		}
-	}
-	return momentum;
-}
-
 function pickRandomZone(candidates, selector) {
 	var blackDie = d6();
 	var tanDie = d6();

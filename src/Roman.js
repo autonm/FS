@@ -233,6 +233,17 @@ function doRomanEmergencyBattleCheck() {
     return (zones.length > 0);
 }
 
+function doRomanCanPlayEventCheck() {
+    // check if by sequence of play (eligibility) Roman can play the event
+    return game.roman_eligibility == 'Eligible Factions' &&
+        (game.aedui_eligibility != '1st Faction Event' && game.aedui_eligibility != '1st Faction Command Only' &&
+        !game.aedui_eligibility.startsWith('2nd ')) &&
+        (game.arverni_eligibility != '1st Faction Event' && game.arverni_eligibility != '1st Faction Command Only' &&
+        !game.arverni_eligibility.startsWith('2nd ')) &&
+        (game.belgic_eligibility != '1st Faction Event' && game.belgic_eligibility != '1st Faction Command Only' &&
+        !game.belgic_eligibility.startsWith('2nd '));
+}
+
 function doRoman() {
     game.faction = "Roman";
 
@@ -276,7 +287,43 @@ function doRoman() {
             break;
         case "8.8.2":
             // 8.8.2: check sequence of play for use of Event
-            msgPush('TODO: 8.8.2');
+            var canPlayEvent = doRomanCanPlayEventCheck();
+
+            if (canPlayEvent) {
+                game.state = '8.8.2-effective'
+            } else {
+                game.state = '8.8.3';
+            }
+            break;
+        case '8.8.2-effective':
+            // is the event effective?
+            // check for icon on card
+            var cardData = kCardIndex[game.currentcard.num];
+            var hasSwords = false;
+            for (var i = 0; i < cardData.length; i++)
+                if (cardData[i] == 'RoS')
+                    hasSwords = true;
+
+            if (!hasSwords) {
+                // check human answer
+                if (answer.length > 0 && answerdata.q == 'event-ineffective') {
+                    if (answerdata.reply.toUpperCase() == 'YES') {
+                        game.state = '8.8.3';
+                    } else {
+                        // execute the event
+                        msgPush('# Execute the Unshaded event text (see 8.2.1)');
+                        game.state = '';
+                    }
+                } else {
+                    askQuestion(QUESTION_YESNO, 'event-ineffective', 'Is the event ineffective?', '');
+                }
+            } else {
+                game.state = '8.8.3';
+            }
+            break;
+        case '8.8.3':
+            // can't play event, should we March?
+            msgPush('TODO: 8.8.3');
             game.state = '';
             break;
         case "battle":
