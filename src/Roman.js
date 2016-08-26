@@ -9,14 +9,6 @@ function battleCheckGaulPresence(zone) {
         zone.germanic_tribe || control == 'Germanic Control';
 }
 
-function belgicLeaderPresentOrAdjacent(zone) {
-    if (zone.belgic_leader) return true;
-    for (var adj in zone.adjacent) {
-        if (getZone(adj).belgic_leader) return true;
-    }
-    return false;
-}
-
 function romanCanRetreat(zone, attacker) {
     // see if any adjacent zone can be retreated to
     // any roman control?
@@ -70,34 +62,54 @@ function battleCheckEnemyForcesLoss(zone) {
 
     // Belgic?
     if (zone.belgicForces() > 0) {
-        var rampage = (belgicLeaderPresentOrAdjacent(zone) && zone.belgic_warbands &&
-                !zone.roman_fort && !zone.roman_leader);
+        // rampage + battle
+        var rampage = (zone.belgicLeaderPresentOrAdjacent() && zone.belgic_warband &&
+                !zone.roman_fort && !zone.roman_leader && zone.romanForces());
         var rampageAuxilia = 0;
         var rampageLegion = 0;
         if  (rampage) {
             // rampage
-            if (zone.romanAuxilia())
-                rampageAuxilia = 1;
-            else
-                rampageLegion = 1;
+            rampageAuxilia = Math.min(zone.romanAuxilia(), zone.belgic_warband);
+            if (rampageAuxilia < zone.belgic_warband)
+                rampageLegion = Math.min(zone.roman_legion, zone.belgic_warband - rampageAuxilia);
             
-            if (!romanCanRetreat(zone, 'Belgic') && zone.roman_legion) return true;
+            if (rampageLegion && !romanCanRetreat(zone, 'Belgic')) return true;
+
+            // battle after rampage
+            var aux = zone.romanAuxilia() - rampageAuxilia;
+            var halfLosses = zone.roman_fort > 0;
+            var losses = zone.belgicLosses();
+            if (halfLosses) losses = Math.floor(losses / 2);
+            if (losses > aux) {
+                // losses > auxilia, so remaining hits are on leader/legion
+                // check to see if retreat can help
+                var retreatCap = zone.roman_tribe + zone.roman_fort + aux;
+                var retreatLosses = halfLosses ? losses : Math.floor(losses / 2);
+                if (retreatLosses <= retreatCap) {
+                    if (romanCanRetreat(zone, 'Belgic')) {
+                        return (retreatLosses > retreatCap);
+                    } else
+                        return true;
+                } else
+                    return true;
+            }
         }
 
-        // battle + ambush
-        var canAmbush = belgicLeaderPresentOrAdjacent(zone) && (zone.belgic_warbands > zone.roman_auxilia);
+        // ambush + battle
+        var canAmbush = zone.belgicLeaderPresentOrAdjacent() && (zone.belgic_warband > zone.roman_auxilia);
         var halfLosses = zone.roman_fort > 0;
-        var losses = zone.belgic_leader + Math.floor(zone.belgicWarband() * (zone.belgic_leader ? 1 : 0.5));
+        var losses = zone.belgicLosses();
         if (halfLosses) losses = Math.floor(losses / 2);
-        msgPush(canAmbush + ', ' + halfLosses);
-        msgPush(zone.name + ': Belgic losses ' + losses);
         if (losses > zone.romanAuxilia()) {
             // losses > auxilia, so remaining hits are on leader/legion
             // check to see if retreat can help
-            if (romanCanRetreat(zone, 'Belgic')) {
-                if (!halfLosses) losses = Math.floor(losses / 2);
-
-                return (losses > zone.roman_tribe + zone.roman_fort + zone.romanAuxilia());
+            var retreatCap = zone.roman_tribe + zone.roman_fort + zone.romanAuxilia();
+            var retreatLosses = halfLosses ? losses : Math.floor(losses / 2);
+            if (retreatLosses <= retreatCap) {
+                if (romanCanRetreat(zone, 'Belgic')) {
+                    return (retreatLosses > retreatCap);
+                } else
+                    return true;
             } else
                 return true;
         }
@@ -105,35 +117,51 @@ function battleCheckEnemyForcesLoss(zone) {
 
     // Arverni?
     if (zone.arverniForces() > 0) {
-        // TODO: devastate instead of rampage
-        // var rampage = (arverniLeaderPresentOrAdjacent(zone) && zone.arverni_warbands &&
-        //         !zone.roman_fort && !zone.roman_leader);
-        // var rampageAuxilia = 0;
-        // var rampageLegion = 0;
-        // if  (rampage) {
-        //     // TODO devastate!
-        //     if (zoneRomanAuxilia())
-        //         rampageAuxilia = 1;
-        //     else
-        //         rampageLegion = 1;
-            
-        //     if (!romanCanRetreat(zone, 'Belgic') && zone.roman_legion) return true;
-        // }
+        // devastate + battle
+        var devastate = zone.control() == 'Arverni Control' && arverniLeaderPresentOrAdjacent(zone);
+        if (devastate) {
+            var romanLosses = Math.floor(roman / 3);
+            var aux = zone.romanAuxilia() - romanLosses;
+            if (aux < 0) {
+                // must remove legion
+                return true;
+            }
+            var warb = Math.floor(zone.arverniWarband() / 4);
+
+            // battle after devastate
+            var halfLosses = zone.roman_fort > 0;
+            var losses = zone.arverniLosses();
+            if (halfLosses) losses = Math.floor(losses / 2);
+            if (losses > aux) {
+                // losses > auxilia, so remaining hits are on leader/legion
+                // check to see if retreat can help
+                var retreatCap = zone.roman_tribe + zone.roman_fort + aux;
+                var retreatLosses = halfLosses ? losses : Math.floor(losses / 2);
+                if (retreatLosses <= retreatCap) {
+                    if (romanCanRetreat(zone, 'Arverni')) {
+                        return (retreatLosses > retreatCap);
+                    } else
+                        return true;
+                } else
+                    return true;
+            }
+        }
 
         // battle + ambush
-        var canAmbush = arverniLeaderPresentOrAdjacent(zone) && (zone.arverni_warbands > zone.roman_auxilia);
+        var canAmbush = zone.arverniLeaderPresentOrAdjacent() && (zone.arverni_warband > zone.roman_auxilia);
         var halfLosses = zone.roman_fort > 0;
-        var losses = zone.arverni_leader + Math.floor(zone.arverniWarband() * 0.5);
+        var losses = zone.arverniLosses();
         if (halfLosses) losses = Math.floor(losses / 2);
-        msgPush(canAmbush + ', ' + halfLosses);
-        msgPush(zone.name + ': Arverni losses ' + losses);
         if (losses > zone.romanAuxilia()) {
             // losses > auxilia, so remaining hits are on leader/legion
             // check to see if retreat can help
-            if (romanCanRetreat(zone, 'Arverni')) {
-                if (!halfLosses) losses = Math.floor(losses / 2);
-
-                return (losses > zone.roman_tribe + zone.roman_fort + zone.romanAuxilia());
+            var retreatCap = zone.roman_tribe + zone.roman_fort + zone.romanAuxilia();
+            var retreatLosses = halfLosses ? losses : Math.floor(losses / 2);
+            if (retreatLosses <= retreatCap) {
+                if (romanCanRetreat(zone, 'Arverni')) {
+                    return (retreatLosses > retreatCap);
+                } else
+                    return true;
             } else
                 return true;
         }
@@ -141,20 +169,21 @@ function battleCheckEnemyForcesLoss(zone) {
 
     // Aedui?
     if (zone.aeduiForces() > 0) {
-        // battle + ambush
-        var canAmbush = zone.aedui_warbands > zone.roman_auxilia;
+        // ambush + battle
+        var canAmbush = zone.aedui_warband > zone.roman_auxilia;
         var halfLosses = zone.roman_fort > 0;
-        var losses = Math.floor(zone.aeduiWarband() * 0.5);
+        var losses = zone.aeduiLosses();
         if (halfLosses) losses = Math.floor(losses / 2);
-        msgPush(canAmbush + ', ' + halfLosses);
-        msgPush(zone.name + ': Aedui losses ' + losses);
         if (losses > zone.romanAuxilia()) {
             // losses > auxilia, so remaining hits are on leader/legion
             // check to see if retreat can help
-            if (romanCanRetreat(zone, 'Aedui')) {
-                if (!halfLosses) losses = Math.floor(losses / 2);
-
-                return (losses > zone.roman_tribe + zone.roman_fort + zone.romanAuxilia());
+            var retreatCap = zone.roman_tribe + zone.roman_fort + zone.romanAuxilia();
+            var retreatLosses = halfLosses ? losses : Math.floor(losses / 2);
+            if (retreatLosses <= retreatCap) {
+                if (romanCanRetreat(zone, 'Aedui')) {
+                    return (retreatLosses > retreatCap);
+                } else
+                    return true;
             } else
                 return true;
         }
@@ -162,13 +191,12 @@ function battleCheckEnemyForcesLoss(zone) {
 
     // Germanic?
     if (zone.aeduiForces() > 0) {
-        // battle + ambush
-        var canAmbush = zone.germanic_warbands > zone.roman_auxilia;
+        // ambush + battle
+        var canAmbush = zone.germanic_warband > zone.roman_auxilia;
         if (canAmbush) {
             var halfLosses = !canAmbush && (zone.roman_fort > 0);
-            var losses = Math.floor(zone.aeduiWarband() * 0.5);
+            var losses = zone.germanicLosses();
             if (halfLosses) losses = Math.floor(losses / 2);
-            msgPush(zone.name + ': Germanic losses ' + losses);
             if (losses > zone.romanAuxilia()) {
                 // losses > auxilia, so remaining hits are on leader/legion
                 return true;
@@ -177,8 +205,7 @@ function battleCheckEnemyForcesLoss(zone) {
     }
 
     romanRetreatAsk();
-    if (interrupt) return false;
-
+    
     return false;
 }
 
@@ -187,6 +214,7 @@ function doRomanEmergencyBattleCheck() {
 
     // condition 1: subdue?
     var zones = filterZones(zoneList(), function(zone) {
+        console.log('8.8.1: check for subdue in ' + zone.name + '; ' + zone.status());
         return (zone.roman_legion || zone.roman_leader) && 
             battleCheckGaulPresence(zone);
     });
@@ -194,9 +222,11 @@ function doRomanEmergencyBattleCheck() {
 
     // condition 2: threat?  
     var zones = filterZones(zoneList(), function (zone) {
-        msgPush(zone.name + ": " + zone.roman_legion + ", " + zone.roman_leader);
-        return (zone.roman_legion || zone.roman_leader) && 
-            (battleCheckEnemyForcesLoss(zone));
+        console.log('8.8.1: check for threat in ' + zone.name + '; ' + zone.status());
+        if (!zone.roman_legion && !zone.roman_leader) return false;
+        var battleForceLoss = battleCheckEnemyForcesLoss(zone);
+        console.log('8.8.1: threat in ' + zone.name + '? ' + battleForceLoss);
+        return battleForceLoss;
     });
     if (interrupt) return false;
 
@@ -230,11 +260,30 @@ function doRoman() {
         }
     }
 
-    if (game.state == '8.8.1') {
-        // 8.8.1: check for emergency battles or subdue opportunities
-        var emergencyBattleSubdue = doRomanEmergencyBattleCheck();
-        if (interrupt) return;
+    while (game.state != '' && !interrupt) {
+        var state = game.state;
+        switch (state) {
+        case "8.8.1":
+            // 8.8.1: check for emergency battles or subdue opportunities
+            var emergencyBattleSubdue = doRomanEmergencyBattleCheck();
+            if (interrupt) return;
 
-        msgPush("?" + emergencyBattleSubdue);
+            if (emergencyBattleSubdue) {
+                game.state = 'battle';
+            } else {
+                game.state = '8.8.2';
+            }
+            break;
+        case "8.8.2":
+            // 8.8.2: check sequence of play for use of Event
+            msgPush('TODO: 8.8.2');
+            game.state = '';
+            break;
+        case "battle":
+            // Battle
+            msgPush('TODO: Battle');
+            game.state = '';
+            break;
+        }
     }
 }
