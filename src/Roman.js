@@ -375,7 +375,7 @@ function doRoman() {
     game.faction = "Roman";
 
     // check answer
-    if (answer.length > 0) {
+    if (hasAnswer()) {
         switch (answerdata.q) {
             case "retreat_permission":
                 if (answerdata.options.indexOf(';') == -1) {
@@ -436,7 +436,7 @@ function doRoman() {
 
             if (!hasSwords) {
                 // check human answer
-                if (answer.length > 0 && answerdata.q == 'event-ineffective') {
+                if (hasAnswer() && answerdata.q == 'event-ineffective') {
                     if (answerdata.reply.toUpperCase() == 'YES') {
                         game.state = '8.8.3';
                     } else {

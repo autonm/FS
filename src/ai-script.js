@@ -546,11 +546,11 @@ function loadGameFromInputData() {
 			if (pieceName == 'Colony Added')
 				game.colonies++;
 			if (pieceName == 'Ambiorix' || pieceName == 'Belgic Successor')
-				self.game.belgic_leader_available = 0;
+				game.belgic_leader_available = 0;
 			if (pieceName == 'Vercingetorix' || pieceName == 'Arverni Successor')
-				self.game.arverni_leader_available = 0;
+				game.arverni_leader_available = 0;
 			if (pieceName == 'Caesar' || pieceName == 'Roman Successor')
-				self.game.roman_leader_available = 0;
+				game.roman_leader_available = 0;
 			if (zone.name == 'Senate - Uproar')
                 if (pieceName == 'Roman Senate')
                     game.roman_senate = 1;
@@ -585,11 +585,15 @@ function loadGameFromInputData() {
 	*/
 }
 
+function hasAnswer() {
+	return (typeof answer !== 'undefined');
+}
+
 function main() {
 	// load input data
 
 	inputdata = JSON.parse(inputString);
-	if (answer.length > 0) {
+	if (hasAnswer()) {
 		answerdata = JSON.parse(answer);
 		game = inputdata;
 	} else {
