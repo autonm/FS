@@ -357,7 +357,7 @@ function loadGameFromInputData() {
 					if (pieceName == 'Aedui Citadel')
 						region.aedui_citadel++;
 					// Arverni leader
-					if (pieceName == ' (Vercingetorix /) (Averni Successor)')
+					if (pieceName == 'Vercingetorix' || pieceName == 'Averni Successor')
 						region.arverni_leader = 1;
 					// count the arverni warbands
 					if (pieceName == 'Arverni Warband')
@@ -372,7 +372,7 @@ function loadGameFromInputData() {
 					if (pieceName == 'Averni Citadel')
 						region.arverni_citadel++;
 					// Belgic leader
-					if (pieceName == ' (Ambiorix /) (Belgic Successor)')
+					if (pieceName == 'Ambiorix' || pieceName == 'Belgic Successor')
 						region.belgic_leader = 1;
 					// count the belgic warbands
 					if (pieceName == 'Belgic Warband')
@@ -396,7 +396,7 @@ function loadGameFromInputData() {
 					if (pieceName == 'Germanic Ally')
 						region.germanic_tribe++;
 					// Roman leader
-					if (pieceName == ' (Caesar /) (Roman Successor)')
+					if (pieceName == 'Caesar' || pieceName == 'Roman Successor')
 						region.roman_leader = 1;
 					// count the roman auxilia
 					if (pieceName == 'Roman Auxilia')
@@ -562,7 +562,7 @@ function loadGameFromInputData() {
 }
 
 function main() {
-	// 
+	// load input data
 
 	inputdata = JSON.parse(inputString);
 	if (answer.length > 0) {
