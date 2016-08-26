@@ -58,18 +58,6 @@ function fixZoneParameter(zone, outType) {
     msgPush("ASSERT FAILED fixZoneParameter(): Unknown outType");
 }
 
-function isAdjacent(target, origin) {
-    if (typeof target == 'string') msgPush("ASSERT FAILED isAdjacent(): target is string instead of Zone");
-    origin = fixZoneParameter(origin, 'string');
-
-    for (var i = 0; i < target.adjacencies.length; i++) {
-        console.log('isAdjacent() ' + target.adjacencies[i] + ' == ' + origin + '?');
-        if (target.adjacencies[i] == origin)
-            return true;
-    }
-    return false;
-}
-
 function getZone(zoneName) {
 	if (typeof zoneName !== 'string') msgPush('ASSERT FAILED getZone(): zoneName is already a zone');
 
@@ -80,6 +68,96 @@ function getZone(zoneName) {
 		}
 	}
 	return false;
+}
+
+function setFunctions(zone) {
+	zone = fixZoneParameter(zone);
+
+	zone.isAdjacent = function (target) {
+		target = fixZoneParameter(target);
+		
+		for (var adj in this.adjacencies) { 
+			console.log('isAdjacent() ' + adj + ' == ' + target.key + '?');
+			if (adj == origin.key)
+				return true;
+		}
+		return false;
+	}
+
+	zone.aedui = function () {
+		return this.aedui_tribe + this.aedui_citadel + this.aeduiForces();
+	}
+
+	zone.aeduiForces = function () {
+		return this.aeduiWarband();
+	}
+
+	zone.aeduiWarband = function () {
+		return this.aedui_warband + this.aedui_warband_revealed;
+	}
+
+	zone.arverni = function () {
+		return this.arverni_tribe + this.arverni_citadel + this.arverniForces();
+	}
+
+	zone.arverniForces = function () {
+		return this.arverniWarband() + this.arverni_leader;
+	}
+
+	zone.arverniWarband = function () {
+		return this.arverni_warband + this.arverni_warband_revealed;
+	}
+
+	zone.belgic = function () {
+		return this.belgic_tribe + this.belgic_citadel + this.belgicForces();
+	}
+
+	zone.belgicForces = function () {
+		return this.belgicWarband() + this.belgic_leader;
+	}
+
+	zone.belgicWarband = function () {
+		return this.belgic_warband + this.belgic_warband_revealed;
+	}
+
+	zone.roman = function () {
+		return this.roman_tribe + this.roman_fort + this.romanForces();
+	}
+
+	zone.romanForces = function () {
+		return this.romanAuxilia() + this.roman_legion + this.roman_leader;
+	}
+
+	zone.romanAuxilia = function () {
+		return this.roman_auxilia + this.roman_auxilia_revealed;
+	}
+
+	zone.germanic = function () {
+		return this.germanic_tribe + this.germanicForces();
+	}
+
+	zone.germanicForces = function () {
+		return this.germanicWarband();
+	}
+
+	zone.germanicWarband = function () {
+		return this.germanic_warband + this.germanic_warband_revealed;
+	}
+
+	zone.control = function () {
+		var aedui = zone.aedui();
+		var arverni = zone.arverni();
+		var belgic = zone.belgic();
+		var germanic = zone.germanic();
+		var roman = zone.roman();
+		var totalPieces = aedui + arverni + belgic + roman + germanic;
+		if (aedui > (totalPieces - aedui)) return 'Aedui Control';
+		if (arverni > (totalPieces - arverni)) return 'Arverni Control';
+		if (belgic > (totalPieces - belgic)) return 'Belgic Control';
+		if (roman > (totalPieces - roman)) return 'Roman Control';
+		if (germanic > (totalPieces - germanic)) return 'Germanic Control';
+		return 'No Control';
+	}
 }
 
 function getMomentumCards() {
@@ -95,83 +173,6 @@ function getMomentumCards() {
 		}
 	}
 	return momentum;
-}
-
-function zoneControl(zone) {
-	zone = fixZoneParameter(zone);
-
-	var aedui = zoneAedui(zone);
-	var arverni = zoneArverni(zone);
-	var belgic = zoneBelgic(zone);
-	var germanic = zoneGermanic(zone);
-	var roman = zoneRoman(zone);
-	var totalPieces = aedui + arverni + belgic + roman + germanic;
-	if (aedui > (totalPieces - aedui)) return 'Aedui Control';
-	if (arverni > (totalPieces - arverni)) return 'Arverni Control';
-	if (belgic > (totalPieces - belgic)) return 'Belgic Control';
-	if (roman > (totalPieces - roman)) return 'Roman Control';
-	if (germanic > (totalPieces - germanic)) return 'Germanic Control';
-	return 'No Control';
-}
-
-function zoneAedui(zone) {
-	return zone.aedui_tribe + zone.aedui_citadel + zoneAeduiForces(zone);
-}
-
-function zoneAeduiForces(zone) {
-	return zoneAeduiWarband(zone);
-}
-
-function zoneAeduiWarband(zone) {
-	return zone.aedui_warband + zone.aedui_warband_revealed;
-}
-
-function zoneArverni(zone) {
-	return zone.arverni_tribe + zone.arverni_citadel + zoneArverniForces(zone);
-}
-
-function zoneArverniForces(zone) {
-	return zoneArverniWarband(zone) + zone.arverni_leader;
-}
-
-function zoneArverniWarband(zone) {
-	return zone.arverni_warband + zone.arverni_warband_revealed;
-}
-
-function zoneBelgic(zone) {
-	return zone.belgic_tribe + zone.belgic_citadel + zoneBelgicForces(zone);
-}
-
-function zoneBelgicForces(zone) {
-	return zoneBelgicWarband(zone) + zone.belgic_leader;
-}
-
-function zoneBelgicWarband(zone) {
-	return zone.belgic_warband + zone.belgic_warband_revealed;
-}
-
-function zoneRoman(zone) {
-	return zone.roman_tribe + zone.roman_fort + zoneRomanForces(zone);
-}
-
-function zoneRomanForces(zone) {
-	return zoneRomanAuxilia(zone) + zone.roman_legion + zone.roman_leader;
-}
-
-function zoneRomanAuxilia(zone) {
-	return zone.roman_auxilia + zone.roman_auxilia_revealed;
-}
-
-function zoneGermanic(zone) {
-	return zone.germanic_tribe + zoneGermanicForces(zone);
-}
-
-function zoneGermanicForces(zone) {
-	return zoneGermanicWarband(zone);
-}
-
-function zoneGermanicWarband(zone) {
-	return zone.germanic_warband + zone.germanic_warband_revealed;
 }
 
 function pickRandomZone(candidates, selector) {

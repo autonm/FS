@@ -573,6 +573,9 @@ function main() {
 
 		msgPush("# Activated Bot: " + game.action);
 	}
+	for (var zone in game.map) {
+		setFunctions(zone);
+	}
 		
 	// find cards
 
