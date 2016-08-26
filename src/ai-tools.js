@@ -144,6 +144,22 @@ function setFunctions(zone) {
 		return this.germanic_warband + this.germanic_warband_revealed;
 	}
 
+	zone.aeduiLosses = function () {
+		return Math.floor(this.aeduiWarband() * 0.5);
+	}
+
+	zone.arverniLosses = function () {
+		return this.arverni_leader + Math.floor(this.arverniWarband() * 0.5);
+	}
+
+	zone.belgicLosses = function () {
+		return this.belgic_leader + Math.floor(this.belgicWarband() * (this.belgic_leader ? 1 : 0.5));
+	}
+
+	zone.germanicLosses = function () {
+		return Math.floor(this.germanicWarband() * 0.5);
+	}
+
 	zone.control = function () {
 		var aedui = zone.aedui();
 		var arverni = zone.arverni();
@@ -157,6 +173,28 @@ function setFunctions(zone) {
 		if (roman > (totalPieces - roman)) return 'Roman Control';
 		if (germanic > (totalPieces - germanic)) return 'Germanic Control';
 		return 'No Control';
+	}
+
+	zone.belgicLeaderPresentOrAdjacent = function () {
+		if (this.belgic_leader) return true;
+		for (var adj in this.adjacent) {
+			if (getZone(adj).belgic_leader) return true;
+		}
+		return false;
+	}
+
+	zone.arverniLeaderPresentOrAdjacent = function () {
+		if (this.arverni_leader) return true;
+		for (var adj in this.adjacent) {
+			if (getZone(adj).arverni_leader) return true;
+		}
+		return false;
+	}
+
+	zone.status = function () {
+		return (zone.name + ': aedui=' + this.aedui() + ', arverni=' + this.arverni() +
+			', belgic=' + this.belgic() + ', roman=' + this.roman() + ', germanic=' +
+			this.germanic());
 	}
 }
 
