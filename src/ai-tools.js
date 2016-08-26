@@ -1,14 +1,28 @@
 // utility functions
 
-function msgPush(line) {
+function consoleLog() {
+	var msg = '';
+	for (var i = 0; i < arguments.length; i++) {
+		if (i > 0) msg += ' ';
+		msg += arguments[i];
+	}
+	console.log(msg + '\n');
+}
+
+function msgPush() {
 	if (interrupt) return;
-	msg.push(line);
-	console.log('<AI> ' + line);
+	var line = '';
+	for (var i = 0; i < arguments.length; i++) {
+		if (i > 0) line += ' ';
+		line += arguments[i];
+	}
+	msg.push(line + '\n');
+	consoleLog('MSG: ' + line);
 }
 
 function msgPop() {
 	var line = msg.pop();
-	console.log('MSG-POP: ' + line);
+	consoleLog('MSG-POP: ' + line);
 }
 
 function contains(array, item) {
@@ -47,11 +61,11 @@ function fixZoneParameter(zone, outType) {
         return zone;
 
     if (outType == 'string') {
-        //console.log('INFO fixZoneParameter() converting from object to string for ' + zone.name);
+        //consoleLog('INFO fixZoneParameter() converting from object to string for ' + zone.name);
         return zone.name;
     }
     if (outType == 'object') {
-        //console.log('INFO fixZoneParameter() converting from string to object for ' + zone);
+        //consoleLog('INFO fixZoneParameter() converting from string to object for ' + zone);
         return getZone(zone);
     }
     
@@ -77,7 +91,7 @@ function setFunctions(zone) {
 		target = fixZoneParameter(target);
 		
 		for (var adj in this.adjacencies) { 
-			console.log('isAdjacent() ' + adj + ' == ' + target.key + '?');
+			consoleLog('isAdjacent() ' + adj + ' == ' + target.key + '?');
 			if (adj == origin.key)
 				return true;
 		}
@@ -203,7 +217,7 @@ function pickRandomZone(candidates, selector) {
 	var tanDie = d6();
 	var greenDie = d6();
 	
-	console.log("pickRandomZone() BLACK=" + blackDie + ", TAN=" + tanDie + ", GREEN=" + greenDie);
+	consoleLog("pickRandomZone() BLACK=" + blackDie + ", TAN=" + tanDie + ", GREEN=" + greenDie);
 	
 	blackDie = Math.ceil(blackDie / 2) - 1;
 	tanDie = Math.ceil(tanDie / 2) - 1;
@@ -212,7 +226,7 @@ function pickRandomZone(candidates, selector) {
 	var spaceIndex = (tanDie * 9) + (blackDie * 3) + greenDie;
 	var safety = kSpacesTable.length + 1;
 	
-	console.log("pickRandomZone() rolled " + kSpacesTable[spaceIndex]);
+	consoleLog("pickRandomZone() rolled " + kSpacesTable[spaceIndex]);
 	
 	do {
 		var isCandidate = contains(candidates, kSpacesTable[spaceIndex]);
@@ -231,7 +245,7 @@ function pickRandomZone(candidates, selector) {
 	if (safety == 0)
 		return false;
 		
-	console.log("pickRandomZone() selected " + kSpacesTable[spaceIndex]);
+	consoleLog("pickRandomZone() selected " + kSpacesTable[spaceIndex]);
 	
 	return getZone(kSpacesTable[spaceIndex]);
 }
@@ -287,7 +301,7 @@ function totalDispersedGathering() {
 	for (var key in game.map) {
 		var zone = game.map[key];
 		total += zone.dispersed_gathering;
-		console.log('totalDispersedGathering()', zone.name, zone.dispersed_gathering);
+		consoleLog('totalDispersedGathering()', zone.name, zone.dispersed_gathering);
 	}
 	return total;
 }
@@ -303,7 +317,7 @@ function totalSubdued() {
 			zone.roman_tribe + zone.germanic_tribe) -
 			zone.dispersed_gathering;
 		total += subdued;
-		console.log('totalSubdued()', zone.name, zone.ally, subdued);
+		consoleLog('totalSubdued()', zone.name, zone.ally, subdued);
 	}
 	return total;
 }
@@ -313,7 +327,7 @@ function romanVictoryScore() {
 
 	var score = (6 - game.roman_tribe_available) + 
 		totalDispersedGathering() + totalSubdued();
-	console.log('Roman Victory = ', score); 
+	consoleLog('Roman Victory = ', score);
 	return score;
 }
 

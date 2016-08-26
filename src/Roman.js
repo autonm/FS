@@ -341,7 +341,7 @@ function doRomanEmergencyBattleCheck() {
 
     // condition 1: subdue?
     var zones = filterZones(zoneList(), function(zone) {
-        console.log('8.8.1: check for subdue in ' + zone.name + '; ' + zone.status());
+        consoleLog('8.8.1: check for subdue in ' + zone.name + '; ' + zone.status());
         return (zone.roman_legion || zone.roman_leader) && 
             battleCheckGaulPresence(zone);
     });
@@ -349,10 +349,10 @@ function doRomanEmergencyBattleCheck() {
 
     // condition 2: threat?  
     var zones = filterZones(zoneList(), function (zone) {
-        console.log('8.8.1: check for threat in ' + zone.name + '; ' + zone.status());
+        consoleLog('8.8.1: check for threat in ' + zone.name + '; ' + zone.status());
         if (!zone.roman_legion && !zone.roman_leader) return false;
         var battleForceLoss = battleCheckEnemyForcesLoss(zone);
-        console.log('8.8.1: threat in ' + zone.name + '? ' + battleForceLoss);
+        consoleLog('8.8.1: threat in ' + zone.name + '? ' + battleForceLoss);
         return battleForceLoss;
     });
     if (interrupt) return false;
@@ -392,7 +392,7 @@ function doRoman() {
                             rf = rf || replies[r].toLowerCase() == faction;
                         game.permissions[faction] = rf;
                     }
-                    console.log(game.permissions);
+                    consoleLog(game.permissions);
                 }
                 break;
             case "diviciacus_permission":
@@ -445,7 +445,7 @@ function doRoman() {
                         game.state = '';
                     }
                 } else {
-                    askQuestion(QUESTION_YESNO, 'event-ineffective', 'Is the event ineffective?', '');
+                    askQuestion(QUESTION_YESNO, 'event-ineffective', 'Is the event on \'' + game.currentcard.name + '\' ineffective?', '');
                 }
             } else {
                 game.state = '8.8.3';
@@ -453,7 +453,7 @@ function doRoman() {
             break;
         case '8.8.3':
             // can't play event, should we March or Recuit?
-            console.log('8.8.3: ' + game.roman_auxilia_available);
+            consoleLog('8.8.3: ' + game.roman_auxilia_available);
             if (game.roman_auxilia_available > 8) {
                 game.state = 'recruit';
             } else {

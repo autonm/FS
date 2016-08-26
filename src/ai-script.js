@@ -586,7 +586,17 @@ function loadGameFromInputData() {
 }
 
 function hasAnswer() {
-	return (typeof answer !== 'undefined');
+	var haveanswer = (typeof answer !== 'undefined') && (answer !== '');
+	consoleLog('has answer? ' + haveanswer);
+	return haveanswer;
+}
+
+function isVassal() {
+	return (typeof isvasal !== 'undefined' && isvassal);
+}
+
+function joinMsg() {
+	msg = msg.join("");
 }
 
 function main() {
@@ -601,13 +611,10 @@ function main() {
 
 		msgPush("# Activated Bot: " + game.action);
 	}
+	
 	for (var zone in game.map) {
 		setFunctions(zone);
 	}
-		
-	// find cards
-
-	//var momentum = getMomentumCards();
 
 	// Actions
 
@@ -621,7 +628,7 @@ function main() {
 		msgPush('# Bot Complete');
 	}
 
-	msg = msg.join("\n");
+	joinMsg();
 }
 
 main();
