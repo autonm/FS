@@ -177,6 +177,7 @@ var kCardIndex = {
 
 function loadGameFromInputData() {
 	game.retreatPermission = {};
+	game.capabilities = [];
 	game.state = "8.8.1";
 
 	game.action = inputdata.action;
@@ -299,10 +300,8 @@ function loadGameFromInputData() {
 			ally: 2,
 			citadel: 0
 		}
-	}
+	};
 	
-    // TODO: calculate control dynamically: control = ""
-
 	for (var key in game.map) {
 		var region = game.map[key];
 		for (var z = 0; z < inputdata["zones"].length; z++) {
@@ -461,6 +460,16 @@ function loadGameFromInputData() {
 	game.belgic_leader_available = 1;
 	game.roman_leader_available = 1;
 
+	for (var p = 0; p < inputdata["offboard"].length; p++) {
+		var pieceName = inputdata["offboard"][p].name;
+		if (pieceName.indexOf(' Capability **') > -1) {
+			var cardName = pieceName.substring(0, pieceName.indexOf(' **'));
+			var cardNumber = parseInt(pieceName.substring(0, 2));
+			var shadedCapability = pieceName.indexOf('** Shaded ') > -1; 
+			game.capabilities.push({card: cardName, num: cardNumber, shaded: shadedCapability});
+		}
+	}
+
 	for (var z = 0; z < inputdata["zones"].length; z++) {
 		var zone = inputdata["zones"][z];
 		for (var p = 0; p < zone["pieces"].length; p++) {
@@ -506,13 +515,13 @@ function loadGameFromInputData() {
 					game.roman_legion_available++;
 			}
 			if (zone.name == 'Upcoming') {
-				game.upcomingcard = pieceName;
-				if (game.upcomingcard.endsWith(' - Winter'))
+				game.upcomingcard = {name: pieceName, num: parseInt(pieceName.substring(0, 2))};
+				if (game.upcomingcard.name.endsWith(' - Winter'))
 					game.frost = true;
 			}
 			if (zone.name == 'Current') {
-				game.currentcard = pieceName;
-				if (game.currentcard.endsWith(' - Winter'))
+				game.currentcard = {name: pieceName, num: parseInt(pieceName.substring(0, 2))};
+				if (game.currentcard.name.endsWith(' - Winter'))
 					game.winter = true;
 			}
 			if (pieceName == 'Colony Added')
