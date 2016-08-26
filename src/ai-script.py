@@ -302,7 +302,6 @@ class FY(cmd.Cmd):
                 if answer is None:
                     self.do_aedui_flow(self)
                 else:
-                    print answer.q, answer.faction, answer.reply
                     if answer.q == 'event_ineffective':
                         if answer.reply.upper() == 'YES':
                             self.do_aedui_flow_862(self)
@@ -709,6 +708,9 @@ class FY(cmd.Cmd):
                 return ','.join(map(str, selection))
 
     def do_status(self, rest):
+
+        print "GMT: Falling Sky; Release", RELEASE
+        print ""
 
         print "** Scenario Status Report **"
         print ""
@@ -1230,10 +1232,11 @@ def main():
     #with open(home + "/vassal-raw.json", "w") as text_file:
     #    text_file.write(inputdata)
 
-    #from os.path import expanduser
-    #home = expanduser("~")
-    #with open(home + "/Documents/Projects/COIN-FS/test/raw1.js", "w") as text_file:
-    #    text_file.write("inputString = '" + inputdata + "';")
+    #if answer is None:
+    #    from os.path import expanduser
+    #    home = expanduser("~")
+    #    with open(home + "/Documents/Projects/COIN-FS/test/raw1.js", "w") as text_file:
+    #        text_file.write("inputString = '" + inputdata.replace("'", "\\'") + "';")
 
     # JSON string with answer information from VASSAL, no argument given if this is not a reply run
     if (args > 3):
@@ -1251,10 +1254,6 @@ def main():
 
         # Delete the gamedata file we no longer need
         os.remove(fileparam)
-
-    if answer is None:
-        # Only show the RELEASE info on the initial run, not each reply as well
-        print "GMT: Falling Sky; Release", RELEASE
 
     # start the main program
     app = FY()
