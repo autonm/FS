@@ -186,6 +186,22 @@ function loadGameFromInputData() {
 	game.romanNP = inputdata.nproman;
 	game.belgicNP = inputdata.npbelgic;
 	
+	game.aedui_warband_available = 0;
+	game.aedui_tribe_available = 0;
+	game.aedui_citadel_available = 0;
+	game.arverni_warband_available = 0;
+	game.arverni_tribe_available = 0;
+	game.arverni_citadel_available = 0;
+	game.belgic_warband_available = 0;
+	game.belgic_tribe_available = 0;
+	game.belgic_citadel_available = 0;
+	game.germanic_warband_available = 0;
+	game.germanic_tribe_available = 0;
+	game.roman_auxilia_available = 0;
+	game.roman_fort_available = 0;
+	game.roman_tribe_available = 0;
+	game.roman_legion_available = 0;
+
 	// regions
 	game.map = {
 		AED: {

@@ -322,13 +322,32 @@ function doRoman() {
             }
             break;
         case '8.8.3':
-            // can't play event, should we March?
-            msgPush('TODO: 8.8.3');
-            game.state = '';
+            // can't play event, should we March or Recuit?
+            console.log('8.8.3: ' + game.roman_auxilia_available);
+            if (game.roman_auxilia_available > 8) {
+                game.state = 'recruit';
+            } else {
+                game.state = 'march';
+            }
             break;
         case "battle":
             // Battle
             msgPush('TODO: Battle');
+            game.state = '';
+            break;
+        case "march":
+            // March
+            msgPush('TODO: March');
+            game.state = '';
+            break;
+        case "recruit":
+            // Recruit
+            msgPush('TODO: Recruit');
+            game.state = '';
+            break;
+        case "seize":
+            // Seize
+            msgPush('TODO: Seize');
             game.state = '';
             break;
         }
