@@ -22,6 +22,7 @@ class Game:
         self.currentcard = ""
         self.upcomingcard = ""
         self.action = ""
+        self.capabilities = []
 
         self.aedui_eligibility = ""
         self.arverni_eligibility = ""
@@ -350,41 +351,17 @@ class FY(cmd.Cmd):
         self.game.map["VEN"] = Region(self, "VEN", "Veneti", self.mapAdjacencies["VEN"])
         self.load_region(self.game.map["VEN"])
 
-        # find number of resources, find eligibility
-        for element, data in inputdata.items():
-            if element == 'zones':
-                for zone in data:
-                    for piece in zone['pieces']:
-                        # Aedui Resources
-                        if piece['name'].startswith('Aedui Resources ('):
-                            self.game.aedui_resources = int(zone['name'])
-                        # Aedui Eligibility
-                        if piece['name'].startswith('Aedui Eligibility'):
-                            self.game.aedui_eligibility = zone['name']
-                        # Arverni Resources
-                        if piece['name'].startswith('Averni Resources ('):
-                            self.game.arverni_resources = int(zone['name'])
-                        # Arverni Eligibility
-                        if piece['name'].startswith('Averni Eligibility'):
-                            self.game.arverni_eligibility = zone['name']
-                        # Belgic Resources
-                        if piece['name'].startswith('Belgic Resources ('):
-                            self.game.belgic_resources = int(zone['name'])
-                        # Belgic Eligibility
-                        if piece['name'].startswith('Belgic Eligibility'):
-                            self.game.belgic_eligibility = zone['name']
-                        # Roman Resources
-                        if piece['name'].startswith('Roman Resources ('):
-                            self.game.roman_resources = int(zone['name'])
-                        # Roman Eligibility
-                        if piece['name'].startswith('Roman Eligibility'):
-                            self.game.roman_eligibility = zone['name']
-
-        # units available, cards
+        # units available, cards, resources, eligibility
         self.game.arverni_leader_available = 1
         self.game.belgic_leader_available = 1
         self.game.roman_leader_available = 1
         for element, data in inputdata.items():
+            # load capabilities
+            if element == 'offboard':
+                for piece in data:
+                    if piece['name'].find(' Capability **') > -1:
+                        self.game.capabilities.append(piece['name'])
+            # load zones (regions)
             if element == 'zones':
                 for zone in data:
                     if zone['name'] == 'Aedui Available Forces':
@@ -436,7 +413,7 @@ class FY(cmd.Cmd):
                         for piece in zone['pieces']:
                             if piece['name'].endswith(' - Winter'):
                                 self.game.winter = 1
-                    # check for leaders on the map, colonies on map
+                    # check for leaders on the map, colonies on map, resources, eligibility
                     for piece in zone['pieces']:
                         if piece['name'] == 'Ambiorix' or piece['name'] == 'Belgic Successor':
                             self.game.belgic_leader_available = 0
@@ -446,6 +423,30 @@ class FY(cmd.Cmd):
                             self.game.roman_leader_available = 0
                         if piece['name'] == 'Colony Added':
                             self.game.colonies += 1
+                        # Aedui Resources
+                        if piece['name'].startswith('Aedui Resources ('):
+                            self.game.aedui_resources = int(zone['name'])
+                        # Aedui Eligibility
+                        if piece['name'].startswith('Aedui Eligibility'):
+                            self.game.aedui_eligibility = zone['name']
+                        # Arverni Resources
+                        if piece['name'].startswith('Averni Resources ('):
+                            self.game.arverni_resources = int(zone['name'])
+                        # Arverni Eligibility
+                        if piece['name'].startswith('Averni Eligibility'):
+                            self.game.arverni_eligibility = zone['name']
+                        # Belgic Resources
+                        if piece['name'].startswith('Belgic Resources ('):
+                            self.game.belgic_resources = int(zone['name'])
+                        # Belgic Eligibility
+                        if piece['name'].startswith('Belgic Eligibility'):
+                            self.game.belgic_eligibility = zone['name']
+                        # Roman Resources
+                        if piece['name'].startswith('Roman Resources ('):
+                            self.game.roman_resources = int(zone['name'])
+                        # Roman Eligibility
+                        if piece['name'].startswith('Roman Eligibility'):
+                            self.game.roman_eligibility = zone['name']
 
         # find other_most_allies
         aedui_score = 8 - self.game.aedui_tribe_available - self.game.aedui_citadel_available
@@ -521,7 +522,7 @@ class FY(cmd.Cmd):
                             if piece['name'] == 'Aedui Citadel':
                                 region.aedui_citadel += 1
                             # Arverni leader
-                            if piece['name'] == ' (Vercingetorix /) (Averni Successor)':
+                            if piece['name'] == 'Vercingetorix' or piece['name'] == 'Averni Successor':
                                 region.arverni_leader = 1
                             # count the arverni warbands
                             if piece['name'] == 'Arverni Warband':
@@ -536,7 +537,7 @@ class FY(cmd.Cmd):
                             if piece['name'] == 'Averni Citadel':
                                 region.arverni_citadel += 1
                             # Belgic leader
-                            if piece['name'] == ' (Ambiorix /) (Belgic Successor)':
+                            if piece['name'] == 'Ambiorix' or piece['name'] == 'Belgic Successor':
                                 region.belgic_leader = 1
                             # count the belgic warbands
                             if piece['name'] == 'Belgic Warband':
@@ -560,7 +561,7 @@ class FY(cmd.Cmd):
                             if piece['name'] == 'Germanic Ally':
                                 region.germanic_tribe += 1
                             # Roman leader
-                            if piece['name'] == ' (Caesar /) (Roman Successor)':
+                            if piece['name'] == 'Caesar' or piece['name'] == 'Roman Successor':
                                 region.roman_leader = 1
                             # count the roman auxilia
                             if piece['name'] == 'Roman Auxilia':
@@ -1228,6 +1229,11 @@ def main():
     #home = expanduser("~")
     #with open(home + "/vassal-raw.json", "w") as text_file:
     #    text_file.write(inputdata)
+
+    #from os.path import expanduser
+    #home = expanduser("~")
+    #with open(home + "/Documents/Projects/COIN-FS/test/raw1.js", "w") as text_file:
+    #    text_file.write("inputString = '" + inputdata + "';")
 
     # JSON string with answer information from VASSAL, no argument given if this is not a reply run
     if (args > 3):
