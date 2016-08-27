@@ -484,8 +484,10 @@ function loadGameFromInputData() {
 		if (pieceName.indexOf(' Capability **') > -1) {
 			var cardName = pieceName.substring(0, pieceName.indexOf(' **'));
 			var cardNumber = parseInt(pieceName.substring(0, 2));
-			var shadedCapability = pieceName.indexOf('** Shaded ') > -1; 
-			game.capabilities.push({card: cardName, num: cardNumber, shaded: shadedCapability});
+			var shadedCapability = pieceName.indexOf('** Shaded ') > -1;
+			var cap = {card: cardName, num: cardNumber, shaded: shadedCapability}; 
+			game.capabilities.push(cap);
+			console.log('Capability: ', cap);
 		}
 	}
 
