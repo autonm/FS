@@ -1,5 +1,47 @@
 // AI
 
+function sortZonesClosestToSupplyLine(zones) {
+    var z = zones.sort(function (a, b) {
+        a = fixZoneParameter(a);
+        b = fixZoneParameter(b);
+        var aSupply = a.inSupplyLine(false);
+        var bSupply = b.inSupplyLine(false); 
+        if (aSupply && bSupply) {
+            return 0;
+        } else if (aSupply && !bSupply) {
+            return -1;
+        } else if (!aSupply && bSupply) {
+            return 1;
+        } else {
+            var aDistance = a.distanceToSupplyLine();
+            var bDistance = b.distanceToSupplyLine();
+            return bDistance - aDistance;
+        }
+    });
+    consoleLog('sortZonesClosestToSupplyLine()', z);
+    return z;
+}
+
+function reduceRomanResources(amount) {
+    // 8.6.6: Aedui NP give Roman resources under certain conditions
+    game.roman_resources -= amount;
+    if (game.roman_resources < 2 && game.aedui_resources > 8 && game.aeduiNP) {
+        game.aedui_resources -= 2;
+        game.roman_resources += 2;
+        msgPush('# Reduce Aedui resources by 2 to', game.aedui_resources);
+        amount += 2;
+        if (amount == 0) {
+            msgPush('# Roman resources stay at', game.roman_resources);
+        } else if (amount < 0) {
+            msgPush('# Reduce Roman resources by', amount, 'to', game_roman_resources);
+        } else {
+            msgPush('# Add Roman resources by', amount, 'to', game_roman_resources);
+        }
+    } else {
+        msgPush('# Reduce Roman resources by', amount, 'to', game.roman_resources);
+    }
+}
+
 function battleCheckGaulPresence(zone) {
     // see if there is an enemy tribe / citadel / control
     var control = zone.control();
@@ -397,6 +439,113 @@ function doRomanCanPlayEventCheck() {
         !game.belgic_eligibility.startsWith('2nd '));
 }
 
+function canRomanRecruit() {
+    // 8.8.4: see if Roman can recruit, return true / false only
+    var aedui = game.aedui_resources;
+    var resources = game.roman_resources;
+    var aux_available = game.roman_auxilia_available;
+    var allies_placed = 0;
+    var aux_placed = 0;
+    var activated = [];
+
+    // Find valid placement regions for recruit
+    var zonesAllies = filterZones(zoneList(), function (zone) {
+        return (zone.roman_leader || zone.control() == 'Roman Control') &&
+            zone.subduedTribesAvailable('Roman') > 0;
+    });
+    var zonesAuxSupply = filterZones(zoneList(), function (zone) {
+        return (zone.roman_leader || zone.roman_tribe || zone.roman_fort) &&
+            zone.inSupplyLine(false);
+    });
+    var zonesAuxNoSupply = filterZones(zoneList(), function (zone) {
+        return (zone.roman_leader || zone.roman_tribe || zone.roman_fort) &&
+            !zone.inSupplyLine(false);
+    });
+
+    // place allies
+    for (var i = 0; i < zonesAllies.length; i++) {
+        if (!activated.includes(zonesAllies[i])) {
+            var zone = getZone(zonesAllies[i]);
+            var valid = false;
+            var insupply = zone.inSupplyLine(false);
+            if (insupply) {
+                valid = true;
+                allies_placed++;
+            } else {
+                if (resources >= 2) {
+                    valid = true;
+                    allies_placed++;
+                    if (game.aeduiNP && aedui > 8 && resources < 2) {
+                        aedui -= 2;
+                    } else {
+                        resources -= 2;
+                    }
+                }
+            }
+            if (valid)
+                activated.push(zone.name);
+        }
+    }
+    if (allies_placed >= 2) return true;
+
+    // place aux - in supply
+    for (var i = 0; i < zonesAuxSupply.length; i++) {
+        if (!activated.includes(zonesAllies[i])) {
+            var zone = getZone(zonesAllies[i]);
+            var valid = false;
+            var insupply = zone.inSupplyLine(false);
+            if (insupply) {
+                valid = true;
+                allies_placed++;
+            } else {
+                if (resources >= 2) {
+                    valid = true;
+                    allies_placed++;
+                    if (game.aeduiNP && aedui > 8 && resources < 2) {
+                        aedui -= 2;
+                    } else {
+                        resources -= 2;
+                    }
+                }
+            }
+            if (valid)
+                activated.push(zone.name);
+        }
+    }
+    if (aux_placed >= 3) return true;
+
+    // place aux - ask for supply
+    zonesAuxNoSupply = sortZonesClosestToSupplyLine(zonesAuxNoSupply);
+
+    for (var i = 0; i < zonesAuxSupply.length; i++) {
+        if (!activated.includes(zonesAllies[i])) {
+            var zone = getZone(zonesAllies[i]);
+            var valid = false;
+            var insupply = zone.inSupplyLine(true);
+            if (insupply) {
+                valid = true;
+                allies_placed++;
+            } else {
+                if (resources >= 2) {
+                    valid = true;
+                    allies_placed++;
+                    if (game.aeduiNP && aedui > 8 && resources < 2) {
+                        aedui -= 2;
+                    } else {
+                        resources -= 2;
+                    }
+                }
+            }
+            if (valid)
+                activated.push(zone.name);
+        }
+    }
+    if (interrupt) return false;
+    if (aux_placed >= 3) return true;
+
+    return false;
+}
+
 function doRoman() {
     game.faction = "Roman";
 
@@ -483,7 +632,7 @@ function doRoman() {
             break;
         case '8.8.3':
             // can't play event, should we March or Recuit?
-            consoleLog('8.8.3: ' + game.roman_auxilia_available);
+            consoleLog('8.8.3: Roman Auxilia Available', game.roman_auxilia_available, '> 8 ?');
             if (game.roman_auxilia_available > 8) {
                 game.state = 'recruit';
             } else {
@@ -502,7 +651,10 @@ function doRoman() {
             break;
         case "recruit":
             // Recruit
-            msgPush('TODO: Recruit');
+            var didRecruit = canRomanRecruit();
+            if (interrupt) return;
+
+            msgPush('TODO outcome of canRomanRecruit() =', didRecruit);
             game.state = '';
             break;
         case "seize":
