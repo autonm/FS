@@ -33,6 +33,13 @@ function contains(array, item) {
 	return false;
 }
 
+function uniq(a) {
+    var seen = {};
+    return a.filter(function(item) {
+        return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+    });
+}
+
 function count(array, item) {
 	var count = 0;
 	for (var i = 0; i < array.length; i++) {
