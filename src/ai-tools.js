@@ -68,11 +68,9 @@ function fixZoneParameter(zone, outType) {
         return zone;
 
     if (outType == 'string') {
-        //consoleLog('INFO fixZoneParameter() converting from object to string for ' + zone.name);
         return zone.name;
     }
     if (outType == 'object') {
-        //consoleLog('INFO fixZoneParameter() converting from string to object for ' + zone);
         return getZone(zone);
     }
     
@@ -97,9 +95,10 @@ function setFunctions(zone) {
 	zone.isAdjacent = function (target) {
 		target = fixZoneParameter(target);
 		
-		for (var adj in this.adjacencies) { 
-			consoleLog('isAdjacent() ' + adj + ' == ' + target.key + '?');
-			if (adj == origin.key)
+		for (var adj in this.adjacencies) {
+			var isAdj = (adj == origin.key); 
+			consoleLog('isAdjacent()', adj, ' == ', target.key, '?', isAdj);
+			if (isAdj)
 				return true;
 		}
 		return false;
@@ -181,6 +180,39 @@ function setFunctions(zone) {
 		return Math.floor(this.germanicWarband() * 0.5);
 	}
 
+	zone.subdued = function () {
+		var subdued = this.ally -
+			(this.aedui_tribe + this.aedui_citadel +
+			this.arverni_tribe + this.arverni_citadel +
+			this.belgic_tribe + this.belgic_citadel +
+			this.roman_tribe + this.germanic_tribe) -
+			this.dispersed_gathering;
+		consoleLog('zone.subdued()', this.name, subdued);
+		return subdued;
+	}
+
+	zone.subduedTribesAvailable = function (faction) {
+		faction = faction || '';
+		if (faction == '') msgPush('ASSERT ERROR: zone.subduedTribesAvailable() should be provided with a faction');
+
+		var subdued = this.subdued();
+
+		if ('aedui_special' in this) {
+			// Aedui Special City
+			if (status == 'subdued' && faction != 'Aedui')
+				subdued--;
+		}
+
+		if ('arverni_special' in this) {
+			// Arverni Special City
+			if (status == 'subdued' && faction != 'Arverni')
+				subdued--;
+		}
+
+		consoleLog('zone.subduedTribesAvailable()', faction, this.name, subdued);
+		return subdued;
+	}
+
 	zone.control = function () {
 		var aedui = zone.aedui();
 		var arverni = zone.arverni();
@@ -188,12 +220,14 @@ function setFunctions(zone) {
 		var germanic = zone.germanic();
 		var roman = zone.roman();
 		var totalPieces = aedui + arverni + belgic + roman + germanic;
-		if (aedui > (totalPieces - aedui)) return 'Aedui Control';
-		if (arverni > (totalPieces - arverni)) return 'Arverni Control';
-		if (belgic > (totalPieces - belgic)) return 'Belgic Control';
-		if (roman > (totalPieces - roman)) return 'Roman Control';
-		if (germanic > (totalPieces - germanic)) return 'Germanic Control';
-		return 'No Control';
+		var control = 'No Control';
+		if (aedui > (totalPieces - aedui)) control = 'Aedui Control';
+		if (arverni > (totalPieces - arverni)) control = 'Arverni Control';
+		if (belgic > (totalPieces - belgic)) control = 'Belgic Control';
+		if (roman > (totalPieces - roman)) control = 'Roman Control';
+		if (germanic > (totalPieces - germanic)) control = 'Germanic Control';
+		consoleLog('zone.control()', this.name, control, '-', 'aedui=', aedui, 'arverni=', arverni, 'belgic=', belgic, 'roman=', roman, 'germanic=', germanic, 'total=', totalPieces);
+		return control;
 	}
 
 	zone.belgicLeaderPresentOrAdjacent = function () {
@@ -217,44 +251,21 @@ function setFunctions(zone) {
 			', belgic=' + this.belgic() + ', roman=' + this.roman() + ', germanic=' +
 			this.germanic());
 	}
-}
 
-function pickRandomZone(candidates, selector) {
-	var blackDie = d6();
-	var tanDie = d6();
-	var greenDie = d6();
-	
-	consoleLog("pickRandomZone() BLACK=" + blackDie + ", TAN=" + tanDie + ", GREEN=" + greenDie);
-	
-	blackDie = Math.ceil(blackDie / 2) - 1;
-	tanDie = Math.ceil(tanDie / 2) - 1;
-	greenDie = Math.ceil(greenDie / 2) - 1;
-	
-	var spaceIndex = (tanDie * 9) + (blackDie * 3) + greenDie;
-	var safety = kSpacesTable.length + 1;
-	
-	consoleLog("pickRandomZone() rolled " + kSpacesTable[spaceIndex]);
-	
-	do {
-		var isCandidate = contains(candidates, kSpacesTable[spaceIndex]);
-		var selectorOk = (selector == null || selector(kSpacesTable[spaceIndex]));
-		if (isCandidate && selectorOk) {
-			safety = -1;
-		} else {
-			safety--;
-			if (spaceIndex == (kSpacesTable.length - 1))
-				spaceIndex = 0;
-			else
-				spaceIndex++;
-		}
-	} while (safety > 0);
-	
-	if (safety == 0)
+	zone.inSupplyLine = function (ask) {
+		// TODO
+		// see if in supply, if not and not(ask) return false
+		// if not and ask find a path to supply line, ask permission if needed
+		// if no paths then return false;
+		msgPush('TODO zone.inSupplyLine()', this.name);
 		return false;
-		
-	consoleLog("pickRandomZone() selected " + kSpacesTable[spaceIndex]);
-	
-	return getZone(kSpacesTable[spaceIndex]);
+	}
+
+	zone.distanceToSupplyLine = function () {
+		// TODO
+		msgPush('TODO zone.distanceToSupplyLine()', this.name);
+		return 99;
+	}
 }
 
 function zoneList() {
@@ -317,15 +328,9 @@ function totalSubdued() {
 	var total = 0;
 	for (var key in game.map) {
 		var zone = game.map[key];
-		var subdued = zone.ally -
-			(zone.aedui_tribe + zone.aedui_citadel +
-			zone.arverni_tribe + zone.arverni_citadel +
-			zone.belgic_tribe + zone.belgic_citadel +
-			zone.roman_tribe + zone.germanic_tribe) -
-			zone.dispersed_gathering;
-		total += subdued;
-		consoleLog('totalSubdued()', zone.name, zone.ally, subdued);
+		total += zone.subdued();
 	}
+	consoleLog('totalSubdued()', total);
 	return total;
 }
 
