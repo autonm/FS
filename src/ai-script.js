@@ -355,6 +355,34 @@ function loadGameFromInputData() {
 				region.score = region.ally + region.citadel;
 				region.adjacent = kMapAdjacencies[key];
 
+				if (region.key == 'AED') {
+					// special case, citadel of Aedui
+					var status = 'subdued';
+					for (var p = 0; p < zone["pieces"].length; p++) {
+						var pieceName = zone["pieces"][p].name;
+						if (zone["pieces"][p]["x"] == 2519 && zone["pieces"][p]["y"] == 1588) {
+							if (pieceName == 'Aedui Ally') status = 'ally';
+							if (pieceName == 'Aedui Citadel') status = 'citadel';
+						}
+					}
+					region.aedui_special = status;
+					consoleLog('Special City Aedui:', status);
+				}
+
+				if (region.key == 'ARV') {
+					// special case, citadel of Arverni
+					var status = 'subdued';
+					for (var p = 0; p < zone["pieces"].length; p++) {
+						var pieceName = zone["pieces"][p].name;
+						if (zone["pieces"][p]["x"] == 2414 && zone["pieces"][p]["y"] == 1978) {
+							if (pieceName == 'Arverni Ally') status = 'ally';
+							if (pieceName == 'Averni Citadel') status = 'citadel';
+						}
+					}
+					region.arverni_special = status;
+					consoleLog('Special City Arverni:', status);
+				}
+
 				for (var p = 0; p < zone["pieces"].length; p++) {
 					var pieceName = zone["pieces"][p].name;
 					// Colony
@@ -589,7 +617,7 @@ function loadGameFromInputData() {
 
 function hasAnswer() {
 	var haveanswer = (typeof answer !== 'undefined') && (answer !== '');
-	consoleLog('has answer? ' + haveanswer);
+	consoleLog('Have answer? ' + haveanswer);
 	return haveanswer;
 }
 
