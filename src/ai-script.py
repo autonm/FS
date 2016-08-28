@@ -354,6 +354,9 @@ class FY(cmd.Cmd):
         self.game.arverni_leader_available = 1
         self.game.belgic_leader_available = 1
         self.game.roman_leader_available = 1
+        self.game.vercingetorix = 0  # TODO: need to load from inputdata
+        self.game.ambiorix = 0  # TODO: need to load from inputdata
+        self.game.caesar = 0  # TODO: need to load from inputdata
         for element, data in inputdata.items():
             # load capabilities
             if element == 'offboard':
