@@ -46,8 +46,8 @@ function battleCheckGaulPresence(zone) {
     // see if there is an enemy tribe / citadel / control
     var control = zone.control();
     return zone.aedui_tribe || zone.aedui_citadel || control == 'Aedui Control' ||
-        zone.arverni_tribe || zone.arverni_citadel || control == 'Arverni Control' ||
-        zone.belgic_tribe || zone.belgic_citadel || control == 'Belgic Control' ||
+        zone.arverni_tribe || zone.arverni_citadel || zone.arverni_leader || control == 'Arverni Control' ||
+        zone.belgic_tribe || zone.belgic_citadel || zone.belgic_leader || control == 'Belgic Control' ||
         zone.germanic_tribe || control == 'Germanic Control';
 }
 
@@ -124,20 +124,28 @@ function battleCheckEnemyForcesLoss(zone) {
             // battle after rampage
             aux = aux - rampageAuxilia;
             var warb = zone.belgicWarband();
-            // 13 - Balearic Slingers
-            if (capabilityActive(13, UNSHADED))
-                // 59 - Germanic Horse
-                warb -= Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+            var lead = zone.belgic_leader;
 
-            var losses = zone.belgic_leader +
-                Math.floor(warb * (zone.belgic_leader ? 1 : 0.5) * (capabilityActive(59, SHADED) ? 2.0 : 1.0));
+            // 13 - Balearic Slingers
+            if (capabilityActive(13, UNSHADED)) {
+                // 59 - Germanic Horse
+                var auxhits = Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+                warb -= auxhits;
+                if (warb < 0) {
+                    warb = 0;
+                    lead = 0;
+                }
+            }
+
+            var losses = lead +
+                Math.floor(warb * (lead && game.amiorix ? 1 : 0.5) * (capabilityActive(59, SHADED) && !zone.roman_fort ? 2.0 : 1.0));
             var finalLosses = losses;
             if (zone.roman_fort) finalLosses = Math.floor(finalLosses * 0.5);
             // 15 - Legio X
-            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
                 finalLosses = Math.max(0, finalLosses--);
-                if (capabilityActive(59, UNSHADED)) finalLosses = Math.max(0, finalLosses--);
-            }
+
+            console.log('Belgic rampage+batle finalLosses', finalLosses, 'Roman aux', aux);
             
             if (finalLosses > aux) {
                 // losses > auxilia, so remaining hits are on leader/legion
@@ -145,11 +153,61 @@ function battleCheckEnemyForcesLoss(zone) {
                 var retreatCap = zone.roman_tribe + zone.roman_fort + aux;
                 var retreatLosses = Math.floor(losses * 0.5);
                 // 15 - Legio X
-                if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+                if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
                     retreatLosses = Math.max(0, retreatLosses--);
-                    if (capabilityActive(59, UNSHADED)) retreatLosses = Math.max(0, retreatLosses--);
-                }
                 
+                if (retreatLosses <= retreatCap) {
+                    if (romanCanRetreat(zone, 'Belgic')) {
+                        return (retreatLosses > retreatCap);
+                    } else
+                        return true;
+                } else
+                    return true;
+            }
+        }
+
+        var enlist = (zone.belgicLeaderPresentOrAdjacent() && zone.germanicWarband());
+        if (enlist) {
+            // enlist + battle
+            var aux = zone.romanAuxilia();
+            // 38 - Diviciacus
+            if (hasDiviciacusPermission()) {
+                aux += zone.aeduiWarband();
+            }
+            
+            var warb = zone.belgicWarband() + zone.germanicWarband();
+            var lead = zone.belgic_leader;
+
+            // 13 - Balearic Slingers
+            if (capabilityActive(13, UNSHADED)) {
+                // 59 - Germanic Horse
+                var auxhits = Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+                warb -= auxhits;
+                if (warb < 0) {
+                    warb = 0;
+                    lead = 0;
+                }
+            }
+
+            var losses = lead +
+                    Math.floor(warb * (lead && game.ambiorix ? 1 : 0.5) * (capabilityActive(59, SHADED) && !zone.roman_fort ? 2.0 : 1.0));
+            var finalLosses = losses;
+            if (zone.roman_fort > 0) finalLosses = Math.floor(losses * 0.5);
+            // 15 - Legio X
+            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
+                finalLosses = Math.max(0, finalLosses--);
+
+            console.log('Belgic enlist+batle finalLosses', finalLosses, 'Roman aux', aux);
+
+            if (finalLosses > aux) {
+                // losses > auxilia, so remaining hits are on leader/legion
+                // check to see if retreat can help
+                var retreatCap = zone.roman_tribe + zone.roman_fort + aux;
+                var retreatLosses = Math.floor(losses * 0.5);
+                // 15 - Legio X
+                if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
+                    retreatLosses = Math.max(0, retreatLosses--);
+
                 if (retreatLosses <= retreatCap) {
                     if (romanCanRetreat(zone, 'Belgic')) {
                         return (retreatLosses > retreatCap);
@@ -172,21 +230,28 @@ function battleCheckEnemyForcesLoss(zone) {
         var canAmbush = zone.belgicLeaderPresentOrAdjacent() && (zone.belgic_warband > aux_hidden);
 
         var warb = zone.belgicWarband();
-        // 13 - Balearic Slingers
-        if (capabilityActive(13, UNSHADED))
-            // 59 - Germanic Horse
-            warb -= Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+        var lead = zone.belgic_leader;
 
-        var losses = zone.belgic_leader +
-                Math.floor(warb * (zone.belgic_leader ? 1 : 0.5) * (capabilityActive(59, SHADED) ? 2.0 : 1.0));
+        // 13 - Balearic Slingers
+        if (capabilityActive(13, UNSHADED)) {
+            // 59 - Germanic Horse
+            var auxhits = Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+            warb -= auxhits;
+            if (warb < 0) {
+                warb = 0;
+                lead = 0;
+            }
+        }
+
+        var losses = lead +
+                Math.floor(warb * (lead && game.ambiorix ? 1 : 0.5) * (capabilityActive(59, SHADED) && !zone.roman_fort ? 2.0 : 1.0));
         var finalLosses = losses;
         if (zone.roman_fort > 0) finalLosses = Math.floor(losses * 0.5);
         // 15 - Legio X
-        if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+        if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
             finalLosses = Math.max(0, finalLosses--);
-            if (capabilityActive(59, UNSHADED)) finalLosses = Math.max(0, finalLosses--);
-        }
-        console.log('Belgic finalLosses', finalLosses, 'Roman aux', aux);
+
+        console.log('Belgic ambush+battle finalLosses', finalLosses, 'Roman aux', aux);
 
         if (finalLosses > aux) {
             // losses > auxilia, so remaining hits are on leader/legion
@@ -194,10 +259,8 @@ function battleCheckEnemyForcesLoss(zone) {
             var retreatCap = zone.roman_tribe + zone.roman_fort + aux;
             var retreatLosses = Math.floor(losses * 0.5);
             // 15 - Legio X
-            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
                 retreatLosses = Math.max(0, retreatLosses--);
-                if (capabilityActive(59, UNSHADED)) retreatLosses = Math.max(0, retreatLosses--);
-            }
 
             if (!canAmbush && retreatLosses <= retreatCap) {
                 if (romanCanRetreat(zone, 'Belgic')) {
@@ -212,7 +275,7 @@ function battleCheckEnemyForcesLoss(zone) {
     // Arverni?
     if (zone.arverniForces() > 0) {
         // devastate + battle
-        var devastate = zone.control() == 'Arverni Control' && arverniLeaderPresentOrAdjacent(zone);
+        var devastate = zone.control() == 'Arverni Control' && zone.arverniLeaderPresentOrAdjacent();
         if (devastate) {
             var aux = zone.romanAuxilia();
             var romanLosses = Math.floor(aux / 3);
@@ -226,16 +289,24 @@ function battleCheckEnemyForcesLoss(zone) {
             }
 
             var warb = Math.floor(zone.arverniWarband() * 0.75);
+            var lead = zone.arverni_leader;
+
             // 13 - Balearic Slingers
-            if (capabilityActive(13, UNSHADED))
+            if (capabilityActive(13, UNSHADED)) {
                 // 59 - Germanic Horse
-                warb -= Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+                var auxhits = Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+                warb -= auxhits;
+                if (warb < 0) {
+                    warb = 0;
+                    lead = 0;
+                }
+            }
 
             // battle after devastate
             // 30 - Vercingetorix's Elite
-            if (capabilityActive(30, SHADED) && zone.arverni_leader)
+            if (capabilityActive(30, SHADED) && lead)
                 if (warb > 1) warb += 2; else if (warb > 0) warb ++;
-            var losses = zone.arverni_leader + Math.floor(warb * 0.5 * (capabilityActive(59, SHADED) ? 2.0 : 1.0));
+            var losses = lead + Math.floor(warb * 0.5 * (capabilityActive(59, SHADED) && !zone.roman_fort ? 2.0 : 1.0));
             // 26 - Massed Gallic Archers
             if (capabilityActive(26, UNSHADED))
                 losses = Math.max(0, losses--);
@@ -244,10 +315,8 @@ function battleCheckEnemyForcesLoss(zone) {
             // 26 - Massed Gallic Archers
             if (capabilityActive(26, SHADED) && warb >= 6) losses++;
             // 15 - Legio X
-            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
                 finalLosses = Math.max(0, finalLosses--);
-                if (capabilityActive(59, UNSHADED)) finalLosses = Math.max(0, finalLosses--);
-            }
 
             if (finalLosses > aux) {
                 // losses > auxilia, so remaining hits are on leader/legion
@@ -257,10 +326,8 @@ function battleCheckEnemyForcesLoss(zone) {
                 // 26 - Massed Gallic Archers
                 if (capabilityActive(26, SHADED) && warb >= 6) retreatLosses++;
                 // 15 - Legio X
-                if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+                if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
                     retreatLosses = Math.max(0, retreatLosses--);
-                    if (capabilityActive(59, UNSHADED)) retreatLosses = Math.max(0, retreatLosses--);
-                }
 
                 if (retreatLosses <= retreatCap) {
                     if (romanCanRetreat(zone, 'Arverni')) {
@@ -272,7 +339,71 @@ function battleCheckEnemyForcesLoss(zone) {
             }
         }
 
-        // battle + ambush
+        // entreat + battle
+        var entreat = zone.arverniLeaderPresentOrAdjacent() && zone.arverni_warband;
+        if (entreat) {
+            var aux = zone.romanAuxilia();
+            // 38 - Diviciacus
+            if (hasDiviciacusPermission()) aux += zone.aeduiWarband();
+            
+            var warb = zone.arverniWarband();
+            var lead = zone.arverni_leader;
+
+            // entreat
+            if (aux > 0) {
+                aux--;
+                warb++;
+            } else if (zone.aedui_warband || zone.belgic_warband || zone.germanic_warband)
+                warb++;
+
+            // 13 - Balearic Slingers
+            if (capabilityActive(13, UNSHADED)) {
+                // 59 - Germanic Horse
+                var auxhits = Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+                warb -= auxhits;
+                if (warb < 0) {
+                    warb = 0;
+                    lead = 0;
+                }
+            }
+
+            // battle after devastate
+            // 30 - Vercingetorix's Elite
+            if (capabilityActive(30, SHADED) && lead)
+                if (warb > 1) warb += 2; else if (warb > 0) warb ++;
+            var losses = lead + Math.floor(warb * 0.5 * (capabilityActive(59, SHADED) && !zone.roman_fort ? 2.0 : 1.0));
+            // 26 - Massed Gallic Archers
+            if (capabilityActive(26, UNSHADED))
+                losses = Math.max(0, losses--);
+            var finalLosses = losses;
+            if (zone.roman_fort > 0) finalLosses = Math.floor(losses * 0.5);
+            // 26 - Massed Gallic Archers
+            if (capabilityActive(26, SHADED) && warb >= 6) losses++;
+            // 15 - Legio X
+            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
+                finalLosses = Math.max(0, finalLosses--);
+
+            if (finalLosses > aux) {
+                // losses > auxilia, so remaining hits are on leader/legion
+                // check to see if retreat can help
+                var retreatCap = zone.roman_tribe + zone.roman_fort + aux;
+                var retreatLosses = Math.floor(losses * 0.5);
+                // 26 - Massed Gallic Archers
+                if (capabilityActive(26, SHADED) && warb >= 6) retreatLosses++;
+                // 15 - Legio X
+                if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
+                    retreatLosses = Math.max(0, retreatLosses--);
+
+                if (retreatLosses <= retreatCap) {
+                    if (romanCanRetreat(zone, 'Arverni')) {
+                        return (retreatLosses > retreatCap);
+                    } else
+                        return true;
+                } else
+                    return true;
+            }
+        }
+
         // ambush + battle
         var aux = zone.romanAuxilia();
         var aux_hidden = zone.roman_auxilia;
@@ -285,21 +416,27 @@ function battleCheckEnemyForcesLoss(zone) {
         var canAmbush = zone.arverniLeaderPresentOrAdjacent() && (zone.arverni_warband > aux_hidden);
         
         var warb = zone.arverniWarband();
-        // 13 - Balearic Slingers
-        if (capabilityActive(13, UNSHADED))
-            // 59 - Germanic Horse
-            warb -= Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+        var lead = zone.arverni_leader;
 
-        var losses = zone.arverni_leader + Math.floor(warb * 0.5 * (capabilityActive(59, SHADED) ? 2.0 : 1.0));
+        // 13 - Balearic Slingers
+        if (capabilityActive(13, UNSHADED)) {
+            // 59 - Germanic Horse
+            var auxhits = Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+            warb -= auxhits;
+            if (warb < 0) {
+                warb = 0;
+                lead = 0;
+            }
+        }
+
+        var losses = lead + Math.floor(warb * 0.5 * (capabilityActive(59, SHADED) && !zone.roman_fort ? 2.0 : 1.0));
         // 26 - Massed Gallic Archers
         if (capabilityActive(26, UNSHADED)) losses = Math.max(0, losses--);
         var finalLosses = losses;
         if (zone.roman_fort > 0) finalLosses = Math.floor(losses * 0.5);
         // 15 - Legio X
-        if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+        if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
             finalLosses = Math.max(0, finalLosses--);
-            if (capabilityActive(59, UNSHADED)) finalLosses = Math.max(0, finalLosses--);
-        }
 
         if (finalLosses > aux) {
             // losses > auxilia, so remaining hits are on leader/legion
@@ -307,10 +444,8 @@ function battleCheckEnemyForcesLoss(zone) {
             var retreatCap = zone.roman_tribe + zone.roman_fort + aux;
             var retreatLosses = Math.floor(losses * 0.5);
             // 15 - Legio X
-            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
                 retreatLosses = Math.max(0, retreatLosses--);
-                if (capabilityActive(59, UNSHADED)) retreatLosses = Math.max(0, retreatLosses--);
-            }
             
             if (!canAmbush && retreatLosses <= retreatCap) {
                 if (romanCanRetreat(zone, 'Arverni')) {
@@ -328,19 +463,21 @@ function battleCheckEnemyForcesLoss(zone) {
         var canAmbush = zone.aedui_warband > zone.roman_auxilia;
 
         var warb = zone.aeduiWarband();
-        // 13 - Balearic Slingers
-        if (capabilityActive(13, UNSHADED))
-            // 59 - Germanic Horse
-            warb -= Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
 
-        var losses = Math.floor(warb * 0.5 * (capabilityActive(59, SHADED) ? 2.0 : 1.0));
+        // 13 - Balearic Slingers
+        if (capabilityActive(13, UNSHADED)) {
+            // 59 - Germanic Horse
+            var auxhits = Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+            warb -= auxhits;
+            if (warb < 0) warb = 0;
+        }
+
+        var losses = Math.floor(warb * 0.5 * (capabilityActive(59, SHADED) && !zone.roman_fort ? 2.0 : 1.0));
         var finalLosses = losses;
         if (zone.roman_fort > 0) finalLosses = Math.floor(losses * 0.5);
         // 15 - Legio X
-        if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+        if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
             finalLosses = Math.max(0, finalLosses--);
-            if (capabilityActive(59, UNSHADED)) finalLosses = Math.max(0, finalLosses--);
-        }
 
         if (finalLosses > zone.romanAuxilia()) {
             // losses > auxilia, so remaining hits are on leader/legion
@@ -348,10 +485,8 @@ function battleCheckEnemyForcesLoss(zone) {
             var retreatCap = zone.roman_tribe + zone.roman_fort + zone.romanAuxilia();
             var retreatLosses = Math.floor(losses * 0.5);
             // 15 - Legio X
-            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
                 retreatLosses = Math.max(0, retreatLosses--);
-                if (capabilityActive(59, UNSHADED)) retreatLosses = Math.max(0, retreatLosses--);
-            }
 
             if (!canAmbush && retreatLosses <= retreatCap) {
                 if (romanCanRetreat(zone, 'Aedui')) {
@@ -377,19 +512,21 @@ function battleCheckEnemyForcesLoss(zone) {
         var canAmbush = zone.germanic_warband > aux_hidden;
         if (canAmbush) {
             var warb = zone.germanicWarband();
+            
             // 13 - Balearic Slingers
-            if (capabilityActive(13, UNSHADED))
+            if (capabilityActive(13, UNSHADED)) {
                 // 59 - Germanic Horse
-                warb -= Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+                var auxhits = Math.floor(aux * (capabilityActive(59, UNSHADED) ? 1.0 : 0.5));
+                warb -= auxhits;
+                if (warb < 0) warb = 0;
+            }
 
             var losses = Math.floor(warb * 0.5);
             var finalLosses = losses;
             if (zone.roman_fort > 0) finalLosses = Math.floor(losses * 0.5);
             // 15 - Legio X
-            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion) {
+            if (capabilityActive(15, UNSHADED) && zone.roman_leader && zone.roman_legion)
                 finalLosses = Math.max(0, finalLosses--);
-                if (capabilityActive(59, UNSHADED)) finalLosses = Math.max(0, finalLosses--);
-            }
             
             if (finalLosses > aux) {
                 // losses > auxilia, so remaining hits are on leader/legion
@@ -408,18 +545,22 @@ function doRomanEmergencyBattleCheck() {
 
     // condition 1: subdue?
     var zones = filterZones(zoneList(), function(zone) {
-        consoleLog('8.8.1: check for subdue in ' + zone.name + '; ' + zone.status());
-        return (zone.roman_legion || zone.roman_leader) && 
+        //consoleLog('8.8.1: check for subdue in ' + zone.name + '; ' + zone.status());
+        var subdue = (zone.roman_legion || zone.roman_leader) && 
             battleCheckGaulPresence(zone);
+        if (subdue)
+            consoleLog('8.8.1: subdue in ' + zone.name);
+        return subdue;
     });
     if (zones.length > 0) result = zones;
 
     // condition 2: threat?  
     var zones = filterZones(zoneList(), function (zone) {
-        consoleLog('8.8.1: check for threat in ' + zone.name + '; ' + zone.status());
+        //consoleLog('8.8.1: check for threat in ' + zone.name + '; ' + zone.status());
         if (!zone.roman_legion && !zone.roman_leader) return false;
         var battleForceLoss = battleCheckEnemyForcesLoss(zone);
-        consoleLog('8.8.1: threat in ' + zone.name + '? ' + battleForceLoss);
+        if (battleForceLoss)
+            consoleLog('8.8.1: threat in ' + zone.name);
         return battleForceLoss;
     });
     if (interrupt) return false;
@@ -464,7 +605,7 @@ function canRomanRecruit() {
 
     // place allies
     for (var i = 0; i < zonesAllies.length; i++) {
-        if (!activated.includes(zonesAllies[i])) {
+        if (!contains(activated, zonesAllies[i])) {
             var zone = getZone(zonesAllies[i]);
             var valid = false;
             var insupply = zone.inSupplyLine(false);
@@ -490,7 +631,7 @@ function canRomanRecruit() {
 
     // place aux - in supply
     for (var i = 0; i < zonesAuxSupply.length; i++) {
-        if (!activated.includes(zonesAllies[i])) {
+        if (!contains(activated, zonesAllies[i])) {
             var zone = getZone(zonesAllies[i]);
             var valid = false;
             var insupply = zone.inSupplyLine(false);
@@ -518,7 +659,7 @@ function canRomanRecruit() {
     zonesAuxNoSupply = sortZonesClosestToSupplyLine(zonesAuxNoSupply);
 
     for (var i = 0; i < zonesAuxSupply.length; i++) {
-        if (!activated.includes(zonesAllies[i])) {
+        if (!contains(activated, zonesAllies[i])) {
             var zone = getZone(zonesAllies[i]);
             var valid = false;
             var insupply = zone.inSupplyLine(true);
