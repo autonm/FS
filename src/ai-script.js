@@ -100,6 +100,8 @@ var kCitadelSpaces = {
 	"Sequani":     {"Aedui": true,  "Arverni": true,  "Belgic": true,  "Roman": true,  "Germanic": true}
 }
 
+var kEnlistSpaces = ["SUG", "UBI", "MOR", "NER", "TRE", "SEQ"];
+
 // card number: [ faction order + NP Instruction ]
 // factions: (Ro)man, (Ar)verni, (Ae)dui, (Be)lgic
 // NP instructions: (C)arnyx, (L)aurels, (S)words
@@ -204,6 +206,9 @@ function loadGameFromInputData() {
 	game.roman_fort_available = 0;
 	game.roman_tribe_available = 0;
 	game.roman_legion_available = 0;
+	game.vercingetorix = 0;
+	game.ambiorix = 0;
+	game.caesar = 0;
 
 	// regions
 	game.map = {
@@ -405,6 +410,8 @@ function loadGameFromInputData() {
 					// Arverni leader
 					if (pieceName == 'Vercingetorix' || pieceName == 'Averni Successor')
 						region.arverni_leader = 1;
+						if (pieceName == 'Vercingetorix')
+							game.vercingetorix = 1;
 					// count the arverni warbands
 					if (pieceName == 'Arverni Warband')
 						region.arverni_warband++;
@@ -420,6 +427,8 @@ function loadGameFromInputData() {
 					// Belgic leader
 					if (pieceName == 'Ambiorix' || pieceName == 'Belgic Successor')
 						region.belgic_leader = 1;
+						if (pieceName == 'Ambiorix')
+							game.ambiorix = 1;
 					// count the belgic warbands
 					if (pieceName == 'Belgic Warband')
 						region.belgic_warband++;
@@ -444,6 +453,8 @@ function loadGameFromInputData() {
 					// Roman leader
 					if (pieceName == 'Caesar' || pieceName == 'Roman Successor')
 						region.roman_leader = 1;
+						if (pieceName == 'Caesar')
+							game.caesar = 1;
 					// count the roman auxilia
 					if (pieceName == 'Roman Auxilia')
 						region.roman_auxilia++;
