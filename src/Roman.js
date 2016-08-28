@@ -274,6 +274,7 @@ function battleCheckEnemyForcesLoss(zone) {
 
     // Arverni?
     if (zone.arverniForces() > 0) {
+        /* redundant as Arverni control would trigger subdue condition:
         // devastate + battle
         var devastate = zone.control() == 'Arverni Control' && zone.arverniLeaderPresentOrAdjacent();
         if (devastate) {
@@ -337,7 +338,7 @@ function battleCheckEnemyForcesLoss(zone) {
                 } else
                     return true;
             }
-        }
+        }*/
 
         // entreat + battle
         var entreat = zone.arverniLeaderPresentOrAdjacent() && zone.arverni_warband;
