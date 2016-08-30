@@ -308,6 +308,12 @@ class FY(cmd.Cmd):
                         else:
                             self.do_aedui_flow_execute_event(self)
 
+                    if answer.q == 'force_loss':
+                        if answer.reply.upper() == 'YES':
+                            print "run a battle"
+                        else:
+                            self.do_aedui_flow_863(self)
+
     def parse_json(self, rest):
         global inputdata
         inputdata = json.loads(inputdata)
@@ -827,161 +833,125 @@ class FY(cmd.Cmd):
 
         if bnoevent:
             # continue with 8.6.2
-            self.do_aedui_flow_862(self)
+            if self.do_aedui_flow_862(self) is True:
+                self.do_aedui_flow_battle(self)
+            else:
+                if self.do_aedui_flow_863(self) is True:
+                    print ""
+                else:
+                    print "Rally check failed"  # aedui_flow_execute_8.6.4
+                    print ""
+
 
     def do_aedui_flow_execute_event(self, rest):
-        print "ACTION: Execute Event UNSHADED text. Check for Laurels on the Aedui icon."
+        print "ACTION: test Execute Event UNSHADED text. Check for Laurels on the Aedui icon."
 
     def do_aedui_flow_862(self, rest):
-        bFlowEnded = False
-        bAmbush = False
-        bTrade = False
 
         print ""
-        choice = self.ask_question("Aedui", QUESTION_YESNO, "force_loss", "Battle would force loss on Enemy Leader, Ally, Citadel or Legion?", None)
-        if choice == "YES":
-            self.aedui_battle()
-            reply = self.ask_question("Aedui", QUESTION_YESNO, "play_event_ambush", "Play Special Event - Ambush?", None)
-            if reply == "YES":
-                bAmbush = True
-        else:
+        reply = self.ask_question("Aedui", QUESTION_YESNO, "force_loss", "Battle would force loss on Enemy Leader, Ally, Citadel or Legion?", None)
+        if reply == "YES":
+            return True
+        elif reply == 'NO':
+            return  False
 
-            print ""
-            print "***CHECKING TO SEE IF RALLY IS POSSIBLE***"
+    def do_aedui_flow_863(self, rest):          #Rally Check
+        # TEST - following line forces the correct warband / resources for a Rally.
+        self.game.aedui_warband_available = 16
+        self.game.aedui_resources = 50
 
-            #print "TEST FOLLOWING LINE- forces aedui_warband_available = 16"
-            #self.game.aedui_warband_available = 16
+        print ""
+        print "8.6.3 - Rally Check:"
 
+        if self.game.aedui_resources > 0:
             if (20 - self.game.aedui_warband_available) < 5:
                 print ""
                 print "There are < 5 Aedui Warbands on map, there are %s on the map" % (20 - self.game.aedui_warband_available)
-                print "Aedui Resources: %s " % self.game.aedui_resources
                 print ""
                 print "Checking available Rally regions"
                 region_list = ""
 
-                if self.aedui_rally(region_list) == True:
-                    place = self.ask_question("Aedui", QUESTION_YESNO, "rally_places", "Would Rally place Citadel, Ally, 3x pieces + available resources?", None)
-                    if place == "YES":
-                        self.bRally = True
-                        region_list = ""
-                    while place == "YES":
-                        select = self.ask_question("Aedui", QUESTION_YESNO, "rally_map_counts", "Update map Rally counts?", None)
-                        if select == "NO":
-                            break
-                        else:
-                            region = self.ask_question("Aedui", QUESTION_SINGLECHOICE, "rally_location", "Where to Rally?", ';'.join(self.allRegions))
-
-                            region_list += region
-                            region_list += " "
-                            ac_count = int(raw_input("How many Aedui Citadel added to %s ? " % self.game.map[region].name))
-                            at_count = int(raw_input("How many Aedui Tribe added to %s ? " % self.game.map[region].name))
-                            aw_count = int(raw_input("How many Aedui Warband added to %s ? " % self.game.map[region].name))
-
-                            self.game.map[region].aedui_citadel += ac_count
-                            self.game.map[region].aedui_tribe += at_count
-                            self.game.map[region].aedui_warband += aw_count
-                            self.game.aedui_citadel_available -= ac_count
-                            self.game.aedui_tribe_available -= at_count
-                            self.game.aedui_warband_available -= aw_count
-                            self.game.aedui_resources -= 1
-                            print "Aedui Resources %s :" % self.game.aedui_resources
-
-                            print ""
-                            print "Checking Further Available Rally points"
-
-                            if self.aedui_rally(region_list) == False and self.game.aedui_resources == 0:
-                                break
-
+                if self.do_aedui_flow_rally(region_list) is True:
+                    return True
                 else:
-                    print "Rally Unavailable"
+                    print "Rally check failed: Citadel, Ally, or 3+ Warbands could not be placed"
+                    return False
+            else:
+                print "Rally check failed: There are > 5 Aedui Warbands on map, there are %s on the map" % (20 - self.game.aedui_warband_available)
+                return False
+        else:
+            print "Rally check failed: Resources < 1"
+            return False
+
+    def do_temp(self, rest):
+        print ""
+        print "***CHECKING TO SEE IF RAID IS POSSIBLE"
+        # print "TEST FOLLOWING LINE- forces a RAID aedui resources = 3
+        self.game.aedui_resources = 3
+
+        region_list = ""
+
+        if self.aedui_raid(region_list) == True and self.game.aedui_resources < 4:
+            place = raw_input("Would Raid gain > 2 Resources Total [Y/N]: ")
+            if place.upper() == "Y":
+                region_list = ""
+            while True and place.upper() == "Y":
+                select = raw_input("Enter MAP to update Raid - with Aedui Revealed counts or QUIT: ")
+                if select.strip().upper() == "QUIT":
+                    break
+                else:
+                    if select.upper() == "MAP":
+                        region = raw_input("Enter 3 CHAR Region Code to Raid in: ").upper()
+                        region_list += region
+                        region_list += " "
+                        aw_count = int(raw_input("How many Aedui Warband(s) are Revealed in %s ? " % self.game.map[region].name))
+
+                        # TODO: you can't just increase the number of revealed warbands without decreasing the number of non-revealed warbands
+                        # TODO: or you will end up with too many warbands there. The total number of warbands in a region is
+                        # TODO: (x_warband + x_warband_revealed).
+                        self.game.map[region].aedui_warband_revealed += aw_count
+                        self.game.map[region].aedui_warband -= aw_count  # I ADDED THIS LINE
+                        self.game.aedui_resources += aw_count
+                        print "Aedui Resources %s :" % self.game.aedui_resources
+
+                    print ""
+                    print "Checking Further Available Raid regions"
+
+                    if self.aedui_raid(region_list) == False and self.game.aedui_resources == 0:
+                        break
 
             else:
-                print "RALLY check FAILED - %s Aedui Warbands already on the map" % (20 - self.game.aedui_warband_available)
+                print ""
+                print "RAID UNAVAILABLE"
+                bTrade = False
+                print "Pass !!"
 
             print ""
-            if self.bRally:
+            if bTrade == True:
+                if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
+                    bTrade = True
+
+        else:
+            print "RAID check FAILED Aedui has > 3 Resources with %s" % self.game.aedui_resources
+            print ""
+            print "***CHECKING TO SEE IF MARCH IS POSSIBLE"
+            if self.aedui_march() == True:
+
                 if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
                     bTrade = True
             else:
-                print ""
-                print "***CHECKING TO SEE IF RAID IS POSSIBLE"
-                # print "TEST FOLLOWING LINE- forces a RAID aedui resources = 3
-                self.game.aedui_resources = 3
+                ##if none or Frost then raid
+                self.aedui_raid()  # TODO: this is highlighted as an error for missing parameter
+                if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
+                    bTrade = True
 
-                region_list = ""
 
-                if self.aedui_raid(region_list) == True and self.game.aedui_resources < 4:
-                    place = raw_input("Would Raid gain > 2 Resources Total [Y/N]: ")
-                    if place.upper() == "Y":
-                        region_list = ""
-                    while True and place.upper() == "Y":
-                        select = raw_input("Enter MAP to update Raid - with Aedui Revealed counts or QUIT: ")
-                        if select.strip().upper() == "QUIT":
-                            break
-                        else:
-                            if select.upper() == "MAP":
-                                region = raw_input("Enter 3 CHAR Region Code to Raid in: ").upper()
-                                region_list += region
-                                region_list += " "
-                                aw_count = int(raw_input("How many Aedui Warband(s) are Revealed in %s ? " % self.game.map[region].name))
-
-                                # TODO: you can't just increase the number of revealed warbands without decreasing the number of non-revealed warbands
-                                # TODO: or you will end up with too many warbands there. The total number of warbands in a region is
-                                # TODO: (x_warband + x_warband_revealed).
-                                self.game.map[region].aedui_warband_revealed += aw_count
-                                self.game.map[region].aedui_warband -= aw_count  # I ADDED THIS LINE
-                                self.game.aedui_resources += aw_count
-                                print "Aedui Resources %s :" % self.game.aedui_resources
-
-                            print ""
-                            print "Checking Further Available Raid regions"
-
-                            if self.aedui_raid(region_list) == False and self.game.aedui_resources == 0:
-                                break
-
-                    else:
-                        print ""
-                        print "RAID UNAVAILABLE"
-                        bTrade = False
-                        print "Pass !!"
-
-                    print ""
-                    if bTrade == True:
-                        if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
-                            bTrade = True
-
-                else:
-                    print "RAID check FAILED Aedui has > 3 Resources with %s" % self.game.aedui_resources
-                    print ""
-                    print "***CHECKING TO SEE IF MARCH IS POSSIBLE"
-                    if self.aedui_march() == True:
-
-                        if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
-                            bTrade = True
-                    else:
-                        ##if none or Frost then raid
-                        self.aedui_raid()  # TODO: this is highlighted as an error for missing parameter
-                        if raw_input("Play Special Event - Trade? [Y/N]").upper == "Y":
-                            bTrade = True
-
-        #if bAmbush == True:
-        #    self.aedui_ambush()
-
-        #if bTrade == True or bNoAmbush:
-        #    self.aedui_trade
-
-        #if bNoTrade:
-        #    self.aedui_Suborn
-
-    def aedui_rally(self, region_list):
-        print ""
-        print "***RALLY CHECK***"
-        print "Priority is indicated with 1-3) + Instruction"
-        print "Aedui Resources: %s " % self.game.aedui_resources
+    def do_aedui_flow_rally(self, region_list):
         print ""
 
-        bfound_rally = False
+        brallied_citadel = False
+        brallied_tribe = False
+        brallied_warband = 0
 
         for country in self.game.map:
             if self.game.map[country].devastated == 0 and region_list.find(country) == -1:
@@ -991,7 +961,7 @@ class FY(cmd.Cmd):
                         if total_citadel_placed < self.game.map[country].max_citadel:
                             if self.game.map[country].aedui_tribe > 0:
                                 print "1) - Replace Aedui Ally / Tribe with Citadel at - %s" % self.game.map[country].name
-                                bfound_rally = True
+                                brallied_citadel = True
 
                 if self.game.aedui_tribe_available > 0:
                     if self.game.map[country].max_cities > 0 and self.game.map[country].control == "Aedui Control":
@@ -999,16 +969,23 @@ class FY(cmd.Cmd):
                         total_citadel_placed = int(self.game.map[country].aedui_citadel) + int(self.game.map[country].belgic_citadel) + int(self.game.map[country].arverni_citadel)
                         if total_tribe_placed + total_citadel_placed < self.game.map[country].max_cities:
                             print "2) - Place %s Ally / Tribe at - %s" % (self.game.map[country].max_cities - total_tribe_placed + total_citadel_placed, self.game.map[country].name)
-                            bfound_rally = True
+                            brallied_tribe = True
 
                 total = int(self.game.map[country].aedui_tribe) + int(self.game.map[country].aedui_citadel)
                 if total > 0:
                     print "3) - Place up to %s Warband(s) at - %s" % (total, self.game.map[country].name)
-                    bfound_rally = True
+                    brallied_warband += total
 
         print ""
 
-        return bfound_rally
+        if brallied_citadel is True or brallied_tribe is True or brallied_warband >= 3:
+            print "INSTRUCTIONS:"
+            print "Priority is indicated with 1-3) + Instruction"
+            print "Due to Resources, limit yourself to maximum %s rally regions" % self.game.aedui_resources
+            print "Remember to reduce Aedui resources, by the number of regions rallied in"
+            return True
+        else:
+            return False
 
     def aedui_battle(self):
         bHalfLoss = False
