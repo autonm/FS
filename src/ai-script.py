@@ -857,8 +857,8 @@ class FY(cmd.Cmd):
 
     def do_aedui_flow_863(self, rest):          #Rally Check
         # TEST - following line forces the correct warband / resources for a Rally.
-        self.game.aedui_warband_available = 16
-        self.game.aedui_resources = 50
+        #self.game.aedui_warband_available = 16
+        #self.game.aedui_resources = 50
 
         print ""
         print "8.6.3 - Rally Check:"
