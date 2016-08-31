@@ -596,12 +596,8 @@ function canRomanRecruit() {
             zone.subduedTribesAvailable('Roman') > 0;
     });
     var zonesAux = filterZones(zoneList(), function (zone) {
-        console.log('filter', zone.key, zone.roman_leader, zone.roman_tribe, zone.roman_fort);
         return (zone.roman_leader || zone.roman_tribe || zone.roman_fort);
     });
-
-    console.log(zonesAllies);
-    console.log(zonesAux);
 
     // place allies
     for (var i = 0; i < zonesAllies.length; i++) {

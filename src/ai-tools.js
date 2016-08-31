@@ -367,11 +367,13 @@ function findAllSupplyPaths(zone, ask, path) {
 					result = findAllSupplyPaths(getZone(adj), ask, mypath);
 					if (result) {
 						console.log('R', 'findAllSupplyPaths(', key, ')', result);
-						paths.push(result);
-						// for (var i = 0; i < result.length; i++) {
-						// 	console.log('R', i+1, 'findAllSupplyPaths(', key, ')', result[i]);
-						// 	paths.push(result[i]);
-						// }
+						if (result[0].constructor === Array) {
+							for (var i = 0; i < result.length; i++) {
+								paths.push(result[i]);
+							}
+						} else {
+							paths.push(result);
+						}
 					}
 				}
 			}
