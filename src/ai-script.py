@@ -312,7 +312,15 @@ class FY(cmd.Cmd):
                         if answer.reply.upper() == 'YES':
                             print "run a battle"
                         else:
-                            self.do_aedui_flow_863(self)
+                            #self.do_aedui_flow_863(self)
+                            if self.do_aedui_flow_863(self) is True:
+                                print ""
+                            else:
+                                #Rally check failed
+                                if self.do_aedui_flow_864(self) is True:
+                                    print ""
+                                else:
+                                    print "Raid check failed"
 
     def parse_json(self, rest):
         global inputdata
@@ -835,13 +843,6 @@ class FY(cmd.Cmd):
             # continue with 8.6.2
             if self.do_aedui_flow_862(self) is True:
                 self.do_aedui_flow_battle(self)
-            else:
-                if self.do_aedui_flow_863(self) is True:
-                    print ""
-                else:
-                    print "Rally check failed"  # aedui_flow_execute_8.6.4
-                    print ""
-
 
     def do_aedui_flow_execute_event(self, rest):
         print "ACTION: test Execute Event UNSHADED text. Check for Laurels on the Aedui icon."
@@ -882,6 +883,51 @@ class FY(cmd.Cmd):
         else:
             print "Rally check failed: Resources < 1"
             return False
+
+    def do_aedui_flow_864(self, rest):  # Raid Check
+        # TEST - following line forces a RAID aedui resources = 3
+        self.game.aedui_resources = 3
+
+        print ""
+        print "8.6.4 - Raid Check:"
+
+        region_list = ""
+        bfound_raid = False
+
+        if self.game.aedui_resources < 4:
+            for country in self.game.map:
+                if region_list.find(country) == -1:
+                    if self.game.map[country].aedui_warband > 1 and (self.game.map[country].arverni_warband + self.game.map[country].arverni_warband_revealed) > 0:
+                        total = self.game.map[country].aedui_warband
+                        print "1) %s Aedui Warband(s) available at - %s - against Arverni" % (total, self.game.map[country].name)
+                        bfound_raid = True
+
+                    elif self.game.map[country].aedui_warband > 1 and (self.game.map[country].belgic_warband + self.game.map[country].belgic_warband_revealed) > 0:
+                        total = self.game.map[country].aedui_warband
+                        print "2) %s Aedui Warband(s) available at - %s - against Belgic" % (total, self.game.map[country].name)
+                        bfound_raid = True
+
+                    elif self.game.map[country].aedui_warband > 1 and (self.game.map[country].arverni_warband + self.game.map[country].arverni_warband_revealed) == 0 and (self.game.map[country].belgic_warband + self.game.map[country].belgic_warband_revealed) == 0:
+                        total = self.game.map[country].aedui_warband
+                        print "3) %s Aedui Warband(s) available at - %s - no faction" % (total, self.game.map[country].name)
+                        bfound_raid = True
+
+            print ""
+
+            if bfound_raid is True:
+                print "INSTRUCTIONS"
+                print "Priority is indicated with 1-3) + Instruction"
+                print " - Never Roman - never Last Hidden Warband - "
+                print ""
+                return 1
+            else:
+                print "Rally check failed: No valid regions found"
+                print "Aedui Pass !!"
+                return 2
+        else:
+            print "Rally check failed: Resources => 4"
+            return 3
+
 
     def do_temp(self, rest):
         print ""
@@ -982,7 +1028,7 @@ class FY(cmd.Cmd):
             print "INSTRUCTIONS:"
             print "Priority is indicated with 1-3) + Instruction"
             print "Due to Resources, limit yourself to maximum %s rally regions" % self.game.aedui_resources
-            print "Remember to reduce Aedui resources, by the number of regions rallied in"
+            print "Remember to reduce Aedui resources, by the number of regions Rallied in"
             return True
         else:
             return False
