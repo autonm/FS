@@ -1049,8 +1049,8 @@ class FY(cmd.Cmd):
             else:
                 print "Cost is 1 resources as origin is not Devastated"
 
-            self.game.map[lowest_from_region].aedui_warband -= 1
-            self.game.map[lowest_adj_region].aedui_warband += 1
+            self.game.map[lowest_from_region].aedui_warband -= lowest_required
+            self.game.map[lowest_adj_region].aedui_warband += lowest_required
 
     def do_aedui_flow_rally(self, region_list):
         print ""
