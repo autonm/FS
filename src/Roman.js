@@ -79,17 +79,8 @@ function romanCanRetreat(zone, attacker) {
 }
 
 function romanRetreatAsk() {
-    var options = '';
-    var multiple = false;
-    for (var f in askFactions) {
-        if (!(f in game.permissions)) {
-            if (options.length > 0) {
-                options += ';';
-                multiple = true;
-            }
-            options += capitalizeFirstLetter(f);
-        }
-    }
+    var options = getAskFactionsString();
+    var multiple = options.indexOf(';')>-1;
     if (options.length > 0)
         if (multiple) {
             askQuestion(QUESTION_MULTIPLECHOICE, "retreat_permission", "Do the following factions allow the Roman to retreat?", options);
@@ -623,7 +614,11 @@ function canRomanRecruit() {
                 activated.push(zone.name);
         }
     }
-    if (allies_placed >= 2) return true;
+    if (allies_placed >= 2) {
+        consoleLog('Can recruit in', activated);
+        consoleLog('Allies placed=', allies_placed, 'Aux placed=', aux_placed);
+        return true;
+    }
 
     // place aux - in supply first
     for (var i = 0; i < zonesAux.length; i++) {
@@ -633,23 +628,27 @@ function canRomanRecruit() {
             var insupply = zone.inSupplyLine(false);
             if (insupply) {
                 valid = true;
-                allies_placed++;
+                aux_placed += zone.roman_leader + zone.roman_tribe + zone.roman_fort + (zone.key == 'HEL' ? 1 : 0);
             } else {
-                if (resources >= 2) {
-                    valid = true;
-                    allies_placed++;
-                    if (game.aeduiNP && aedui > 8 && resources < 2) {
-                        aedui -= 2;
-                    } else {
-                        resources -= 2;
-                    }
-                }
+                // if (resources >= 2) {
+                //     valid = true;
+                //     aux_placed += zone.roman_leader + zone.roman_tribe + zone.roman_fort + (zone.key == 'HEL' ? 1 : 0);
+                //     if (game.aeduiNP && aedui > 8 && resources < 2) {
+                //         aedui -= 2;
+                //     } else {
+                //         resources -= 2;
+                //     }
+                // }
             }
             if (valid)
                 activated.push(zone.name);
         }
     }
-    if (aux_placed >= 3) return true;
+    if (aux_placed >= 3) {
+        consoleLog('Can recruit in', activated);
+        consoleLog('Allies placed=', allies_placed, 'Aux placed=', aux_placed);
+        return true;
+    }
 
     // place aux - ask for supply
     for (var i = 0; i < zonesAux.length; i++) {
@@ -658,12 +657,13 @@ function canRomanRecruit() {
             var valid = false;
             var insupply = zone.inSupplyLine(true);
             if (insupply) {
-                valid = true;
-                allies_placed++;
+                msgPush('ASSERT FAILED canRomanRecruit(): place aux in region in supply line should already be activated.');
+                // valid = true;
+                // aux_placed += zone.roman_leader + zone.roman_tribe + zone.roman_fort + (zone.key == 'HEL' ? 1 : 0);
             } else {
                 if (resources >= 2) {
                     valid = true;
-                    allies_placed++;
+                    aux_placed += zone.roman_leader + zone.roman_tribe + zone.roman_fort + (zone.key == 'HEL' ? 1 : 0);
                     if (game.aeduiNP && aedui > 8 && resources < 2) {
                         aedui -= 2;
                     } else {
@@ -676,7 +676,11 @@ function canRomanRecruit() {
         }
     }
     if (interrupt) return false;
-    if (aux_placed >= 3) return true;
+    if (aux_placed >= 3) {
+        consoleLog('Can recruit in', activated);
+        consoleLog('Allies placed=', allies_placed, 'Aux placed=', aux_placed);
+        return true;
+    }
 
     return false;
 }
@@ -786,15 +790,23 @@ function doRoman() {
             break;
         case "recruit":
             // Recruit
-            var didRecruit = canRomanRecruit();
+            var canRecruit = canRomanRecruit();
             if (interrupt) return;
-
-            msgPush('TODO outcome of canRomanRecruit() =', didRecruit);
-            game.state = '';
+            
+            if (canRecruit) {
+                game.state = 'build-recruit';
+            } else {
+                game.state = 'seize';
+            }
             break;
         case "seize":
             // Seize
             msgPush('TODO: Seize');
+            game.state = '';
+            break;
+        case 'build-recruit':
+            // Build before Recruit, or if no Build: recruit-scout
+            msgPush('TODO: Build before Recruit');
             game.state = '';
             break;
         }

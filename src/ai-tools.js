@@ -89,6 +89,19 @@ function getZone(zoneName) {
 	return false;
 }
 
+function getAskFactionsString() {
+	var options = '';
+	for (var f in askFactions) {
+		if (!(f in game.permissions)) {
+			if (options.length > 0) {
+				options += ';';
+			}
+			options += capitalizeFirstLetter(f);
+		}
+	}
+	return options;
+}
+
 function setFunctions(zone) {
 	zone = fixZoneParameter(zone);
 
@@ -282,32 +295,21 @@ function setFunctions(zone) {
 		// 3. find a valid path in the set
 		// 4. find a valid path in the set again, but ask for permission this time
 
-		console.log('zone.inSupplyLine(', this.key, ')');
 		var paths = findAllSupplyPaths(this, ask);
-		console.log('PATHS');
-		console.log(paths);
 
-		//var supplyLine = findSupplyLine(this, [], ask);
-		// TODO
-		// see if in supply, if not and not(ask) return false
-		// if not and ask find a path to supply line, ask permission if needed
-		// if no paths then return false;
-		//msgPush('TODO zone.inSupplyLine()', this.name);
-		return false;
-	}
+		// check for ask?
+		if (ask) {
+			var options = getAskFactionsString();
+			var multiple = options.indexOf(';')>-1;
+			if (options.length > 0)
+				if (multiple) {
+					askQuestion(QUESTION_MULTIPLECHOICE, "supplyline_permission", "Do the following factions allow the Roman to use supply line?", options);
+				} else {
+					askQuestion(QUESTION_YESNO, "supplyline_permission", "Does " + options + " player allow Roman to use supply line?", options);
+				}
+		}
 
-	zone.distanceToSupplyLine = function () {
-		// TARGETS: Cisalpina: 'HEL', 'SEQ', 'UBI'
-		var anyInSupply = false;
-		var zones = zoneList();
-		for (var i = 0; i < zones && !anyInSupply; i++)
-			if (getZone(zones[i]).inSupplyLine(false))
-				anyInSupply = true;
-		
-		var distance = findDistanceToSupplyLine(this, [], 99, anyInSupply);
-		consoleLog('zone.distanceToSupplyLine()', this.name, distance, anyInSupply);
-
-		return distance;
+		return paths;
 	}
 }
 
@@ -322,7 +324,6 @@ function findAllSupplyPaths(zone, ask, path) {
 	var mypath = path.slice(); 
 
 	mypath.push(key);
-	console.log('-> findAllSupplyPaths(', key, ')', mypath);
 
 	if (isTarget) {
 		return mypath;
@@ -330,7 +331,6 @@ function findAllSupplyPaths(zone, ask, path) {
 		var paths = [];
 		for (var adj in zone.adjacent) {
 			if (!contains(mypath, adj)) {
-				console.log(mypath, 'does not contain', adj);
 				var adjzone = getZone(adj);
 				var control = adjzone.control();
 				var supplyControl = false;
@@ -344,21 +344,21 @@ function findAllSupplyPaths(zone, ask, path) {
 						if ('supply_aedui' in game.permissions) {
 							supplyControl = game.permissions.supply_aedui;
 						} else if (ask) {
-							supplyControl = true; // return blocked path, to ask faction
+							askFactions.aedui = true;
 						}
 						break;
 					case 'Arverni Control':
 						if ('supply_arverni' in game.permissions) {
 							supplyControl = game.permissions.supply_arverni;
 						} else if (ask) {
-							supplyControl = true; // return blocked path, to ask faction
+							askFactions.arverni = true;
 						}
 						break;
 					case 'Belgic Control':
 						if ('supply_belgic' in game.permissions) {
 							supplyControl = game.permissions.supply_belgic;
 						} else if (ask) {
-							supplyControl = true; // return blocked path, to ask faction
+							askFactions.belgic = true;
 						}
 						break;
 				}
@@ -366,7 +366,6 @@ function findAllSupplyPaths(zone, ask, path) {
 				if (supplyControl) {
 					result = findAllSupplyPaths(getZone(adj), ask, mypath);
 					if (result) {
-						console.log('R', 'findAllSupplyPaths(', key, ')', result);
 						if (result[0].constructor === Array) {
 							for (var i = 0; i < result.length; i++) {
 								paths.push(result[i]);
@@ -378,83 +377,10 @@ function findAllSupplyPaths(zone, ask, path) {
 				}
 			}
 		}
-		console.log('<- findAllSupplyPaths(', key, ')', paths);
 		if (paths.length > 0)
 			return paths;
 		else
 			return false;
-	}
-}
-
-function findSupplyLine(zone, path, ask) {
-	// find path to a supply line, if possible
-	var targets = ['HEL', 'SEQ', 'UBI'];
-	var key = zone.key;
-	var isTarget = contains(targets, key);
-	var control = zone.control();
-	var supplyControl = false;
-	switch (control) {
-		case 'No Control':
-		case 'Roman Control':
-			supplyControl = true;
-			break;
-		case 'Aedui Control':
-			if ('supply_aedui' in game.permissions) {
-				supplyControl = game.permissions.supply_aedui;
-			} else if (ask) {
-				msgPush('TODO: Aedui permission for supply line?');
-			}
-			break;
-		case 'Arverni Control':
-			if ('supply_arverni' in game.permissions) {
-				supplyControl = game.permissions.supply_arverni;
-			} else if (ask) {
-				msgPush('TODO: Arverni permission for supply line?');
-			}
-			break;
-		case 'Belgic Control':
-			if ('supply_belgic' in game.permissions) {
-				supplyControl = game.permissions.supply_belgic;
-			} else if (ask) {
-				msgPush('TODO: Belgic permission for supply line?');
-			}
-			break;
-	}
-	if (interrupt) return false;
-
-	if (!supplyControl) return false;
-
-	var result = false;
-	for (var adj in zone.adjacent) {
-		if (!contains(path, adj)) {
-			path.push(adj);
-			result = result || findSupplyLine(getZone(adj), path, ask); 
-		}
-	}
-	return dist;
-}
-
-function findDistanceToSupplyLine(zone, path, distance, anyInSupply) {
-	var targets = ['HEL', 'SEQ', 'UBI'];
-	var key = zone.key;
-	var isTarget = contains(targets, key);
-	var inSupply = zone.inSupplyLine(false);
-	var finish = inSupply || (!anyInSupply && isTarget);
-
-	consoleLog('findDistanceToSupplyLine()', key, inSupply, isTarget, finish, distance);
-
-	if (finish) {
-		var d = path.length + 1;
-		return Math.min(d, distance);
-	} else {
-		var dist = distance;
-		for (var adj in zone.adjacent) {
-			if (!contains(path, adj)) {
-				path.push(adj);
-				dist = Math.min(dist, findDistanceToSupplyLine(getZone(adj), path, dist, anyInSupply));
-			}
-		}
-		return dist;
 	}
 }
 
