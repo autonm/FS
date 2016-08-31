@@ -595,14 +595,13 @@ function canRomanRecruit() {
         return (zone.roman_leader || zone.control() == 'Roman Control') &&
             zone.subduedTribesAvailable('Roman') > 0;
     });
-    var zonesAuxSupply = filterZones(zoneList(), function (zone) {
-        return (zone.roman_leader || zone.roman_tribe || zone.roman_fort) &&
-            zone.inSupplyLine(false);
+    var zonesAux = filterZones(zoneList(), function (zone) {
+        console.log('filter', zone.key, zone.roman_leader, zone.roman_tribe, zone.roman_fort);
+        return (zone.roman_leader || zone.roman_tribe || zone.roman_fort);
     });
-    var zonesAuxNoSupply = filterZones(zoneList(), function (zone) {
-        return (zone.roman_leader || zone.roman_tribe || zone.roman_fort) &&
-            !zone.inSupplyLine(false);
-    });
+
+    console.log(zonesAllies);
+    console.log(zonesAux);
 
     // place allies
     for (var i = 0; i < zonesAllies.length; i++) {
@@ -630,10 +629,10 @@ function canRomanRecruit() {
     }
     if (allies_placed >= 2) return true;
 
-    // place aux - in supply
-    for (var i = 0; i < zonesAuxSupply.length; i++) {
-        if (!contains(activated, zonesAllies[i])) {
-            var zone = getZone(zonesAllies[i]);
+    // place aux - in supply first
+    for (var i = 0; i < zonesAux.length; i++) {
+        if (!contains(activated, zonesAux[i])) {
+            var zone = getZone(zonesAux[i]);
             var valid = false;
             var insupply = zone.inSupplyLine(false);
             if (insupply) {
@@ -657,11 +656,9 @@ function canRomanRecruit() {
     if (aux_placed >= 3) return true;
 
     // place aux - ask for supply
-    zonesAuxNoSupply = sortZonesClosestToSupplyLine(zonesAuxNoSupply);
-
-    for (var i = 0; i < zonesAuxSupply.length; i++) {
-        if (!contains(activated, zonesAllies[i])) {
-            var zone = getZone(zonesAllies[i]);
+    for (var i = 0; i < zonesAux.length; i++) {
+        if (!contains(activated, zonesAux[i])) {
+            var zone = getZone(zonesAux[i]);
             var valid = false;
             var insupply = zone.inSupplyLine(true);
             if (insupply) {

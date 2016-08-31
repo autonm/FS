@@ -226,7 +226,7 @@ function setFunctions(zone) {
 		if (belgic > (totalPieces - belgic)) control = 'Belgic Control';
 		if (roman > (totalPieces - roman)) control = 'Roman Control';
 		if (germanic > (totalPieces - germanic)) control = 'Germanic Control';
-		consoleLog('zone.control()', this.name, control, '-', 'aedui=', aedui, 'arverni=', arverni, 'belgic=', belgic, 'roman=', roman, 'germanic=', germanic, 'total=', totalPieces);
+		//D1: consoleLog('zone.control()', this.name, control, '-', 'aedui=', aedui, 'arverni=', arverni, 'belgic=', belgic, 'roman=', roman, 'germanic=', germanic, 'total=', totalPieces);
 		return control;
 	}
 
@@ -282,6 +282,7 @@ function setFunctions(zone) {
 		// 3. find a valid path in the set
 		// 4. find a valid path in the set again, but ask for permission this time
 
+		console.log('zone.inSupplyLine(', this.key, ')');
 		var paths = findAllSupplyPaths(this, ask);
 		console.log('PATHS');
 		console.log(paths);
@@ -318,21 +319,64 @@ function findAllSupplyPaths(zone, ask, path) {
 	var control = zone.control();
 
 	path = path || [];
+	var mypath = path.slice(); 
+
+	mypath.push(key);
+	console.log('-> findAllSupplyPaths(', key, ')', mypath);
 
 	if (isTarget) {
-		path.push(key);
-		return path;
+		return mypath;
 	} else {
 		var paths = [];
 		for (var adj in zone.adjacent) {
-			if (!contains(path, adj)) {
-				path.push(adj);
-				// TODO: need to concat arrays somehow!
-				result = findAllSupplyPaths(getZone(adj), ask, path);
-				if (result)
-					paths.push(result); 
+			if (!contains(mypath, adj)) {
+				console.log(mypath, 'does not contain', adj);
+				var adjzone = getZone(adj);
+				var control = adjzone.control();
+				var supplyControl = false;
+
+				switch (control) {
+					case 'No Control':
+					case 'Roman Control':
+						supplyControl = true;
+						break;
+					case 'Aedui Control':
+						if ('supply_aedui' in game.permissions) {
+							supplyControl = game.permissions.supply_aedui;
+						} else if (ask) {
+							supplyControl = true; // return blocked path, to ask faction
+						}
+						break;
+					case 'Arverni Control':
+						if ('supply_arverni' in game.permissions) {
+							supplyControl = game.permissions.supply_arverni;
+						} else if (ask) {
+							supplyControl = true; // return blocked path, to ask faction
+						}
+						break;
+					case 'Belgic Control':
+						if ('supply_belgic' in game.permissions) {
+							supplyControl = game.permissions.supply_belgic;
+						} else if (ask) {
+							supplyControl = true; // return blocked path, to ask faction
+						}
+						break;
+				}
+
+				if (supplyControl) {
+					result = findAllSupplyPaths(getZone(adj), ask, mypath);
+					if (result) {
+						console.log('R', 'findAllSupplyPaths(', key, ')', result);
+						paths.push(result);
+						// for (var i = 0; i < result.length; i++) {
+						// 	console.log('R', i+1, 'findAllSupplyPaths(', key, ')', result[i]);
+						// 	paths.push(result[i]);
+						// }
+					}
+				}
 			}
 		}
+		console.log('<- findAllSupplyPaths(', key, ')', paths);
 		if (paths.length > 0)
 			return paths;
 		else
@@ -354,21 +398,21 @@ function findSupplyLine(zone, path, ask) {
 			break;
 		case 'Aedui Control':
 			if ('supply_aedui' in game.permissions) {
-				supplyControl = game.permissions['supply_aedui'];
+				supplyControl = game.permissions.supply_aedui;
 			} else if (ask) {
 				msgPush('TODO: Aedui permission for supply line?');
 			}
 			break;
 		case 'Arverni Control':
 			if ('supply_arverni' in game.permissions) {
-				supplyControl = game.permissions['supply_arverni'];
+				supplyControl = game.permissions.supply_arverni;
 			} else if (ask) {
 				msgPush('TODO: Arverni permission for supply line?');
 			}
 			break;
 		case 'Belgic Control':
 			if ('supply_belgic' in game.permissions) {
-				supplyControl = game.permissions['supply_belgic'];
+				supplyControl = game.permissions.supply_belgic;
 			} else if (ask) {
 				msgPush('TODO: Belgic permission for supply line?');
 			}

@@ -609,6 +609,14 @@ function loadGameFromInputData() {
 
 	game.winter_remaining = inputdata['winter'];
 
+	// set retreat permission for NP
+	if (game.belgicNP) {
+		game.permissions.belgic = false;
+	}
+	if (game.arverniNP) {
+		game.permissions.arverni = false;
+	}
+
 	/*
         # find other_most_allies
         aedui_score = 8 - self.game.aedui_tribe_available - self.game.aedui_citadel_available
