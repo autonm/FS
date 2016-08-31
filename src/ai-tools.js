@@ -283,6 +283,26 @@ function setFunctions(zone) {
 		return false;
 	}
 
+	zone.romanLeaderPresentOrAdjacent = function () {
+		// is the Roman leader/Successor in this region?
+		if (this.roman_leader) {
+			consoleLog('Roman leader present in', this.name);
+			return true;
+		}
+
+		// Roman leader adjacent works only if Caesar, not Successor
+		if (game.caesar) {
+			for (var adj in this.adjacent) {
+				var adjZone = getZone(adj);
+				if (adjZone.roman_leader) {
+					consoleLog('Roman leader adjacent to', this.name, 'in', adjZone.name);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	zone.status = function () {
 		return (zone.name + ': aedui=' + this.aedui() + ', arverni=' + this.arverni() +
 			', belgic=' + this.belgic() + ', roman=' + this.roman() + ', germanic=' +
