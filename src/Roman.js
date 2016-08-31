@@ -644,7 +644,7 @@ function canRomanRecruit() {
                 activated.push(zone.name);
         }
     }
-    if (aux_placed >= 3) {
+    if ((allies_placed + aux_placed) >= 3) {
         consoleLog('Can recruit in', activated);
         consoleLog('Allies placed=', allies_placed, 'Aux placed=', aux_placed);
         return true;
@@ -676,11 +676,36 @@ function canRomanRecruit() {
         }
     }
     if (interrupt) return false;
-    if (aux_placed >= 3) {
+    if ((allies_placed + aux_placed) >= 3) {
         consoleLog('Can recruit in', activated);
         consoleLog('Allies placed=', allies_placed, 'Aux placed=', aux_placed);
         return true;
     }
+
+    return false;
+}
+
+function doRomanBuild() {
+    msgPush('TODO: doRomanBuild()');
+
+    var result = false;
+    var activated = [];
+
+    // get valid regions
+    var zones = filterZones(zoneList(), function(zone) {
+        return (zone.roman_tribe || (zone.roman() && zone.inSupplyLine(true))) &&
+            zone.romanLeaderPresentOrAdjacent();
+    });
+    if (interrupt) return false;
+    
+    // 1: place all Forts able
+    place forts
+
+    // 2: subdue allies
+    subdue allies
+
+    // 3: place all Roman Allies able
+    place roman allies
 
     return false;
 }
@@ -799,6 +824,16 @@ function doRoman() {
                 game.state = 'seize';
             }
             break;
+        case "recruit-build":
+            // Recruit after a Build
+            msgPush('TODO: Recruit after Build');
+            game.state = '';
+            break;
+        case "recruit-scout":
+            // Recruit before a Scout (no Build)
+            msgPush('TODO: Recruit before Scout');
+            game.state = '';
+            break;
         case "seize":
             // Seize
             msgPush('TODO: Seize');
@@ -806,7 +841,17 @@ function doRoman() {
             break;
         case 'build-recruit':
             // Build before Recruit, or if no Build: recruit-scout
-            msgPush('TODO: Build before Recruit');
+            var didBuild = doRomanBuild();
+            if (interrupt) return;
+
+            if (didBuild) {
+                game.state = 'recruit-build';
+            } else {
+                game.state = 'recruit-scout';
+            }
+            break;
+        default:
+            msgPush('ASSERT FAILED doRoman(): game state is unknown \'', game.state, '\'');
             game.state = '';
             break;
         }
