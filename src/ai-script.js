@@ -604,6 +604,9 @@ function loadGameFromInputData() {
             if (zone.name == 'Legions')
                 if (pieceName == 'Roman Legion')
                     game.off_map_legions++;
+			if (zone.name == 'Fallen Legions')
+                if (pieceName == 'Roman Legion')
+                    game.off_map_legions++;
 		}
 	}
 
