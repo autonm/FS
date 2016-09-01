@@ -945,8 +945,9 @@ class FY(cmd.Cmd):
 
             if bfound_raid is True:
                 print "INSTRUCTIONS"
-                print "Priority is indicated with 1-3) + Instruction"
-                print " - Never Roman - never Last Hidden Warband - "
+                print "Priority is indicated with 1-3 + Instruction"
+                print "Reveal/Flip Warband. +1 Resource for each revealed"
+                print "Pay NO resources"
                 print ""
                 return 1
             else:
@@ -1002,7 +1003,6 @@ class FY(cmd.Cmd):
 
                     if bmarched is False:
                         break
-
 
         if bmarched is True:
             if devastated > 0:
@@ -1106,7 +1106,7 @@ class FY(cmd.Cmd):
 
         if brallied_citadel is True or brallied_tribe is True or brallied_warband >= 3:
             print "INSTRUCTIONS:"
-            print "Priority is indicated with 1-3) + Instruction"
+            print "Priority is indicated with 1-3 + Instruction"
             print "Due to Resources, limit yourself to maximum %s rally regions" % self.game.aedui_resources
             print "Remember to reduce Aedui resources, by the number of regions Rallied in"
             return True
@@ -1175,133 +1175,15 @@ class FY(cmd.Cmd):
         print "Remove in order Leaders, Allied Tribes, Citadels, Legions"
         self.do_map(self)  # TODO: there is no do_map() in this file
 
-    def aedui_raid(self, region_list):
-        print ""
-        print "***RAID CHECK***"
-        print "Priority 1) Arverni, 2) Belgic, 3) No Faction. "
-        print " - Never Roman - never Last Hidden Warband - "
-        print ""
-        print "Raid locations are as follows"
-        print ""
-
-        bfound_raid = False
-
-        for country in self.game.map:
-            if country == "MAN":
-                bfound_raid = False
-
-            if region_list.find(country) == -1:
-                if self.game.map[country].aedui_warband > 1 and (self.game.map[country].arverni_warband + self.game.map[country].arverni_warband_revealed) > 0:
-                    total = self.game.map[country].aedui_warband
-                    print "1) %s Aedui Warband(s) available at - %s - against Arverni" % (total, self.game.map[country].name)
-                    bfound_raid = True
-
-                elif self.game.map[country].aedui_warband > 1 and (self.game.map[country].belgic_warband + self.game.map[country].belgic_warband_revealed) > 0:
-                    total = self.game.map[country].aedui_warband
-                    print "2) %s Aedui Warband(s) available at - %s - against Belgic" % (total, self.game.map[country].name)
-                    bfound_raid = True
-
-                elif self.game.map[country].aedui_warband > 1 and (self.game.map[country].arverni_warband + self.game.map[country].arverni_warband_revealed) == 0 and (self.game.map[country].belgic_warband + self.game.map[country].belgic_warband_revealed) == 0:
-                    total = self.game.map[country].aedui_warband
-                    print "3) %s Aedui Warband(s) available at - %s - no faction" % (total, self.game.map[country].name)
-                    bfound_raid = True
-
-        print ""
-
-        return bfound_raid
-
-    def aedui_march(self):
-        print ""
-        print "MARCH"
-        global bNoMarch
-        ##if we are unable to march goes to Raid
-
-        bmarched = False
-
-        # Bullet Point 2
-        for country in self.game.map:
-
-            if bmarched == False:
-                high_count = 0
-                high_region = ""
-                moved = 0
-
-                # check that we are not moving last aedui warband
-                while self.game.map[country].aedui_warband > 1 and moved < 3:
-                    # need to check that moving will not change AEDUI control
-
-                    for loc in self.game.map[country].adjacent:
-                        if self.game.map[loc].aedui_warband == 0:
-                            count = self.game.map[loc].roman_tribe + self.game.map[loc].arverni_tribe + self.game.map[
-                                loc].belgic_tribe + self.game.map[loc].germanic_tribe
-                            count += self.game.map[loc].arverni_citadel + self.game.map[loc].belgic_citadel
-                            if count > 0 and count > high_count:
-                                high_region = loc
-
-                    if len(high_region) > 0:
-                        print "Move 1 Aedui Warband from %s to %s" % (country, high_region)
-                        self.game.map[country].aedui_warband -= 1
-                        self.game.map[high_region].aedui_warband += 1
-                        moved += 1
-                        bmarched = True
-
-        # Bullet Point 2
-        lowest_required = 0
-        lowest_adj_region = ""
-        lowest_from_region = ""
-
-        for country in self.game.map:
-            if self.game.map[country].aedui_warband > 1:
-                for loc in self.game.map[country].adjacent:
-                    for num in range(1, self.game.map[country].aedui_warband - 1):
-                        if self.game.map[loc].control != ("Aedui Control"):
-                            aedui_control = int(self.game.map[loc].aedui_warband) + \
-                                int(self.game.map[loc].aedui_tribe) + \
-                                int(self.game.map[loc].aedui_citadel)
-
-                            arverni_count = int(self.game.map[loc].arverni_leader) + \
-                                int(self.game.map[loc].arverni_warband) + int(self.game.map[loc].arverni_tribe) + \
-                                int(self.game.map[loc].arverni_citadel)
-
-                            belgic_count = int(self.game.map[loc].belgic_leader) + \
-                                int(self.game.map[loc].belgic_warband) + int(self.game.map[loc].belgic_tribe) + \
-                                int(self.game.map[loc].belgic_citadel)
-
-                            roman_count = int(self.game.map[loc].roman_leader) + \
-                                int(self.game.map[loc].roman_auxilia) + int(self.game.map[loc].roman_fort) + \
-                                int(self.game.map[loc].roman_legion) + int(self.game.map[loc].roman_tribe)
-
-                            germanic_count = int(self.game.map[loc].aedui_warband) + int(self.game.map[loc].aedui_tribe)
-
-                            if aedui_control + num > arverni_count + belgic_count + roman_count + germanic_count:
-                                if num < lowest_required or lowest_required == 0:
-                                    lowest_required = num
-                                    lowest_adj_region = loc
-                                    lowest_from_region = country
-                                break
-
-        if lowest_required > 0:
-            print "Move %s Aedui Warband from %s to %s" % (lowest_required, lowest_from_region, lowest_adj_region)
-            self.game.map[lowest_from_region].aedui_warband -= 1
-            self.game.map[lowest_adj_region].aedui_warband += 1
-            bmarched = True
-
-        if bmarched == True:
-            return True
-        else:
-            return False
-
     def aedui_ambush(self):
         print ""
         print "AMBUSH"
         global bNoAmbush
 
-
     def aedui_trade(self):
         print ""
         print "TRADE"
         global bNoTrade
-
 
     def aedui_suborn(self):
         print ""
