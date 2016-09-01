@@ -33,9 +33,9 @@ function reduceRomanResources(amount) {
         if (amount == 0) {
             msgPush('# Roman resources stay at', game.roman_resources);
         } else if (amount < 0) {
-            msgPush('# Reduce Roman resources by', amount, 'to', game_roman_resources);
+            msgPush('# Reduce Roman resources by', amount, 'to', game.roman_resources);
         } else {
-            msgPush('# Add Roman resources by', amount, 'to', game_roman_resources);
+            msgPush('# Add Roman resources by', amount, 'to', game.roman_resources);
         }
     } else {
         msgPush('# Reduce Roman resources by', amount, 'to', game.roman_resources);
@@ -685,11 +685,11 @@ function canRomanRecruit() {
     return false;
 }
 
-function doRomanBuild() {
-    msgPush('TODO: doRomanBuild()');
-
+function doRomanBuild(seizeActivated) {
     var result = false;
+    seizeActivated = seizeActivated || [];
     var activated = [];
+    var startresources = game.roman_resources;
 
     // get valid regions
     var zones = filterZones(zoneList(), function(zone) {
@@ -697,17 +697,88 @@ function doRomanBuild() {
             zone.romanLeaderPresentOrAdjacent();
     });
     if (interrupt) return false;
-    
-    // 1: place all Forts able
-    place forts
+
+    console.log(zones);
+
+    // 1: place all Forts able    
+    for (var i = 0; i < zones.length && game.roman_resources >= 6; i++) {
+        var zone = getZone(zones[i]);
+        if (game.roman_fort_available && 
+                (zone.aeduiWarband() > 3 || zone.arverniWarband() > 3 || zone.belgicWarband() > 3 || zone.germanicWarband() > 3)) {
+            result = true;
+            game.roman_resources -= 2;
+            zone.roman_fort++;
+            game.roman_fort_available--;
+            msgPush('# Build a Roman Fort in ' + zone.name);
+        }
+    }
 
     // 2: subdue allies
-    subdue allies
+    for (var i = 0; i < zones.length && game.roman_resources >= 6; i++) {
+        var zone = getZone(zones[i]);
+        if (!contains(seizeActivated, zone.name) && zone.control() == 'Roman Control' &&
+                (zone.aedui_tribe + zone.belgic_tribe + zone.arverni_tribe) > 0) {
+            var victory = getVictoryMargins();
+            victory.splice(arrayObjectIndexOf(victory, "Roman", "faction"), 1);
+            victory = victory.sort(function (a, b) {
+                if (a.margin == b.margin) {
+                    if (a.human == b.human) {
+                        return (d6() >= 4 ? 1 : -1);
+                    } else {
+                        return (a.human && !b.human) ? -1 : 1;
+                    }
+                } else {
+                    return b.margin - a.margin;
+                }
+            });
+            for (var j = 0; j < victory.length; j++) {
+                if ((victory[j].faction == 'Aedui' && zone.aedui_tribe) ||
+                    (victory[j].faction == 'Arverni' && zone.arverni_tribe) ||
+                    (victory[j].faction == 'Belgic' && zone.belgic_tribe)) {
+                    result = true;
+                    game.roman_resources -= 2;
+                    activated.push(zone.name);
+                    switch (victory[j].faction) {
+                        case 'Aedui':
+                            zone.aedui_tribe--;
+                            game.aedui_tribe_available++;
+                            msgPush('# Subdue an Aedui Ally in ' + zone.name);
+                            break;
+                        case 'Arverni':
+                            zone.arverni_tribe--;
+                            game.arverni_tribe_available++;
+                            msgPush('# Subdue an Arverni Ally in ' + zone.name);
+                            break;
+                        case 'Belgic':
+                            zone.belgic_tribe--;
+                            game.belgic_tribe_available++;
+                            msgPush('# Subdue a Belgic Ally in ' + zone.name);
+                            break;
+                    }
+                    break;
+                }
+            }
+        }
+    }
 
     // 3: place all Roman Allies able
-    place roman allies
+    for (var i = 0; i < zones.length && game.roman_resources >= 6; i++) {
+        var zone = getZone(zones[i]);
+        if (!contains(activated, zone.name) && game.roman_tribe_available &&
+                zone.subduedTribesAvailable('Roman')) {
+            result = true;
+            game.roman_resources -= 2;
+            activated.push(zone.name);
+            zone.roman_tribe++;
+            game.roman_tribe_available--;
+            msgPush('# Place a Roman Ally in ' + zone.name);
+        }
+    }
 
-    return false;
+    if (result)
+        msgPush('# Reduce Roman resources by', startresources - game.roman_resources, 'to', game.roman_resources);
+
+    return result;
 }
 
 function doRoman() {

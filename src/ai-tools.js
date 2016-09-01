@@ -49,6 +49,13 @@ function count(array, item) {
 	return count;
 }
 
+function arrayObjectIndexOf(myArray, searchTerm, property) {
+    for(var i = 0, len = myArray.length; i < len; i++) {
+        if (myArray[i][property] === searchTerm) return i;
+    }
+    return -1;
+}
+
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
@@ -151,6 +158,10 @@ function setFunctions(zone) {
 
 	zone.belgicWarband = function () {
 		return this.belgic_warband + this.belgic_warband_revealed;
+	}
+
+	zone.warband = function () {
+		return this.belgicWarband() + this.arverniWarband() + this.aeduiWarband();
 	}
 
 	zone.roman = function () {
@@ -477,6 +488,80 @@ function romanVictoryScore() {
 		totalDispersedGathering() + totalSubdued();
 	consoleLog('Roman Victory = ', score);
 	return score;
+}
+
+function aeduiVictoryScore() {
+	// Aedui Victory
+
+	var score = (8 - game.aedui_tribe_available - game.aedui_citadel_available);
+	consoleLog('Aedui Victory = ', score);
+	return score;
+}
+
+function arverniVictoryScoreLegions() {
+	// Arverni Victory
+
+	var score = game.off_map_legions;
+	consoleLog('Arverni Legions Victory = ', score);
+	return score;
+}
+
+function arverniVictoryScoreTribes() {
+	// Arverni Victory
+
+	var score = 13 - game.arverni_tribe_available - game.arverni_citadel_available;
+	consoleLog('Arverni Tribes Victory = ', score);
+	return score;
+}
+
+function belgicVictoryScore() {
+	// Belgic Victory
+
+	var score = 11 - game.belgic_tribe_available - game.belgic_citadel_available;
+	var zones = zoneList();
+	for (var i = 0; i < zones.length; i++) {
+		var zone = getZone(zones[i]);
+		if (zone.control() == 'Belgic Control')
+			score += zone.score;
+	}
+	consoleLog('Belgic Victory = ', score);
+	return score;
+}
+
+function mostTribesScore() {
+	// Most non-Aedui Tribes
+
+	return Math.max(
+		13 - game.arverni_tribe_available - game.arverni_citadel_available,
+		11 - game.belgic_tribe_available - game.belgic_citadel_available,
+		6 - game.germanic_tribe_available,
+		6 - game.roman_tribe_available
+	);
+}
+
+function getVictoryMargins() {
+	// victory margins for all factions
+	var victory = [];
+
+	// aedui
+	victory.push({faction: 'Aedui', margin: aeduiVictoryScore() - mostTribesScore(), human: (!game.aeduiNP)});
+
+	// arverni
+	victory.push({faction: 'Arverni', margin: Math.min(
+		arverniVictoryScoreLegions() - 6,
+		arverniVictoryScoreTribes() - 8
+	), human: (!game.arverniNP)});
+
+	// belgic
+	victory.push({faction: 'Belgic', margin: belgicVictoryScore() - 15, human: (!game.belgicNP)});
+
+	// roman
+	victory.push({faction: 'Roman', margin: romanVictoryScore() - 15, human: (!game.romanNP)});
+
+	console.log('victory:');
+	console.log(victory);
+
+	return victory;
 }
 
 function hasDiviciacusPermission() {
