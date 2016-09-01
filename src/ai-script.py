@@ -488,7 +488,7 @@ class FY(cmd.Cmd):
                         for piece in zone['pieces']:
                             if piece['name'] == 'Roman Senate':
                                 self.game.roman_senate = 3
-                    if zone['name'] == 'Legions':
+                    if zone['name'] == 'Legions' or zone['name'] == 'Fallen Legions':
                         for piece in zone['pieces']:
                             if piece['name'] == 'Roman Legion':
                                 self.game.off_map_legions += 1
