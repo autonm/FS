@@ -877,11 +877,53 @@ function doRoman() {
         case "battle":
             // Battle
             msgPush('TODO: Battle');
-            game.state = '';
+
+            var canBattle = false;
+            if (interrupt) return;
+
+            if (!canBattle) {
+                game.state = 'march';
+            } else {
+                var didBesiege = false;
+
+                if (didBesiege) {
+                    game.state = '';
+                } else { 
+                    game.state = 'scout';
+                }
+            }
             break;
         case "march":
             // March
             msgPush('TODO: March');
+            var didMarch = false;
+
+            if (didMarch) {
+                game.state = 'march-build';
+            } else {
+                game.state = 'recruit';
+            }
+            break;
+        case "marchseize-build":
+            // Build after a March or Seize
+            msgPush('TODO: Recruit after March or Seize');
+
+            var didBuild = doRomanBuild(game.seizeActivated);
+            if (interrupt) return;
+
+            if (didBuild) {
+                game.state = '';
+            } else {
+                game.state = 'scout';
+            }
+            break;
+        case "scout":
+            // Scout after a Command
+            msgPush('TODO: Scout after Command');
+
+            var didScout = false;
+            if (interrupt) return;
+
             game.state = '';
             break;
         case "recruit":
@@ -908,6 +950,12 @@ function doRoman() {
         case "seize":
             // Seize
             msgPush('TODO: Seize');
+
+            var didSeize = false;
+
+            if (!didSeize) {
+                msgPush('# Roman PASS');
+            }
             game.state = '';
             break;
         case 'build-recruit':
