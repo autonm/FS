@@ -66,6 +66,8 @@ class Game:
         self.roman_legion_available = 0
         self.roman_tribe_available = 0
 
+        self.bforcedraid = False
+
 class Region:
     app = None
     key = ""
@@ -320,13 +322,12 @@ class FY(cmd.Cmd):
                                 nraid = self.do_aedui_flow_864(self)
                                 if nraid == 1:
                                     print ""
-                                elif nraid == 2 :
+                                elif nraid == 2:
                                     print ""
                                 else:
                                     #Raid check failed so lets March
                                     if self.do_aedui_flow_865(self) is True:
                                         print ""
-
 
 
     def parse_json(self, rest):
@@ -917,12 +918,12 @@ class FY(cmd.Cmd):
         # self.game.aedui_resources = 3
 
         print ""
-        print "8.6.4 - Raid Check:"
+        print "8.6.4 - Raid Check"
 
         region_list = ""
         bfound_raid = False
 
-        if self.game.aedui_resources < 4:
+        if self.game.aedui_resources < 4 or self.game.bforcedraid is True:
             for country in self.game.map:
                 if region_list.find(country) == -1:
                     if self.game.map[country].aedui_warband > 1 and (self.game.map[country].arverni_warband + self.game.map[country].arverni_warband_revealed) > 0:
@@ -973,14 +974,14 @@ class FY(cmd.Cmd):
 
                 # check that we are not moving last aedui warband (bullet point 1)
                 while self.game.map[country].aedui_warband > 1 and moved < 3:
-                    # check that moving will not change AEDUI control
 
+                    # check that moving will not change AEDUI control
                     if self.game.map[country].control is "Aedui":
                         self.game.map[country].aedui_warband -= 1  # -1 before the check
                         if self.control_change_check(self, country) is not "Aedui":
-                            bcontrolchange = True
+                            bcontrolchange = True  # We would change control, so we have to skip this region
 
-                        self.game.map[country].aedui_warband += 1  # +1 after the check
+                        self.game.map[country].aedui_warband += 1  # +1 after the check to reset to pre-check status
 
                     if bcontrolchange is False:
                         for loc in self.game.map[country].adjacent:
@@ -999,11 +1000,16 @@ class FY(cmd.Cmd):
                             moved += 1
                             bmarched = True
 
+                    if bmarched is False:
+                        break
+
+
         if bmarched is True:
             if devastated > 0:
                 print "Cost is 2 resources as origin is Devastated"
             else:
-                print "Cost is 1 resources as origin is not Devastated"
+                print "Cost is 1 resource as origin is not Devastated"
+            print ""
 
         # Bullet Point 2
         lowest_required = 0
@@ -1047,10 +1053,24 @@ class FY(cmd.Cmd):
             if self.game.map[lowest_from_region].devastated > 0:
                 print "Cost is 2 resources as origin is Devastated"
             else:
-                print "Cost is 1 resources as origin is not Devastated"
+                print "Cost is 1 resource as origin is not Devastated"
+
+            print ""
 
             self.game.map[lowest_from_region].aedui_warband -= lowest_required
             self.game.map[lowest_adj_region].aedui_warband += lowest_required
+
+        if bmarched is False and lowest_required is 0:
+            print "March Unavailable - *Forced Raid*"
+            self.game.bforcedraid = True
+
+            nraid = self.do_aedui_flow_864(self)
+            if nraid == 1:   #Raid occured
+                print ""
+            elif nraid == 2:  #Pass was returned
+                print ""
+
+        return bmarched
 
     def do_aedui_flow_rally(self, region_list):
         print ""
