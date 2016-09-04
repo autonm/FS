@@ -308,29 +308,24 @@ class FY(cmd.Cmd):
                     self.do_aedui_flow(self)
                 else:
                     if answer.q == 'event_ineffective':
-                        if answer.reply.upper() == 'YES':
-                            self.do_aedui_flow_862(self)
-                        else:
+                        if answer.reply.upper() == 'NO':
                             self.do_aedui_flow_execute_event(self)
-
-                    if answer.q == 'force_loss':
-                        if answer.reply.upper() == 'YES':
-                            self.do_aedui_battle(self)
                         else:
-                            #self.do_aedui_flow_863(self)
-                            if self.do_aedui_flow_863(self) is True:
-                                print ""
-                            else:
-                                #Rally check failed so lets Raid
-                                nraid = self.do_aedui_flow_864(self)
-                                if nraid == 1:
-                                    print ""
-                                elif nraid == 2:
+                            if self.do_aedui_flow_862(self) is False:
+                                    # Battle would fail
+                                if self.do_aedui_flow_863(self) is True:
                                     print ""
                                 else:
-                                    #Raid check failed so lets March
-                                    if self.do_aedui_flow_865(self) is True:
+                                    # Rally check failed so lets Raid
+                                    nraid = self.do_aedui_flow_864(self)
+                                    if nraid == 1:
                                         print ""
+                                    elif nraid == 2:
+                                        print ""
+                                    else:
+                                        # Raid check failed so lets March
+                                        if self.do_aedui_flow_865(self) is True:
+                                            print ""
 
                     special_complete = False
 
@@ -930,16 +925,19 @@ class FY(cmd.Cmd):
     def do_aedui_flow_862(self, rest):
 
         print ""
-        reply = self.ask_question("Aedui", QUESTION_YESNO, "force_loss", "Battle would force loss on Enemy Leader, Ally, Citadel or Legion?", None)
-        if reply == "YES":
-            return True
-        elif reply == 'NO':
+        battled = False
+
+        if self.game.aedui_resources > 0:
+            battled = self.do_aedui_battle(self)
+            return battled
+        else:
+            print "Battle check failed: Resources < 1"
             return False
 
     def do_aedui_flow_863(self, rest):          #Rally Check
         # TEST - following line forces the correct warband / resources for a Rally.
-        #self.game.aedui_warband_available = 16
-        #self.game.aedui_resources = 50
+        # self.game.aedui_warband_available = 16
+        # self.game.aedui_resources = 50
 
         print ""
         print "8.6.3 - Rally Check:"
@@ -1010,7 +1008,7 @@ class FY(cmd.Cmd):
                 print "Aedui Pass !!"
                 return 2
         else:
-            print "Rally check failed: Resources => 4"
+            print "Raid check failed: Resources => 4"
             return 3
 
     def do_aedui_flow_865(self, rest):  # March Check
@@ -1051,7 +1049,7 @@ class FY(cmd.Cmd):
                                     high_region = loc
 
                         if len(high_region) > 0:
-                            print "Move 1 Aedui Warband from %s to %s - Adjacent Region with most Allies or Citadels" % (country, high_region)
+                            print "ACTION: Move 1 Aedui Warband from %s to %s - Adjacent Region with most Allies or Citadels" % (country, high_region)
                             self.game.map[country].aedui_warband -= 1
                             self.game.map[high_region].aedui_warband += 1
                             devastated = self.game.map[country].devastated
@@ -1109,7 +1107,7 @@ class FY(cmd.Cmd):
                                 break
 
         if lowest_required > 0:
-            print "Move %s Aedui Warband from %s to %s - Adds Aedui Control with fewest Warbands possible" % (lowest_required, lowest_from_region, lowest_adj_region)
+            print "ACTION: Move %s Aedui Warband from %s to %s - Adds Aedui Control with fewest Warbands possible" % (lowest_required, lowest_from_region, lowest_adj_region)
             if self.game.map[lowest_from_region].devastated > 0:
                 self.game.aedui_resources -= 2
                 print "ACTION: Reduce Aedui resource by 2 down to %s" % self.game.aedui_resources
@@ -1177,14 +1175,15 @@ class FY(cmd.Cmd):
 
     def do_aedui_battle(self, rest):
         print ""
-        print "3.2.4 - Battle"
+        print "8.6.2 - Battle Check:"
 
-        self.game.aedui_last_command = "BATTLE"
+        battled = False
 
         for region in self.game.map:
             if self.region_has_pieces(region, "Arverni", self) and self.region_has_pieces(region, "Aedui", self):
                 # Check if just Tribes / Citadels - need Warbands to retreat
                 if self.game.map[region].arverni_warband > 0:
+                    battled = True
                     print "Step 1 - Battle in: %s " % self.game.map[region].name
 
                     # 8.4.3 - will retreat ensure survival of last defending piece
@@ -1313,12 +1312,13 @@ class FY(cmd.Cmd):
                         # -- RETREAT path --
                         print "Retreat Path"
 
-                else:
-                    # No Battle as no Warbands
-                    return False
-            else:
-                # No Battle as no Pieces
-                print "No Battle in %s" % region
+        if battled:
+            print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
+            self.game.aedui_last_command = "BATTLE"
+        else:
+            print "Battle check failed: No valid regions"
+
+        return battled
 
     def do_aedui_ambush(self, rest):
         print ""
@@ -1338,7 +1338,7 @@ class FY(cmd.Cmd):
             # if (none and battled) OR (marched in/out of Britannia) no special ability
             #     else Suborn
 
-        print "Trade Failed"
+        print "Trade Failed as not implemented"
         return False
 
     def do_aedui_suborn(self, rest):
