@@ -6,6 +6,7 @@ import string
 import tempfile
 import itertools
 import random
+import math
 
 RELEASE = "0.25082016b"
 
@@ -314,7 +315,7 @@ class FY(cmd.Cmd):
 
                     if answer.q == 'force_loss':
                         if answer.reply.upper() == 'YES':
-                            print "run a battle"
+                            self.do_aedui_battle(self)
                         else:
                             #self.do_aedui_flow_863(self)
                             if self.do_aedui_flow_863(self) is True:
@@ -334,7 +335,6 @@ class FY(cmd.Cmd):
                     special_complete = False
 
                     if self.game.aedui_last_command is "BATTLE":
-                        print "run Ambush"
                         special_complete = self.do_aedui_ambush(self)
 
                     if self.game.aedui_last_command is "RALLY":
@@ -780,6 +780,30 @@ class FY(cmd.Cmd):
         else:
             return "No"
 
+    def region_has_pieces(self, region, side, rest):
+
+        count = 0
+
+        if side == "Aedui":
+            count = int(self.game.map[region].aedui_warband) + int(self.game.map[region].aedui_tribe) + int(self.game.map[region].aedui_citadel)
+
+        if side == "Arverni":
+            count = int(self.game.map[region].arverni_leader) + int(self.game.map[region].arverni_warband) + int(self.game.map[region].arverni_tribe) + int(self.game.map[region].arverni_citadel)
+
+        if side == "Belgic":
+            count = int(self.game.map[region].belgic_leader) + int(self.game.map[region].belgic_warband) + int(self.game.map[region].belgic_tribe) + int(self.game.map[region].belgic_citadel)
+
+        if side == "Roman":
+            count = int(self.game.map[region].roman_leader) + int(self.game.map[region].roman_auxilia) + int(self.game.map[region].roman_fort) + int(self.game.map[region].roman_legion) + int(self.game.map[region].roman_tribe)
+
+        if side == "Germanic":
+            count = int(self.game.map[region].aedui_warband) + int(self.game.map[region].aedui_tribe)
+
+        if count > 0:
+            return True
+        else:
+            return False
+
     def do_status(self, rest):
 
         print "GMT: Falling Sky; Release", RELEASE
@@ -898,7 +922,7 @@ class FY(cmd.Cmd):
         if bnoevent:
             # continue with 8.6.2
             if self.do_aedui_flow_862(self) is True:
-                self.do_aedui_flow_battle(self)
+                self.do_aedui_battle(self)
 
     def do_aedui_flow_execute_event(self, rest):
         print "ACTION: Execute Event UNSHADED text. Check for Laurels on the Aedui icon."
@@ -910,7 +934,7 @@ class FY(cmd.Cmd):
         if reply == "YES":
             return True
         elif reply == 'NO':
-            return  False
+            return False
 
     def do_aedui_flow_863(self, rest):          #Rally Check
         # TEST - following line forces the correct warband / resources for a Rally.
@@ -1151,71 +1175,150 @@ class FY(cmd.Cmd):
         else:
             return False
 
-    def aedui_battle(self):
+    def do_aedui_battle(self, rest):
+        print ""
+        print "3.2.4 - Battle"
 
         self.game.aedui_last_command = "BATTLE"
 
-        bHalfLoss = False
+        for region in self.game.map:
+            if self.region_has_pieces(region, "Arverni", self) and self.region_has_pieces(region, "Aedui", self):
+                # Check if just Tribes / Citadels - need Warbands to retreat
+                if self.game.map[region].arverni_warband > 0:
+                    print "Step 1 - Battle in: %s " % self.game.map[region].name
 
-        print ""
-        print "BATTLE"
+                    # 8.4.3 - will retreat ensure survival of last defending piece
+                    # TODO check against LAST piece count, not just warband
+                    if self.game.map[region].arverni_warband > 1:
+                        if self.game.map[region].arverni_citadel > 0:
+                            loss_multiplier = 0.5
+                        else:
+                            loss_multiplier = 1
 
-        battle_region = raw_input("Enter region code for Battle: ").upper()
-        self.game.aedui_resources -= 1  # -2 resource if region is devastated
+                        # Aedu is the attacker
+                        # Arverni is the defender
 
-        battle_defender = raw_input("Enter defender code [ARV]erni [BEL]gae [GER]manic [ROM]ans : ")
+                        # Defender is never against Caesar or Ambiorix - as they are neither Aedui
+                        a_count = self.game.map[region].aedui_warband * 0.5
+                        print "A Loss Count: %s" % a_count
 
-        if battle_defender == "ARV":
-            if self.game.map[battle_region].arverni_citadel > 0:
-                bHalfLoss = True
+                        b_count = (self.game.map[region].roman_auxilia * 0.5)
+                        print "B Loss Count: %s" % b_count
 
-        elif battle_defender == "BEL":
-            if self.game.map[battle_region].belgic_citadel > 0:
-                bHalfLoss = True
+                        a_count += b_count
+                        a_count *= loss_multiplier
+                        a_count = math.floor(a_count)
 
-        elif battle_defender == "GER":
-            bHalfLoss = False
+                        print "Step 3 - Defender Arverni takes %s loses (Calc: %s %s, rounded down)" % (a_count, "A+B *", loss_multiplier)
 
-        elif battle_defender == "ROM":
-            if self.game.map[battle_region].roman_fort > 0:
-                bHalfLoss = True
+                        while a_count > 0:
+                            print ""
 
-        # Defender is never against Caesar or Ambiorix - as they are neither Aedui
+                            if self.game.map[region].arverni_warband > 0 :
+                                print "ACTION: Remove 1 Arverni Warband from %s " % self.game.map[region].name
+                                self.game.map[region].arverni_warband -= 1
+                                self.game.arverni_warband_available += 1
+                                a_count -= 1
 
-        a_count = self.game.map[battle_region].aedui_warband * 0.5
-        a_count += self.game.map[battle_region].aedui_leader
+                            elif self.game.map[region].arverni_leader > 0 and a_count > 0:
+                                foo = [1, 2, 3, 4, 5, 6]
+                                roll = random.choice(foo)
 
-        if bHalfLoss == True:
-            a_count = a_count / 2
+                                print "Rolled %s for remove Leader: " % roll
 
-        print "Attack round - Losses for %s are %s" % (battle_defender, a_count)
-        print "Remove in order Leaders, Allied Tribes, Citadels, Legions"
-        self.do_map(self)  # TODO: there is no do_map() in this file
+                                if roll < 4:
+                                    print "ACTION: Remove 1 Arverni Leader from %s " % self.game.map[region].name
+                                    self.game.map[region].arverni_leader -= 1
+                                    self.game.arverni_leader_available += 1
+                                else:
+                                    print "Leader is not removed - roll failed."
 
-        print ""
-        print "Counterattack"
+                                a_count -= 1  # Think we reduce, as it was an opportunity missed.
 
-        a_count = 0
+                            elif self.game.map[region].arverni_tribe > 0 and a_count > 0:
+                                print "Remove 1 Arverni Tribe from %s " % self.game.map[region].name
+                                self.game.map[region].arverni_tribe -= 1
+                                self.game.arverni_tribe_available += 1
+                                a_count -= 1
 
-        if battle_defender == "ARV":
-            a_count = self.game.map[battle_region].arverni_warband * 0.5
-            a_count += self.game.map[battle_region].arverni_leader
+                            elif self.game.map[region].arverni_citadel > 0 and a_count > 0:
+                                print "Remove 1 Arverni Citadel from %s " % self.game.map[region].name
+                                self.game.map[region].arverni_citadel -= 1
+                                self.game.arverni_citadel_available += 1
+                                a_count -= 1
 
-        elif battle_defender == "BEL":
-            a_count = self.game.map[battle_region].belgic_warband * 0.5
-            a_count += self.game.map[battle_region].belgic_leader
+                        print ""
+                        print "Step 3 - Checking for Ambush"
 
-        elif battle_defender == "GER":
-            a_count = self.game.map[battle_region].germanic_warband * 0.5
+                        # TODO check if AMBUSH - do_aedui_ambush
+                        if self.do_aedui_ambush(self):
+                            print "Step 3 - Ambush !"
+                            print ""
+                        else:
+                            print ""
+                            print "Step 4 - Counterattack"
 
-        elif battle_defender == "ROM":
-            a_count = self.game.map[battle_region].roman_legion
-            a_count += self.game.map[battle_region].roman_leader
+                            # Aedu is the Defender
+                            # Arverni is the Attacker
 
-        print "Counter Attack round - Losses for Aedui are %s" % a_count
-        print "Remove in order Leaders, Allied Tribes, Citadels, Legions"
-        self.do_map(self)  # TODO: there is no do_map() in this file
+                            # Defender is never against Caesar or Ambiorix - as they are neither Aedui
+                            a_count = self.game.map[region].arverni_warband * 0.5
+                            print "A Loss Count: %s" % a_count
 
+                            b_count = self.game.map[region].arverni_leader
+                            b_count += (self.game.map[region].roman_auxilia * 0.5)
+                            print "B Loss Count: %s" % b_count
+
+                            a_count += b_count
+                            a_count = math.floor(a_count)
+
+                            print "Step 4 - Defender Aedui takes %s loses (Calc: %s, rounded down)" % (a_count, "A+B")
+
+                            while a_count > 0:
+                                print ""
+
+                                if self.game.map[region].aedui_warband > 0:
+                                    print "ACTION: Remove 1 Aedui Warband from %s " % self.game.map[region].name
+                                    self.game.map[region].aedui_warband -= 1
+                                    self.game.aedui_warband_available += 1
+                                    a_count -= 1
+
+                                elif self.game.map[region].aedui_tribe > 0 and a_count > 0:
+                                    print "Remove 1 Aedui Tribe from %s " % self.game.map[region].name
+                                    self.game.map[region].aedui_tribe -= 1
+                                    self.game.aedui_tribe_available += 1
+                                    a_count -= 1
+
+                                elif self.game.map[region].aedui_citadel > 0 and a_count > 0:
+                                    print "Remove 1 Aedui Citadel from %s " % self.game.map[region].name
+                                    self.game.map[region].aedui_citadel -= 1
+                                    self.game.aedui_citadel_available += 1
+                                    a_count -= 1
+
+                        print ""
+                        print "Step 5 - All Attacking and Defending survivors flip to Revealed"
+
+                        self.game.map[region].aedui_warband_revealed += self.game.map[region].aedui_warband
+                        self.game.map[region].aedui_warband = 0
+
+                        print "ACTION: %s should have %s Aedui Warbands Revealed and %s Aedui Warbands Hidden" % (self.game.map[region].name, self.game.map[region].aedui_warband_revealed, self.game.map[region].aedui_warband)
+
+                        self.game.map[region].arverni_warband_revealed += self.game.map[region].arverni_warband
+                        self.game.map[region].arverni_warband = 0
+
+                        print "ACTION: %s should have %s Arverni Warbands Revealed and %s Arverni Warbands Hidden" % (self.game.map[region].name, self.game.map[region].arverni_warband_revealed, self.game.map[region].arverni_warband)
+
+                    else:
+                        # Last remaining piece - so they will retreat
+                        # -- RETREAT path --
+                        print "Retreat Path"
+
+                else:
+                    # No Battle as no Warbands
+                    return False
+            else:
+                # No Battle as no Pieces
+                print "No Battle in %s" % region
 
     def do_aedui_ambush(self, rest):
         print ""
