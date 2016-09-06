@@ -800,6 +800,114 @@ function doRomanBuild(seizeActivated) {
     return result;
 }
 
+function doRomanBattle(simulation) {
+    // if simulation == true: only see if Battle occurs, return true if can Battle somewhere, return false If none
+    // if simulation == false: do a real Besiege + Battle, return true if Besiege was used
+    var didBesiege = false;
+    var activated = [];
+    var romanresources = game.roman_resources;
+
+    // find all the zones where an enemy inflicts < 1/2 the Roman hits
+    var zones = filterZones(zoneList(), function (zone) {
+        // Roman
+        var romanHits = zone.roman_leader + (zone.romanAuxilia() * 0.5) + (zone.roman_legion * (zone.leader && game.caesar ? 2 : 1));
+
+        if (romanHits == 0) return false;
+
+        var romanHits2 = Math.floor(romanHits / 2);
+        var romanHits4 = Math.floor(romanHits2 / 2);
+        romanHits = Math.floor(romanHits);
+        var aux = zone.roman_legion ? zone.romanAuxilia() : 9999; // if no Legions then can't have a loss against any
+
+        // Aedui
+        //var aeduiRetreat = !zone.aedui_citadel || zone.aeduiCanRetreat();
+        //var takeHits = (zone.aedui_citadel || aeduiRetreat ? romanHits4 : romanHits2);
+        if (zone.aeduiForces()) {
+            var takeHits = (zone.aedui_citadel ? romanHits2 : romanHits);
+            var warb = zone.aeduiWarband();
+            // if (aeduiRetreat) {
+            //     takeHits = Math.max(takeHits - zone.aedui_tribe - zone.aedui_citadel, 0);
+            // }
+            warb -= takeHits;
+            var aeduiHits = (warb < 0 ? 0 : Math.floor(warb * 0.5));
+
+            if (aeduiHits > 0 && aeduiHits <= aux && (
+                (zone.aedui_citadel && aeduiHits < romanHits4) ||
+                (aeduiHits < romanHits2))
+                ) return true;
+        }
+
+        // Arverni
+        //var arverniRetreat = !zone.arverni_citadel || zone.arverniCanRetreat();
+        //var takeHits = (zone.arverni_citadel || arverniRetreat ? romanHits4 : romanHits2);
+        if (zone.arverniForces()) {
+            var takeHits = (zone.arverni_citadel ? romanHits2 : romanHits);
+            var warb = zone.arverniWarband();
+            // if (arverniRetreat) {
+            //     takeHits = Math.max(takeHits - zone.arverni_tribe - zone.arverni_citadel, 0);
+            // }
+            warb -= takeHits;
+            var arverniHits = (warb < 0 ? 0 : Math.floor(zone.arverni_leader + (warb * 0.5)));
+
+            if (arverniHits <= aux && (
+                (zone.arverni_citadel && arverniHits < romanHits4) ||
+                (arverniHits < romanHits2))
+                ) return true;
+        }
+
+        // Belgic
+        //var belgicRetreat = !zone.belgic_citadel || zone.belgicCanRetreat();
+        //var takeHits = (zone.belgic_citadel || belgicRetreat ? romanHits4 : romanHits2);
+        if (zone.belgicForces()) {
+            var takeHits = (zone.belgic_citadel ? romanHits2 : romanHits);
+            var warb = zone.belgicWarband();
+            // if (belgicRetreat) {
+            //     takeHits = Math.max(takeHits - zone.belgic_tribe - zone.belgic_citadel, 0);
+            // }
+            warb -= takeHits;
+            var belgicHits = (warb < 0 ? 0 : Math.floor(zone.belgic_leader + (warb * 0.5)));
+
+            if (belgicHits <= aux && (
+                (zone.belgic_citadel && belgicHits < romanHits4) ||
+                (belgicHits < romanHits2))
+                ) return true;
+        }
+
+        // Germanic
+        if (zone.germanicForces()) {
+            var takeHits = romanHits;
+            var warb = zone.germanicWarband();
+            warb -= takeHits;
+            var germanicHits = (warb < 0 ? 0 : Math.floor(warb * 0.5));
+
+            if (germanicHits <= aux && germanicHits < romanHits2) return true;
+        }
+        
+        return false;
+    });
+    console.log(zones);
+
+    if (simulation) return zones.length;
+
+    // pick the Region at random
+    zones = zones.sort(function (a, b) {
+        return (d6() <= 3 ? -1 : 1);
+    });
+
+    // go through regions and attack enemies
+    for (var i = 0; i < zones.length && game.roman_resources > 1; i++) {
+        var zone = getZone(zones[i]);
+
+        // determine cost
+        var battleCost = (zone.devastated ? 4 : 2);
+        if (battleCost <= game.roman_resources) {
+            msgPush("Battle in ", zone.name);
+        }
+    }
+
+    return false;
+}
+
 function doRoman() {
     game.faction = "Roman";
 
@@ -809,7 +917,7 @@ function doRoman() {
             case "retreat_permission":
                 if (answerdata.options.indexOf(';') == -1) {
                     // single faction
-                    game.permissions[answerdata.options] = answerdata.reply.toUpperCase() == 'YES';
+                    game.permissions[answerdata.options.toLowerCase()] = answerdata.reply.toUpperCase() == 'YES';
                 } else {
                     // multiple factions
                     var factions = answerdata.options.split(';');
@@ -821,11 +929,27 @@ function doRoman() {
                             rf = rf || replies[r].toLowerCase() == faction;
                         game.permissions[faction] = rf;
                     }
-                    consoleLog(game.permissions);
                 }
                 break;
             case "diviciacus_permission":
                 game.permissions['diviciacus'] = answerdata.reply.toUpperCase() == 'YES'; 
+                break;
+            case "supplyline_permission":
+                if (answerdata.options.indexOf(';') == -1) {
+                    // single faction
+                    game.permissions["supply_" + answerdata.options.toLowerCase()] = answerdata.reply.toUpperCase() == 'YES';
+                } else {
+                    // multiple factions
+                    var factions = answerdata.options.split(';');
+                    var replies = answerdata.reply.split(';');
+                    for (var f = 0; f < factions.length; f++) {
+                        var faction = factions[f].toLowerCase();
+                        var rf = false;
+                        for (var r = 0; r < replies.length && !rf; r++)
+                            rf = rf || replies[r].toLowerCase() == faction;
+                        game.permissions["supply_" + faction] = rf;
+                    }
+                }
                 break;
         }
     }
@@ -840,7 +964,7 @@ function doRoman() {
 
             if (emergencyBattleSubdue) {
                 emergencyBattleSubdue = uniq(emergencyBattleSubdue);
-                console.log('Battle in:', emergencyBattleSubdue);
+                console.log('E-Battle in:', emergencyBattleSubdue);
 
                 game.state = 'battle';
                 game.battlecandidates = emergencyBattleSubdue;
@@ -897,17 +1021,17 @@ function doRoman() {
             // Battle
             msgPush('TODO: Battle');
 
-            var canBattle = false;
+            var canBattle = doRomanBattle(true);
             if (interrupt) return;
 
             if (!canBattle) {
                 game.state = 'march';
             } else {
-                var didBesiege = false;
+                var didBesiege = doRomanBattle(false);
 
                 if (didBesiege) {
                     game.state = '';
-                } else { 
+                } else {
                     game.state = 'scout';
                 }
             }
