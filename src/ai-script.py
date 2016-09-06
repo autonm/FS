@@ -1025,7 +1025,7 @@ class FY(cmd.Cmd):
                 print "INSTRUCTIONS"
                 print "Priority is indicated with 1-3 + Instruction"
                 print "Reveal/Flip Warband. +1 Resource for each revealed"
-                print "Pay NO resources"
+                print "Pay NO resources for this command"
                 print ""
                 print "TODO - 3.3.3 Check for non-germanic enemy, but not romans"
                 return 1
@@ -1193,7 +1193,7 @@ class FY(cmd.Cmd):
         if brallied_citadel is True or brallied_tribe is True or brallied_warband >= 3:
             print "INSTRUCTIONS:"
             print "Priority is indicated with 1-3 + Instruction"
-            print "Due to Resources, limit yourself to maximum %s rally regions" % self.game.aedui_resources
+            print "Due to Resources, limit yourself non-player to maximum %s rally regions" % self.game.aedui_resources
             print "Remember to reduce Aedui resources, by the number of regions Rallied in"
             return True
         else:
@@ -1234,7 +1234,6 @@ class FY(cmd.Cmd):
                 if arverni_losses > 0:
                     # battle
                     leader_list.append(region)
-                    print "here 1 %s " % self.game.map[region].name
 
         print "Leader list"
         print len(leader_list)
@@ -1261,33 +1260,18 @@ class FY(cmd.Cmd):
                 a_count += b_count
                 aedui_losses = math.floor(a_count)
 
-                print "%s - aedui losses %s , arverni_losses %s" % (self.game.map[region].name, aedui_losses, arverni_losses)
-
                 if aedui_losses <= arverni_losses and aedui_losses >= 1:
                     # battle location found
-                    print "leader_list %s" % leader_list
-                    print "enemy_list %s" % enemy_list
                     for item in leader_list:
-                        print "my item %s " %item
                         if enemy_list.count(item) is False:
-                            print "my item check %s" % enemy_list.count(item)
                             enemy_list.append(region)
-                            print "here 4 %s " % self.game.map[region].name
 
         random.shuffle(leader_list)
         random.shuffle(enemy_list)
 
-        print ""
-        print "Leader list"
-        print leader_list
-
-        print "Enemy list"
-        print enemy_list
-
         enemy_list.extend(leader_list)
 
-        print "Extended list"
-        print enemy_list
+        print "Extended Battle Region list (ordered): %s " % enemy_list
 
         first_battle = True
         declare_ambush = False
@@ -1298,9 +1282,6 @@ class FY(cmd.Cmd):
                 resource_needed = 2
             else:
                 resource_needed = 1
-
-            print "aedui resources %s" % self.game.aedui_resources
-            print "aedui resource_needed %s" % resource_needed
 
             if self.game.aedui_resources >= resource_needed:
 
