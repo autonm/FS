@@ -343,6 +343,14 @@ class FY(cmd.Cmd):
                     elif self.game.aedui_last_command is "MARCH":
                         special_complete = self.do_aedui_trade(self)
 
+                    if special_complete > 2:
+                        print "ACTION: Increase Aedui Resources by %s to %s" % (special_complete, self.game.aedui_resources + special_complete)
+                        self.game.aedui_resources += special_complete
+                        special_complete = True
+                    else:
+                        print "Trade Failed: Resources available to trade <= 2"
+                        special_complete = False
+
                     if special_complete is False and self.game.aedui_last_command:
                         special_complete = self.do_aedui_suborn(self)
 
@@ -934,7 +942,8 @@ class FY(cmd.Cmd):
         else:
             # can choose the event, see if the event has a Swords icon
             # ask the player if the event is effective
-            reply = self.ask_question("Aedui", QUESTION_YESNO, "event_ineffective", "Is the event Ineffective OR adds a Capability during final year?", "")
+            #reply = self.ask_question("Aedui", QUESTION_YESNO, "event_ineffective", "Is the event Ineffective OR adds a Capability during final year?", "")
+            reply = 'YES'
             if reply == 'YES':
                 bnoevent = True
             elif reply == 'NO':
@@ -942,8 +951,41 @@ class FY(cmd.Cmd):
 
         if bnoevent:
             # continue with 8.6.2
-            if self.do_aedui_flow_862(self) is True:
-                print "Battled !"
+            # if self.do_aedui_flow_862(self) is True:
+            #    print "Battled !"
+
+            #else:
+            if self.do_aedui_flow_863(self) is True:
+                print "Rally !"
+            else:
+                if self.do_aedui_flow_864(self) is True:
+                    print "Raid !"
+                else:
+                    self.do_aedui_flow_865(self)
+
+            if self.game.aedui_last_command is "BATTLE":
+                if self.game.aedui_ambush is False:
+                    special_complete = self.do_aedui_trade(self)
+
+            if self.game.aedui_last_command is "RALLY":
+                special_complete = self.do_aedui_trade(self)
+
+            elif self.game.aedui_last_command is "RAID":
+                special_complete = self.do_aedui_trade(self)
+
+            elif self.game.aedui_last_command is "MARCH":
+                special_complete = self.do_aedui_trade(self)
+
+            if special_complete > 2:
+                print "ACTION: Increase Aedui Resources by %s to %s" % (special_complete, self.game.aedui_resources + special_complete)
+                self.game.aedui_resources += special_complete
+                special_complete = True
+            else:
+                print "Trade Failed"
+                special_complete = False
+
+            if special_complete is False and self.game.aedui_last_command:
+                special_complete = self.do_aedui_suborn(self)
 
     def do_aedui_flow_execute_event(self, rest):
         print "ACTION: Execute Event UNSHADED text. Check for Laurels on the Aedui icon."
@@ -983,7 +1025,7 @@ class FY(cmd.Cmd):
                     print "Rally check failed: Citadel, Ally, or 3+ Warbands could not be placed"
                     return False
             else:
-                print "Rally check failed: There are > 5 Aedui Warbands on map, there are %s on the map" % (20 - self.game.aedui_warband_available)
+                print "Rally check failed: There are => 5 Aedui Warbands on map, there are %s on the map" % (20 - self.game.aedui_warband_available)
                 return False
         else:
             print "Rally check failed: Resources < 1"
@@ -1384,8 +1426,6 @@ class FY(cmd.Cmd):
 
                 print ""
 
-                counter_roll_needed = False
-
                 if retreat_loc:
                     print "Step 6 - Retreat - to %s" % self.game.map[retreat_loc].name
 
@@ -1493,11 +1533,12 @@ class FY(cmd.Cmd):
                     print "ACTION: %s should have %s Arverni Warbands Revealed and %s Arverni Warbands Hidden" % (self.game.map[region].name, self.game.map[region].arverni_warband_revealed, self.game.map[region].arverni_warband)
 
                     if self.game.map[region].devastated == 1:
-                        print "ACTION: Reduce Aedui resource by 2 down to %s" % self.game.aedui_resources
                         self.game.aedui_resources -= 2
+                        print "ACTION: Reduce Aedui resource by 2 down to %s" % self.game.aedui_resources
                     else:
-                        print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
                         self.game.aedui_resources -= 1
+                        print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
+
 
         if battled:
             self.game.aedui_last_command = "BATTLE"
@@ -1512,22 +1553,173 @@ class FY(cmd.Cmd):
     def do_aedui_trade(self, rest):
         print "4.4.1 - Special Activity - TRADE"
 
+        # Test - uncomment to force trade.
+        # self.game.aedui_resources = 9
+
+        checked = []
+        inc_resource = 0
+
         if self.game.aedui_resources < 10 or self.game.aedui_resources + self.game.roman_resources < 20:
 
-            print "in trade"
-            # Trade ONLY if Trade would add > 2 resources
-            # non player romans always agree
+            paths = []
+            match = False
 
-            # if (none and battled) OR (marched in/out of Britannia) no special ability
-            #     else Suborn
+            for region in self.game.map:
 
-        print "Trade Failed as not implemented"
-        return False
+                currentpath = self.do_aedui_find_all_supply_paths(region, "", [])
+                if currentpath:
+                    currentpath.sort()
+
+                    for p in paths:
+                        if currentpath == p:
+                            match = True
+
+                    if match == False:
+                        paths.append(currentpath)
+
+
+            for region in paths:
+                for loc in region:
+                    if loc not in checked:
+                        checked.append(loc)
+
+                        # we presume that romans will always agree.. TODO change this
+                        inc_resource += 2 * (self.game.map[loc].aedui_tribe + self.game.map[loc].aedui_citadel)
+
+                        if self.game.map[loc].control == "Aedui Control":
+                            inc_resource += 2 * self.game.map[loc].roman_tribe
+                            if self.game.map[loc].max_cities > (self.game.map[loc].aedui_tribe + self.game.map[loc].aedui_citadel + self.game.map[loc].arverni_tribe + self.game.map[loc].arverni_citadel + self.game.map[loc].belgic_tribe + self.game.map[loc].belgic_citadel + self.game.map[loc].germanic_tribe + self.game.map[loc].roman_fort + self.game.map[loc].roman_tribe):
+                                inc_resource += 2 * (self.game.map[loc].max_cities - (self.game.map[loc].aedui_tribe + self.game.map[loc].aedui_citadel + self.game.map[loc].arverni_tribe + self.game.map[loc].arverni_citadel + self.game.map[loc].belgic_tribe + self.game.map[loc].belgic_citadel + self.game.map[loc].germanic_tribe + self.game.map[loc].roman_fort + self.game.map[loc].roman_tribe))
+
+        return inc_resource
+
+    def do_aedui_find_all_supply_paths(self, region, ask, path):
+
+        current_path = path
+        targets = ['HEL', 'SEQ', 'UBI']
+
+        for end_target in targets:
+            if end_target == region:
+
+                control = self.game.map[region].control
+
+                if control == "No Control":
+                    supplycontrol = True
+                if control == "Roman Control":
+                    supplycontrol = True
+                if control == "Aedui Control":
+                    supplycontrol = True
+                if control == "Arverni Control":
+                    supplycontrol = False
+                if control == "Belgic Control":
+                    supplycontrol = False
+                if control == "German Control":
+                    supplycontrol = False
+
+                if supplycontrol == True:
+                    current_path.append(end_target)
+
+                return current_path
+
+        control = self.game.map[region].control
+
+        if control == "No Control":
+            supplycontrol = True
+        if control == "Roman Control":
+            supplycontrol = True
+        if control == "Aedui Control":
+            supplycontrol = True
+        if control == "Arverni Control":
+            supplycontrol = False
+        if control == "Belgic Control":
+            supplycontrol = False
+        if control == "German Control":
+            supplycontrol = False
+
+        if supplycontrol == True:
+            current_path.append(region)
+            for adj in self.game.map[region].adjacent:
+                have_checked = False
+                for check_already in current_path:
+                    if check_already == adj:
+                        have_checked = True
+                        break
+
+                if have_checked == False:
+                    result = self.do_aedui_find_all_supply_paths(adj, ask, current_path)
+
+            return current_path
+
+
+
+    def do_aedui_find_all_supply_paths2(self, region, ask, path):
+        contains = False
+        is_target = False
+        supplycontrol = False
+        control = ""
+        targets = ['HEL', 'SEQ', 'UBI']
+        key = region.key
+
+        for loc in targets:
+            if loc == key:
+                is_target = True
+
+        control = str(region.control)
+
+        if path:
+            mypath = path
+            mypath.append(key)
+        else:
+            path = []
+            mypath = []
+
+        #mypath = slice(path)
+
+
+        if is_target:
+            return mypath
+        else:
+            paths = []
+            for adj in region.adjacent:
+                for place in mypath:
+                    if place == adj:
+                        contains = True
+                        break
+                    else:
+                        contains = False
+
+                if contains == False:
+                    adjzone = self.game.map[adj]
+                    #control = str(adjzone.control)
+
+                    if control == "No Control":
+                        supplycontrol = True
+                        #break
+                    if control == "Roman Control":
+                        supplycontrol = True
+                        #break
+                    if control == "Aedui Control":
+                        supplycontrol = True
+                        #break
+                    if control == "Arverni Control":
+                        supplycontrol = False
+                        #break
+                    if control == "Belgic Control":
+                        supplycontrol = False
+                        #break
+
+                    if supplycontrol:
+                        result = self.do_aedui_find_all_supply_paths(self.game.map[adj], "", mypath)
+                        # result = findAllSupplyPaths(getZone(adj), ask, mypath);
+                        if result:
+                            print path
+                            path.append(result)
+
+
 
     def do_aedui_suborn(self, rest):
         print ""
         print "4.4.2 - Special Activity - SUBORN"
-        print "Buys allegiance to the Aedui"
         subornplayed = False
         suborncount = 0
         regions = 0
@@ -1544,9 +1736,9 @@ class FY(cmd.Cmd):
                         if self.game.aedui_tribe_available > 0 and self.game.aedui_resources > 2:
                             self.game.map[country].aedui_tribe += 1
                             self.game.aedui_tribe_available -= 1
-                            self.game.aedui_resources -= 2
+                            self.game.aedui_resources -= 1
                             print "ACTION: Place 1 Aedui Tribe / Ally from Available in %s" % self.game.map[country].name
-                            print "ACTION: Reduce Aedui resource by 2 down to %s" % self.game.aedui_resources
+                            print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
                             suborncount += 1
                             subornplayed = True
                         else:
@@ -1561,9 +1753,9 @@ class FY(cmd.Cmd):
                                     if self.game.map[country].arverni_tribe > 0:
                                         self.game.map[country].arverni_tribe -= 1
                                         self.game.arverni_tribe_available += 1
-                                        self.game.aedui_resources -= 2
+                                        self.game.aedui_resources -= 1
                                         print "ACTION: Remove 1 Averni Tribe / Ally from %s to Available" % self.game.map[country].name
-                                        print "ACTION: Reduce Aedui resource by 2 down to %s" % self.game.aedui_resources
+                                        print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
                                         suborncount += 1
                                         subornplayed = True
 
@@ -1571,9 +1763,9 @@ class FY(cmd.Cmd):
                                     if self.game.map[country].belgic_tribe > 0:
                                         self.game.map[country].belgic_tribe -= 1
                                         self.game.belgic_tribe_available += 1
-                                        self.game.aedui_resources -= 2
+                                        self.game.aedui_resources -= 1
                                         print "ACTION: Remove 1 Belgic Tribe / Ally from %s to Available" % self.game.map[country].name
-                                        print "ACTION: Reduce Aedui resource by 2 down to %s" % self.game.aedui_resources
+                                        print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
                                         suborncount += 1
                                         subornplayed = True
 
@@ -1581,9 +1773,9 @@ class FY(cmd.Cmd):
                                     if self.game.map[country].germanic_tribe > 0:
                                         self.game.map[country].germanic_tribe -= 1
                                         self.game.germanic_tribe_available += 1
-                                        self.game.aedui_resources -= 2
+                                        self.game.aedui_resources -= 1
                                         print "ACTION: Remove 1 Germanic Tribe / Ally from %s to Available" % self.game.map[country].name
-                                        print "ACTION: Reduce Aedui resource by 2 down to %s" % self.game.aedui_resources
+                                        print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
                                         suborncount += 1
                                         subornplayed = True
 
@@ -1591,9 +1783,9 @@ class FY(cmd.Cmd):
                                     if self.game.map[country].roman_tribe > 0:
                                         self.game.map[country].roman_tribe -= 1
                                         self.game.roman_tribe_available += 1
-                                        self.game.aedui_resources -= 2
+                                        self.game.aedui_resources -= 1
                                         print "ACTION: Remove 1 Roman Tribe / Ally from %s to Available" % self.game.map[country].name
-                                        print "ACTION: Reduce Aedui resource by 2 down to %s" % self.game.aedui_resources
+                                        print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
                                         suborncount += 1
                                         subornplayed = True
                             else:
@@ -1606,6 +1798,7 @@ class FY(cmd.Cmd):
                                 suborncount += 1
                                 subornplayed = True
                                 print "ACTION: Place 1 Aedui Warband from Available in %s" % self.game.map[country].name
+                                print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
 
                 if subornplayed is True:
                     break
