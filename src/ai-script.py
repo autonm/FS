@@ -802,7 +802,7 @@ class FY(cmd.Cmd):
             count = int(self.game.map[region].roman_leader) + int(self.game.map[region].roman_auxilia) + int(self.game.map[region].roman_fort) + int(self.game.map[region].roman_legion) + int(self.game.map[region].roman_tribe)
 
         if side == "Germanic":
-            count = int(self.game.map[region].aedui_warband) + int(self.game.map[region].aedui_tribe)
+            count = int(self.game.map[region].germanic_warband) + int(self.game.map[region].germanic_tribe)
 
         if count > 0:
             return True
@@ -826,7 +826,7 @@ class FY(cmd.Cmd):
             count = int(self.game.map[region].roman_leader) + int(self.game.map[region].roman_fort) + int(self.game.map[region].roman_legion) + int(self.game.map[region].roman_tribe)
 
         if side == "Germanic":
-            count = int(self.game.map[region].aedui_tribe)
+            count = int(self.game.map[region].germanic_tribe)
 
         if count > 0:
             return True
@@ -1250,68 +1250,107 @@ class FY(cmd.Cmd):
         enemy_list = []
         loss_multiplier = 0
 
-        for region in self.game.map:
-            if self.region_has_not_warbands(region, "Arverni", self) and self.region_has_pieces(region, "Aedui", self):
+        # --------------------------------
+        # Check for Aedui v Arverni battle
+        # --------------------------------
 
-                # quick loss check
-                if self.game.map[region].arverni_citadel > 0:
-                    loss_multiplier = 0.5
-                else:
-                    loss_multiplier = 1
+        faction_list = ["Arverni", "Belgic", "Roman", "Germanic"]
 
-                a_count = (self.game.map[region].aedui_warband + self.game.map[region].aedui_warband_revealed) * 0.5
-                b_count = (self.game.map[region].roman_auxilia * 0.5)
-                a_count += b_count
-                a_count *= loss_multiplier
-                arverni_losses = math.floor(a_count)
+        for faction in faction_list:
+            for region in self.game.map:
+                if self.region_has_not_warbands(region, faction, self) and self.region_has_pieces(region, "Aedui", self):
 
-                a_count = (self.game.map[region].arverni_warband + self.game.map[region].arverni_warband_revealed) * 0.5
-                b_count = self.game.map[region].arverni_leader
-                b_count += (self.game.map[region].roman_auxilia * 0.5)
-                a_count += b_count
-                aedui_losses = math.floor(a_count)
+                    # quick loss check
+                    if faction == "Arverni":
+                        if self.game.map[region].arverni_citadel > 0:
+                            loss_multiplier = 0.5
+                    elif faction == "Belgic":
+                        if self.game.map[region].belgic_citadel > 0:
+                            loss_multiplier = 0.5
+                    elif faction == "Roman":
+                        if self.game.map[region].roman_fort > 0:
+                            loss_multiplier = 0.5
 
-                print "%s - aedui losses %s , arverni_losses %s" % (self.game.map[region].name, aedui_losses, arverni_losses)
+                    if loss_multiplier == 0:
+                        loss_multiplier = 1
 
-                if arverni_losses > 0:
-                    # battle
-                    leader_list.append(region)
+                    a_count = (self.game.map[region].aedui_warband + self.game.map[region].aedui_warband_revealed) * 0.5
+                    b_count = (self.game.map[region].roman_auxilia * 0.5)
+                    a_count += b_count
+                    a_count *= loss_multiplier
+                    arverni_losses = math.floor(a_count)
 
-        print "Leader list"
-        print len(leader_list)
-        print leader_list
+                    # if faction == "Arverni":
+                        # a_count = (self.game.map[region].arverni_warband + self.game.map[region].arverni_warband_revealed) * 0.5
+                        # b_count = self.game.map[region].arverni_leader
+                    # elif faction == "Belgic":
+                        # a_count = (self.game.map[region].belgic_warband + self.game.map[region].belgic_warband_revealed) * 0.5
+                        # b_count = self.game.map[region].belgic_leader
+                    # elif faction == "Roman":
+                        # a_count = self.game.map[region].roman_legion
+                        # b_count = self.game.map[region].roman_leader
+                    # elif faction == "Germanic":
+                        # a_count = (self.game.map[region].germanic_warband + self.game.map[region].germanic_warband_revealed) * 0.5
+                        # b_count += (self.game.map[region].roman_auxilia * 0.5)
 
-        for region in self.game.map:
-            if self.region_has_pieces(region, "Arverni", self) and self.region_has_pieces(region, "Aedui", self):
+                    # a_count += b_count
+                    # aedui_losses = math.floor(a_count)
 
-                # quick loss check
-                if self.game.map[region].arverni_citadel > 0:
-                    loss_multiplier = 0.5
-                else:
-                    loss_multiplier = 1
+                    # print "%s - aedui losses %s , arverni_losses %s" % (self.game.map[region].name, aedui_losses, arverni_losses)
 
-                a_count = (self.game.map[region].aedui_warband + self.game.map[region].aedui_warband_revealed) * 0.5
-                b_count = (self.game.map[region].roman_auxilia * 0.5)
-                a_count += b_count
-                a_count *= loss_multiplier
-                arverni_losses = math.floor(a_count)
+                    if arverni_losses > 0:
+                        # battle
+                        leader_list.append(region)
 
-                a_count = (self.game.map[region].arverni_warband + self.game.map[region].aedui_warband_revealed) * 0.5
-                b_count = self.game.map[region].arverni_leader
-                b_count += (self.game.map[region].roman_auxilia * 0.5)
-                a_count += b_count
-                aedui_losses = math.floor(a_count)
+        for faction in faction_list:
+            for region in self.game.map:
+                if self.region_has_pieces(region, faction, self) and self.region_has_pieces(region, "Aedui", self):
 
-                if aedui_losses <= arverni_losses and aedui_losses >= 1:
-                    # battle location found
-                    for item in leader_list:
-                        if enemy_list.count(item) is False:
-                            enemy_list.append(region)
+                    if faction == "Arverni":
+                        if self.game.map[region].arverni_citadel > 0:
+                            loss_multiplier = 0.5
+                    elif faction == "Belgic":
+                        if self.game.map[region].belgic_citadel > 0:
+                            loss_multiplier = 0.5
+                    elif faction == "Roman":
+                        if self.game.map[region].roman_fort > 0:
+                            loss_multiplier = 0.5
+
+                    if loss_multiplier == 0:
+                        loss_multiplier = 1
+
+                    a_count = (self.game.map[region].aedui_warband + self.game.map[region].aedui_warband_revealed) * 0.5
+                    b_count = (self.game.map[region].roman_auxilia * 0.5)
+                    a_count += b_count
+                    a_count *= loss_multiplier
+                    arverni_losses = math.floor(a_count)
+
+                    if faction == "Arverni":
+                        a_count = (self.game.map[region].arverni_warband + self.game.map[region].arverni_warband_revealed) * 0.5
+                        b_count = self.game.map[region].arverni_leader
+                    elif faction == "Belgic":
+                        a_count = (self.game.map[region].belgic_warband + self.game.map[region].belgic_warband_revealed) * 0.5
+                        b_count = self.game.map[region].belgic_leader
+                    elif faction == "Roman":
+                        a_count = self.game.map[region].roman_legion
+                        b_count = self.game.map[region].roman_leader
+                    elif faction == "Germanic":
+                        a_count = (self.game.map[region].germanic_warband + self.game.map[region].germanic_warband_revealed) * 0.5
+                        b_count += (self.game.map[region].roman_auxilia * 0.5)
+
+                    a_count += b_count
+                    aedui_losses = math.floor(a_count)
+
+                    if aedui_losses <= arverni_losses and aedui_losses >= 1:
+                        # battle location found
+                        for item in leader_list:
+                            if enemy_list.count(item) is False:
+                                enemy_list.append(region)
 
         random.shuffle(leader_list)
         random.shuffle(enemy_list)
 
-        enemy_list.extend(leader_list)
+        leader_list.extend(enemy_list)
 
         print "Extended Battle Region list (ordered): %s " % enemy_list
 
@@ -1319,7 +1358,7 @@ class FY(cmd.Cmd):
         declare_ambush = False
         retreat_loc = ""
 
-        for region in enemy_list:
+        for region in leader_list:
             if self.game.map[region].devastated == 1:
                 resource_needed = 2
             else:
