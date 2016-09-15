@@ -890,9 +890,23 @@ function doRomanBattle(simulation) {
     if (simulation) return zones.length;
 
     // pick the Region at random
-    zones = zones.sort(function (a, b) {
-        return (d6() <= 3 ? -1 : 1);
-    });
+    // zones = zones.sort(function (a, b) {
+    //     return (d6() <= 3 ? -1 : 1);
+    // });
+
+    // condition 1: attack enemy leaders
+    for (var i = 0; i < zones.length && game.roman_resources > 1; i++) {
+        var zone = getZone(zones[i]);
+
+        
+        //TODO: if (zone.)
+
+        // determine cost
+        var battleCost = (zone.devastated ? 4 : 2);
+        if (battleCost <= game.roman_resources) {
+            msgPush("Battle in ", zone.name);
+        }
+    }
 
     // go through regions and attack enemies
     for (var i = 0; i < zones.length && game.roman_resources > 1; i++) {
