@@ -1,0 +1,41 @@
+{
+    "factions": ["Aedui NP", "Arverni NP", "Belgic NP", "Roman NP"],
+    "bots": [
+        {
+            "name": "Default",
+            "folder": "bot-default",
+            "actions": [
+                [
+                    "Aedui"
+                ],
+                [
+                    "Arverni"
+                ],
+                [
+                    "Belgic"
+                ],
+                [
+                    "Roman"
+                ]
+            ]
+        },
+        {
+            "name": "Save Input",
+            "folder": "bot-saveraw",
+            "actions": [
+                [
+                    "Aedui"
+                ],
+                [
+                    "Arverni"
+                ],
+                [
+                    "Belgic"
+                ],
+                [
+                    "Roman"
+                ]
+            ]
+        }
+    ]
+}
