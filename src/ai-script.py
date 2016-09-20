@@ -914,6 +914,7 @@ class FY(cmd.Cmd):
 
         print ""
         print "Bot Activated: Aedui"
+        print "** GOLDEN RULE ** - 'If you know better, update Vassal as you require'"
 
         # 8.6.1 Is Aedui symbol 1st on the next card AND != 1st on current?
 
@@ -951,17 +952,17 @@ class FY(cmd.Cmd):
 
         if bnoevent:
             # continue with 8.6.2
-            # if self.do_aedui_flow_862(self) is True:
-            #    print "Battled !"
+            if self.do_aedui_flow_862(self) is True:
+                print "Battled !"
 
-            #else:
-            if self.do_aedui_flow_863(self) is True:
-                print "Rally !"
             else:
-                if self.do_aedui_flow_864(self) is True:
-                    print "Raid !"
+                if self.do_aedui_flow_863(self) is True:
+                    print "Rally !"
                 else:
-                    self.do_aedui_flow_865(self)
+                    if self.do_aedui_flow_864(self) is True:
+                        print "Raid !"
+                    else:
+                        self.do_aedui_flow_865(self)
 
             if self.game.aedui_last_command is "BATTLE":
                 if self.game.aedui_ambush is False:
@@ -1064,7 +1065,7 @@ class FY(cmd.Cmd):
             print ""
 
             if bfound_raid is True:
-                print "INSTRUCTIONS"
+                print "INSTRUCTIONS  ** Further automation to come !! **"
                 print "Priority is indicated with 1-3 + Instruction"
                 print "Reveal/Flip Warband. +1 Resource for each revealed"
                 print "Pay NO resources for this command"
@@ -1233,7 +1234,7 @@ class FY(cmd.Cmd):
         print ""
 
         if brallied_citadel is True or brallied_tribe is True or brallied_warband >= 3:
-            print "INSTRUCTIONS:"
+            print "INSTRUCTIONS:  *** Automation to be further improved ***"
             print "Priority is indicated with 1-3 + Instruction"
             print "Due to Resources, limit yourself non-player to maximum %s rally regions" % self.game.aedui_resources
             print "Remember to reduce Aedui resources, by the number of regions Rallied in"
@@ -1300,7 +1301,9 @@ class FY(cmd.Cmd):
 
                     if arverni_losses > 0:
                         # battle
-                        leader_list.append(region)
+                        #leader_list.append(region)
+                        loc = "%s,%s" % (region, faction)
+                        leader_list.append(loc)
 
         for faction in faction_list:
             for region in self.game.map:
@@ -1311,6 +1314,9 @@ class FY(cmd.Cmd):
                             loss_multiplier = 0.5
                     elif faction == "Belgic":
                         if self.game.map[region].belgic_citadel > 0:
+                            loss_multiplier = 0.5
+                    elif faction == "Germanic":
+                        if self.game.map[region].germanic_citadel > 0:
                             loss_multiplier = 0.5
                     elif faction == "Roman":
                         if self.game.map[region].roman_fort > 0:
@@ -1345,20 +1351,26 @@ class FY(cmd.Cmd):
                         # battle location found
                         for item in leader_list:
                             if enemy_list.count(item) is False:
-                                enemy_list.append(region)
+                                loc = "%s,%s" % (region, faction)
+                                enemy_list.append(loc)
 
         random.shuffle(leader_list)
         random.shuffle(enemy_list)
 
         leader_list.extend(enemy_list)
 
-        print "Extended Battle Region list (ordered): %s " % enemy_list
+        print "Extended Battle Region list (ordered): %s " % leader_list
 
         first_battle = True
         declare_ambush = False
         retreat_loc = ""
 
-        for region in leader_list:
+        for battles in leader_list:
+
+            opts = battles.split(',')
+            region = opts[0]
+            faction = opts[1]
+
             if self.game.map[region].devastated == 1:
                 resource_needed = 2
             else:
@@ -1369,7 +1381,7 @@ class FY(cmd.Cmd):
                 # Check if just Tribes / Citadels - need Warbands to retreat
                 battled = True
                 print "Step 1 - Battle in: %s " % self.game.map[region].name
-                print "Step 1 - Target is Arverni"
+                print "Step 1 - Target is %s" % faction
 
                 if declare_ambush is False:
                     print "Step 2 - Declare (Check) Retreat"
@@ -1377,12 +1389,25 @@ class FY(cmd.Cmd):
                     # if Defender is Germanic - then never a retreat
                     # if only has tribe, citadel, for - then never a retreat
                     # must have warbands to attempt a retreat
-                    if (self.game.map[region].arverni_warband + self.game.map[region].aedui_warband_revealed) == 1:
-                        for loc in self.game.map[region].adjacent:
-                            if self.game.map[loc].control == "Arverni":
-                                retreat_loc == loc
 
-                    if retreat_loc:  # chance to Ambush
+                    if faction is "Arverni":
+                        if (self.game.map[region].arverni_warband + self.game.map[region].arverni_warband_revealed) == 1:
+                            for loc in self.game.map[region].adjacent:
+                                if self.game.map[loc].control != "Germanic":
+                                    retreat_loc == loc
+                    elif faction is "Belgic":
+                        if (self.game.map[region].belgic_warband + self.game.map[region].belgic_warband_revealed) == 1:
+                            for loc in self.game.map[region].adjacent:
+                                if self.game.map[loc].control != "Germanic":
+                                    retreat_loc == loc
+                    elif faction is "Roman":
+                        if (self.game.map[region].roman_auxilia + self.game.map[region].roman_auxilia_revealed) == 1:
+                            for loc in self.game.map[region].adjacent:
+                                if self.game.map[loc].control != "Germanic":
+                                    retreat_loc == loc
+
+                    print "up to here with converting to each faction type"
+                    if len(retreat_loc) > 0:  # chance to Ambush
                         if self.game.map[region].aedui_warband > self.game.map[region].arverni_warband:
 
                             # TODO 8.6.2 AMBUSH. Only if Arverni Retreat would lessen removals
@@ -1578,7 +1603,6 @@ class FY(cmd.Cmd):
                         self.game.aedui_resources -= 1
                         print "ACTION: Reduce Aedui resource by 1 down to %s" % self.game.aedui_resources
 
-
         if battled:
             self.game.aedui_last_command = "BATTLE"
             self.game.aedui_ambush = declare_ambush
@@ -1636,6 +1660,7 @@ class FY(cmd.Cmd):
 
         current_path = path
         targets = ['HEL', 'SEQ', 'UBI']
+        supplycontrol = False
 
         for end_target in targets:
             if end_target == region:
@@ -1655,7 +1680,7 @@ class FY(cmd.Cmd):
                 if control == "German Control":
                     supplycontrol = False
 
-                if supplycontrol == True:
+                if supplycontrol is True:
                     current_path.append(end_target)
 
                 return current_path
@@ -1675,7 +1700,7 @@ class FY(cmd.Cmd):
         if control == "German Control":
             supplycontrol = False
 
-        if supplycontrol == True:
+        if supplycontrol is True:
             current_path.append(region)
             for adj in self.game.map[region].adjacent:
                 have_checked = False
@@ -1688,73 +1713,6 @@ class FY(cmd.Cmd):
                     result = self.do_aedui_find_all_supply_paths(adj, ask, current_path)
 
             return current_path
-
-
-
-    def do_aedui_find_all_supply_paths2(self, region, ask, path):
-        contains = False
-        is_target = False
-        supplycontrol = False
-        control = ""
-        targets = ['HEL', 'SEQ', 'UBI']
-        key = region.key
-
-        for loc in targets:
-            if loc == key:
-                is_target = True
-
-        control = str(region.control)
-
-        if path:
-            mypath = path
-            mypath.append(key)
-        else:
-            path = []
-            mypath = []
-
-        #mypath = slice(path)
-
-
-        if is_target:
-            return mypath
-        else:
-            paths = []
-            for adj in region.adjacent:
-                for place in mypath:
-                    if place == adj:
-                        contains = True
-                        break
-                    else:
-                        contains = False
-
-                if contains == False:
-                    adjzone = self.game.map[adj]
-                    #control = str(adjzone.control)
-
-                    if control == "No Control":
-                        supplycontrol = True
-                        #break
-                    if control == "Roman Control":
-                        supplycontrol = True
-                        #break
-                    if control == "Aedui Control":
-                        supplycontrol = True
-                        #break
-                    if control == "Arverni Control":
-                        supplycontrol = False
-                        #break
-                    if control == "Belgic Control":
-                        supplycontrol = False
-                        #break
-
-                    if supplycontrol:
-                        result = self.do_aedui_find_all_supply_paths(self.game.map[adj], "", mypath)
-                        # result = findAllSupplyPaths(getZone(adj), ask, mypath);
-                        if result:
-                            print path
-                            path.append(result)
-
-
 
     def do_aedui_suborn(self, rest):
         print ""
